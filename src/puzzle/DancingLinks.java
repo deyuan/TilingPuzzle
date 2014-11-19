@@ -16,17 +16,20 @@ import util.Tile;
 public class DancingLinks {
 
 	private static char S = ' '; 		//tile splitter
-	private static boolean verb = true;	//debug information
-	private static int numTiles = 0;
-	private static int numCells = 0;
-	private static int numColumns = 0;
-	private static int numRows = 0;
+	private boolean verb = true;	//debug information
+	private int numTiles = 0;
+	private int numCells = 0;
+	private int numColumns = 0;
+	private int numRows = 0;
 
 	private int[][] boardIdx = null;	//the index of each board cells
 	private int[][] ECA = null;			//the exact cover array
+	private String[] rowName = null;	//for outputting solution
 	private Y[] CHA = null;				//the array of column head
 	private X[][] DLA = null;			//the exact cover cell objects
-	private static Y H = null;			//the head of dancing links
+	private Y H = null;					//the head of dancing links
+	private List<X> O = null;			//the searching trail
+	private int cntSolution = 0;		//count the number of solutions
 
 	/**
 	 * Data object X.
@@ -38,6 +41,8 @@ public class DancingLinks {
 		X U;
 		X D;
 		Y C;
+		int row;
+		int col;
 	}
 
 	/**
@@ -47,9 +52,6 @@ public class DancingLinks {
 	private class Y extends X {
 		Y L;
 		Y R;
-		X U;
-		X D;
-		Y C;
 		int S;
 		String N;
 	}
@@ -77,6 +79,66 @@ public class DancingLinks {
 		DLA = new X[numRows][numColumns];
 		CHA = new Y[numColumns];
 		H = buildDancingLinks();
+		O = new ArrayList<X>();
+
+		verifyDancingLinks();
+	}
+
+	/**
+	 * Verify Dancing Links.
+	 */
+	private void verifyDancingLinks() {
+		if (verb) {
+			int cnt1, cnt2, total = 0;
+
+			System.out.println();
+			System.out.println("Verifying Dancing Links:");
+
+			System.out.print("Column Size: ");
+			for (Y i = H.R; i != H; i = i.R) {
+				System.out.print(i.S + " ");
+				total += i.S;
+			}
+			System.out.println("Total: " + total);
+
+			/* Check links between column head objects */
+			cnt1 = cnt2 = 0;
+			for (Y i = H.R; i != H; i = i.R) cnt1++;
+			for (Y i = H.L; i != H; i = i.L) cnt2++;
+			if (cnt1 != numColumns || cnt2 != numColumns)
+				System.out.println("Column Head Links Error.");
+
+			/* Check links in column direction */
+			for (Y i = H.R; i != H; i = i.R) {
+				cnt1 = cnt2 = 0;
+				for (X j = i.D; j != i; j = j.D) cnt1++;
+				for (X j = i.U; j != i; j = j.U) cnt2++;
+				if (cnt1 != i.S || cnt2 != i.S)
+					System.out.println("Column Links Error at " + i.N + " " + cnt1 + " " + cnt2 + " " + i.S);
+			}
+
+			/* Check links in row direction */
+			int[] rowSize = new int[numRows];
+			for (Y i = H.R; i != H; i = i.R) {
+				for (X j = i.D; j != i; j = j.D) {
+					cnt1 = cnt2 = 0;
+					for (X k = j.R; k != j; k = k.R) cnt1++;
+					for (X k = j.L; k != j; k = k.L) cnt2++;
+					if (cnt1 != cnt2)
+						System.out.println("Row Links Error at " + j.row);
+					if (rowSize[j.row] == 0) {
+						rowSize[j.row] = cnt1 + 1;
+					}
+				}
+			}
+			int total_cnt = 0;
+			for (int i = 0; i < numRows; i++) total_cnt += rowSize[i];
+			if (total != total_cnt)
+				System.out.println("Number of Row Links Error");
+
+			System.out.println("Verifying Finished.");
+			System.out.println();
+		}
 	}
 
 	/**
@@ -151,6 +213,7 @@ public class DancingLinks {
 	 * @return
 	 */
 	private int[][] buildExactCoverArray(Tile board, List<Tile> tiles) {
+		/* Use a list to store all the rows */
 		List<int[]> ECL = new ArrayList<int[]>();
 		for (int i = 0; i < tiles.size(); i++) {
 			Tile tile = tiles.get(i);
@@ -166,10 +229,6 @@ public class DancingLinks {
 					}
 				}
 			}
-
-		}
-		if (verb) {
-			//for (int[] t: ECL) System.out.println(Arrays.toString(t));
 		}
 
 		/* Convert list of int[] to int[][] */
@@ -196,6 +255,8 @@ public class DancingLinks {
 	 */
 	private Y buildDancingLinks () {
 		Y h = new Y(); // head
+		h.row = -1;
+		h.col = -1;
 
 		/* Allocate column head objects CHA and build the links */
 		for (int i = 0; i < numColumns; i++) {
@@ -203,6 +264,8 @@ public class DancingLinks {
 			y.U = y;
 			y.D = y;
 			y.C = y;
+			y.row = -1;
+			y.col = i;
 			if (i == 0) {
 				y.L = h;
 				h.R = y;
@@ -215,13 +278,23 @@ public class DancingLinks {
 				}
 			}
 			CHA[i] = y;
+			if (i < numTiles) {
+				CHA[i].N = "T" + Integer.toString(i);
+			} else {
+				CHA[i].N = "P" + Integer.toString(i - numTiles);
+			}
 		}
 
 		/* Allocate cell objects DLA */
 		for (int i = 0; i < numRows; i++) {
 			for (int j = 0; j < numColumns; j++) {
 				if (ECA[i][j] != 0) {
-					DLA[i][j] = new X();
+					X x = new X();
+					x.row = i;
+					x.col = j;
+					DLA[i][j] = x;
+				} else {
+					DLA[i][j] = null;
 				}
 			}
 		}
@@ -259,6 +332,7 @@ public class DancingLinks {
 					size++;
 					if (prev == null) {
 						curr.U = CHA[i];
+						CHA[i].D = curr;
 						prev = curr;
 					} else {
 						curr.U = prev;
@@ -272,16 +346,93 @@ public class DancingLinks {
 			CHA[i].S = size;
 		}
 
-		if (verb) {
-			System.out.println("Information of Dancing Links:");
-			System.out.print("Column Size: ");
-			for (Y hi = h.R; hi != h; hi = hi.R) {
-				System.out.print(hi.S + " ");
-			}
-			System.out.println();
-		}
-
 		return h;
+	}
+
+	/**
+	 * Choose Column Object - Part of the Dancing Link Algorithm
+	 * @return reference to a column object
+	 */
+	private Y chooseColumnObject() {
+		boolean minimizeBranchingFactor = true;
+
+		Y c = H.R;
+		if (minimizeBranchingFactor) {
+			int s = Integer.MAX_VALUE;
+			for (Y j = H.R; j != H; j = j.R) {
+				if (j.S < s) {
+					c = j;
+					s = j.S;
+				}
+			}
+		}
+		if (verb) {
+			//System.out.println("Choose column " + c.N);
+		}
+		return c;
+	}
+
+	/**
+	 * Cover Column - Part of the Dancing Link Algorithm
+	 * @param c
+	 */
+	private void coverColumn(Y c) {
+		//if (verb) System.out.println("Cover " + c.N);
+		c.R.L = c.L;
+		c.L.R = c.R;
+		for (X i = c.D; i != c; i = i.D) {
+			for (X j = i.R; j != i; j = j.R) {
+				j.D.U = j.U;
+				j.U.D = j.D;
+				j.C.S -= 1;
+			}
+		}
+		//if (verb) {
+		//	System.out.print("Column Size: ");
+		//	for (Y i = H.R; i != H; i = i.R) {
+		//		System.out.print("(" + i.N + ")" + i.S + " ");
+		//	}
+		//	System.out.println();
+		//}
+	}
+
+	/**
+	 * Uncover Column - Part of the Dancing Link Algorithm
+	 * @param c
+	 */
+	private void uncoverColumn(Y c) {
+		//if (verb) System.out.println("Uncover " + c.N);
+		for (X i = c.U; i != c; i = i.U) {
+			for (X j = i.L; j != i; j = j.L) {
+				j.C.S += 1;
+				j.D.U = j;
+				j.U.D = j;
+			}
+		}
+		c.R.L = c;
+		c.L.R = c;
+	}
+
+	private void printSolution(int k) {
+		System.out.print("Solution" + cntSolution + " (" + k + "): ");
+		for (int i = 0; i < k; i++) {
+			X x = O.get(i);
+			/* Find the leftmost cell */
+			X tile = null;
+			for (int j = 0; j < numTiles; j++) {
+				if (DLA[x.row][j] != null) {
+					tile = DLA[x.row][j];
+					break;
+				}
+			}
+			/* Print out the row */
+			System.out.print(tile.C.N + "(");
+			for (X j = tile.R; j != tile; j = j.R) {
+				System.out.print(j.C.N);
+			}
+			System.out.print(") ");
+		}
+		System.out.println();
 	}
 
 	/**
@@ -290,10 +441,34 @@ public class DancingLinks {
 	 */
 	public void search(int k) {
 		if (verb) {
-			System.out.println();
-			System.out.println("Dancing Links Search. Not Yes Implemented.");
+			//System.out.println("Enter Dancing Links Search. k = " + k);
 		}
-		// TODO: Implement Search Algorithm.
+		//if (k > 100) verb = false;
+		if (H.R == H) {
+			cntSolution++;
+			printSolution(k);
+			return;
+		}
+		Y c = chooseColumnObject();
+		coverColumn(c);
+		for (X r = c.D; r != c; r = r.D) {
+			if (k >= O.size()) O.add(r);
+			else O.set(k, r);
+			for (X j = r.R; j != r; j = j.R) {
+				coverColumn(j.C);
+			}
+			search(k + 1);
+			r = O.get(k);
+			c = r.C;
+			for (X j = r.L; j != r; j = j.L) {
+				uncoverColumn(j.C);
+			}
+		}
+		uncoverColumn(c);
+		if (verb) {
+			//System.out.println("Exit Dancing Links Search. k = " + k);
+		}
+		return;
 	}
 
 	/**
