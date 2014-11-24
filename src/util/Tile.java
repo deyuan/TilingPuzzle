@@ -4,110 +4,162 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import util.RotateMatrix;
-
 /**
  * A class representing a tile.
  *
  * @author Dawei Fan
- * @version 0.2
- * 			11/14/2014
- * 			1) Change the data from int to char;
+ * @version 0.2 11/14/2014 1) Change the data from int to char;
  *
- * @version 0.1
- * 			11/14/2014
+ * @version 0.1 11/14/2014
  *
  */
-public class Tile implements Comparable<Tile>{
+public class Tile implements Comparable<Tile> {
 
 	/**
-	 * 2-D array of core data of a tile, in which 0 represents empty and positive numbers represent block.
-	 * Different positive numbers represent different colors.
+	 * 2-D array of core data of a tile, in which 0 represents empty and
+	 * positive numbers represent block. Different positive numbers represent
+	 * different colors.
 	 */
 	public char[][] data;
 
 	/**
-	 * A list of all possible available patterns, including 1, 2, or 4 patterns.
+	 * A list of all possible available patterns with spin, including 1, 2, or 4
+	 * patterns.
 	 */
-	public List<char [][]> pattern = new ArrayList<char [][]>();
+	public List<char[][]> spattern = new ArrayList<char[][]>();
 
 	/**
-	 * Width and length of a tile,
-	 * Eg:
-	 * <p>  1 0  <p>
-	 * <p>  2 1  <p>
-	 * <p>  1 0  <p>
-	 * w =  3, l = 2
+	 * A list of all possible available patterns with spin and flip, including
+	 * 1, 2, or 4 patterns.
+	 */
+	public List<char[][]> sfpattern = new ArrayList<char[][]>();
+
+	/**
+	 * Width and length of a tile, Eg:
+	 * <p>
+	 * 1 0
+	 * <p>
+	 * <p>
+	 * 2 1
+	 * <p>
+	 * <p>
+	 * 1 0
+	 * <p>
+	 * w = 3, l = 2
 	 */
 	public int w, l;
 
 	/**
-	 * The spin of a tile with 0, 1, 3 which means it has 1, 2, 4 available directions.
+	 * The spin of a tile with 0, 1, 3 which means it has 1, 2, 4 available
+	 * directions.
 	 */
 	public int spin;
 
 	/**
-	 * Total area of a tile, bigger tiles should be tried first in the main search routine to
-	 *  reduce complexity.
+	 * Total area of a tile, bigger tiles should be tried first in the main
+	 * search routine to reduce complexity.
 	 */
 	public int area;
 
-	public Tile(char[][] t){
+	public Tile(char[][] t) {
 		w = t.length;
 		l = t[0].length;
 		data = new char[w][l];
 		area = 0;
 		/* Deep copy the array. */
-		for(int i = 0; i<l; i++){
-			for(int j = 0; j<w; j++){
+		for (int i = 0; i < l; i++) {
+			for (int j = 0; j < w; j++) {
 				data[j][i] = t[j][i];
-				if(t[j][i] != ' ')
+				if (t[j][i] != ' ')
 					area++;
 			}
 		}
-		RotateMatrix rm = new RotateMatrix(data);
-		spin = rm.spin();
-		switch(spin){
-			/* No break is needed here. */
-			case 3:
-				pattern.add(rm.rotateC2());
-				pattern.add(rm.rotateC3());
-			case 1:
-				pattern.add(rm.rotateC1());
-			case 0:
-				pattern.add(rm.rotateC0());
-				break;
-			default:
-				System.out.println("Error! Not a valid spin");
+		TransformMatrix tm = new TransformMatrix(data);
+		/* This list includes all possible patterns. */
+		List<char[][]> patterns = new ArrayList<char[][]>();
+		patterns.add(tm.rotateC0());
+		patterns.add(tm.rotateC1());
+		patterns.add(tm.rotateC2());
+		patterns.add(tm.rotateC3());
+		patterns.add(tm.frotateC0());
+		patterns.add(tm.frotateC1());
+		patterns.add(tm.frotateC2());
+		patterns.add(tm.frotateC3());
+
+		/* Print the patterns */
+		/*
+		 * System.out.println("All the patterns: "); for(int i = 0;
+		 * i<patterns.size(); i++){ for(int j = 0; j< patterns.get(i).length;
+		 * j++) System.out.println(Arrays.toString(patterns.get(i)[j]));
+		 * System.out.println(); }
+		 */
+
+		/* Initialize spattern list. */
+		int cur = 0;
+		spattern.add(patterns.get(0));
+		for (int i = 1; i < 4; i++) {
+			boolean e = true;
+			for (int j = 0; j <= cur; j++) {
+				/* It seems that Arrays.deepEqual and Arrays.equal do not work. */
+				if (equal(spattern.get(j), patterns.get(i))) {
+					e = false;
+					break;
+				}
+			}
+			if (e) {
+				spattern.add(patterns.get(i));
+				cur++;
+			}
+		}
+
+		/* Initialize sfpattern list. */
+		cur = 0;
+		sfpattern.add(patterns.get(0));
+		for (int i = 1; i < 8; i++) {
+			boolean e = true;
+			for (int j = 0; j <= cur; j++) {
+				/* It seems that Arrays.deepEqual and Arrays.equal do not work. */
+				if (equal(sfpattern.get(j), patterns.get(i))) {
+					e = false;
+					break;
+				}
+			}
+			if (e) {
+				sfpattern.add(patterns.get(i));
+				cur++;
+			}
+		}
+	}
+
+	public void printTile() {
+		System.out.println("Tile: ");
+		for (int i = 0; i < w; i++)
+			System.out.println(Arrays.toString(data[i]));
+	}
+
+	/**
+	 * Print all the spatterns of a tile.
+	 *
+	 */
+	public void printSPattern() {
+		System.out.println("SPattern: ");
+		for (int i = 0; i < spattern.size(); i++) {
+			System.out.println();
+			for (int j = 0; j < spattern.get(i).length; j++)
+				System.out.println(Arrays.toString(spattern.get(i)[j]));
 		}
 	}
 
 	/**
-	 * Calculate the spin of a tile.
-	 * @return spin
-	 */
-	public int decideSpin(){
-		return 0;
-	}
-
-	public void printTile(){
-		System.out.println("Tile (area: " + area + ", space: "+ w + "x" + l + ","
-				+ " spin: " + pattern.size() + "):");
-		for(int i = 0; i<w; i++)
-			System.out.println(Arrays.toString(data[i]));
-			System.out.println();
-	}
-
-	/**
-	 * Print all the patterns of a tile.
+	 * Print all the spatterns of a tile.
 	 *
 	 */
-	public void printPattern(){
-		System.out.println("Pattern: ");
-		for(int i = 0; i<pattern.size(); i++){
+	public void printFSPattern() {
+		System.out.println("SFPattern: ");
+		for (int i = 0; i < sfpattern.size(); i++) {
 			System.out.println();
-			for(int j = 0; j<pattern.get(i).length; j++)
-				System.out.println(Arrays.toString(pattern.get(i)[j]));
+			for (int j = 0; j < sfpattern.get(i).length; j++)
+				System.out.println(Arrays.toString(sfpattern.get(i)[j]));
 		}
 	}
 
@@ -120,4 +172,18 @@ public class Tile implements Comparable<Tile>{
 		return t.area - area;
 	}
 
+	public boolean equal(char[][] a, char[][] b) {
+		if (a.length != b.length || a[0].length != b[0].length)
+			return false;
+		int h = a.length;
+		int w = a[0].length;
+		for (int i = 0; i < h; i++) {
+			for (int j = 0; j < w; j++) {
+				if (a[i][j] != b[i][j])
+					return false;
+			}
+		}
+
+		return true;
+	}
 }
