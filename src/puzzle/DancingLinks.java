@@ -398,7 +398,7 @@ public class DancingLinks {
 					DLA[i][j] = null;
 				}
 			}
-			if (n == 0) {
+			if (n == 0 && j >= numTiles) {
 				fail = true;
 				System.out.println("Directly fail!");
 				return null;
@@ -429,7 +429,7 @@ public class DancingLinks {
 		/* Build the dancing links (column direction) */
 		for (int i = 0; i < numColumns; i++) {
 			X prev = null;
-			X curr = null;
+			X curr = CHA[i];
 			int size = 0;
 			for (int j = 0; j < numRows; j++) {
 				if (DLA[j][i] != null) {
