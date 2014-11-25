@@ -194,9 +194,10 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 
 	public DisplayDancingLinks() {
 		super(null);
+		setBackground(Color.WHITE);
 
 		this.setLocation(0, 0);
-		this.setSize(frameSize[0] - 20, frameSize[1] - 20);
+		this.setSize(810, 520);
 		this.setOpaque(true);
 		this.setVisible(true);
 		this.setFocusable(true);
@@ -235,8 +236,9 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 	public void setupControlPanel() {
 
 		pControl = new JPanel();
-		pControl.setLocation(10, 10);
-		pControl.setSize(150, 355);
+		pControl.setBackground(Color.WHITE);
+		pControl.setLocation(5, 5);
+		pControl.setSize(190, 340);
 		pControl.setOpaque(true);
 		pControl.setVisible(true);
 		pControl.setFocusable(true);
@@ -250,8 +252,9 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 
 		/* Initialize control sub-panel. */
 		pConfig = new JPanel();
-		pConfig.setLocation(0, 0);
-		pConfig.setSize(150, 160);
+		pConfig.setBackground(Color.WHITE);
+		pConfig.setLocation(5, 5);
+		pConfig.setSize(180, 150);
 		pConfig.setOpaque(true);
 		pConfig.setVisible(true);
 		pConfig.setFocusable(true);
@@ -262,9 +265,11 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 		pConfig.setLayout(null);
 
 		cbEnableSpin = new JCheckBox("Enable spin");
+		cbEnableSpin.setBackground(Color.WHITE);
+		cbEnableSpin.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		cbEnableSpin.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		cbEnableSpin.setSelected(false);
-		cbEnableSpin.setSize(100, 40);
+		cbEnableSpin.setSize(160, 30);
 		cbEnableSpin.setLocation(10, 20);
 		cbEnableSpin.addActionListener(new ActionListener() {
 			@Override
@@ -280,9 +285,11 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 		pConfig.add(cbEnableSpin);
 
 		cbEnableSpinFlip = new JCheckBox("Enable spin + flip");
+		cbEnableSpinFlip.setBackground(Color.WHITE);
+		cbEnableSpinFlip.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		cbEnableSpinFlip.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		cbEnableSpinFlip.setSelected(false);
-		cbEnableSpinFlip.setSize(130, 40);
+		cbEnableSpinFlip.setSize(160, 30);
 		cbEnableSpinFlip.setLocation(10, 50);
 		cbEnableSpinFlip.addActionListener(new ActionListener() {
 			@Override
@@ -298,9 +305,11 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 		pConfig.add(cbEnableSpinFlip);
 
 		cbExtra = new JCheckBox("Extra blocks");
+		cbExtra.setBackground(Color.WHITE);
+		cbExtra.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		cbExtra.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		cbExtra.setSelected(false);
-		cbExtra.setSize(130, 40);
+		cbExtra.setSize(160, 30);
 		cbExtra.setLocation(10, 80);
 		cbExtra.setEnabled(false);
 		cbExtra.addActionListener(new ActionListener() {
@@ -317,6 +326,8 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 		pConfig.add(cbExtra);
 
 		bSolve = new JButton("Solve it!");
+		bSolve.setBackground(Color.WHITE);
+		bSolve.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bSolve.addActionListener(new ActionListener() {
 
 			@Override
@@ -354,16 +365,17 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 			}
 
 		});
-		bSolve.setSize(80, 26);
-		bSolve.setLocation(15, 120);
+		bSolve.setSize(160, 30);
+		bSolve.setLocation(10, 110);
 
 		pConfig.add(bSolve);
 		pControl.add(pConfig);
 
 		/* Initialize result sub-panel. */
 		pResult = new JPanel();
-		pResult.setSize(150, 184);
-		pResult.setLocation(0, 170);
+		pResult.setBackground(Color.WHITE);
+		pResult.setSize(180, 180);
+		pResult.setLocation(5, 155);
 		pResult.setOpaque(true);
 		pResult.setVisible(true);
 		pResult.setFocusable(true);
@@ -373,23 +385,29 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 		pResult.setLayout(null);
 
 		tResultInfo = new JLabel("Press button to solve");
+		tResultInfo.setBackground(Color.WHITE);
+		tResultInfo.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		// tResultInfo.setPreferredSize(new Dimension(60, 30));
-		tResultInfo.setSize(new Dimension(140, 30));
+		tResultInfo.setSize(new Dimension(160, 30));
 		tResultInfo.setLocation(10, 20);
 		tResultInfo.setVisible(true);
 		pResult.add(tResultInfo);
 
 		tIndex = new JTextField(" index", 10);
+		tIndex.setBackground(Color.WHITE);
+		tIndex.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		// tIndex.setPreferredSize(new Dimension(80, 25));
-		tIndex.setSize(new Dimension(50, 26));
+		tIndex.setSize(new Dimension(80, 30));
 		// tIndex.setMaximumSize(new Dimension(80, 25));
 		tIndex.setVisible(true);
 		tIndex.setLocation(10, 50);
 		pResult.add(tIndex);
 
 		bShowResult = new JButton("Show!");
-		bShowResult.setSize(72, 26);
-		bShowResult.setLocation(68, 50);
+		bShowResult.setBackground(Color.WHITE);
+		bShowResult.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		bShowResult.setSize(80, 30);
+		bShowResult.setLocation(90, 50);
 		bShowResult.addActionListener(new ActionListener() {
 
 			@Override
@@ -415,8 +433,10 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 		pResult.add(bShowResult);
 
 		bPre = new JButton("Prev");
-		bPre.setSize(60, 26);
-		bPre.setLocation(10, 84);
+		bPre.setBackground(Color.WHITE);
+		bPre.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		bPre.setSize(80, 30);
+		bPre.setLocation(10, 80);
 		bPre.addActionListener(new ActionListener() {
 
 			@Override
@@ -436,8 +456,10 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 		pResult.add(bPre);
 
 		bNext = new JButton("Next");
-		bNext.setSize(60, 26);
-		bNext.setLocation(80, 84);
+		bNext.setBackground(Color.WHITE);
+		bNext.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		bNext.setSize(80, 30);
+		bNext.setLocation(90, 80);
 		bNext.addActionListener(new ActionListener() {
 
 			@Override
@@ -458,8 +480,9 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 		pResult.add(bNext);
 
 		slider = new JSlider();
-		slider.setSize(140, 26);
-		slider.setLocation(5, 120);
+		slider.setBackground(Color.WHITE);
+		slider.setSize(160, 30);
+		slider.setLocation(10, 110);
 		slider.setExtent(0);
 		slider.setMinimum(1);
 		slider.setMaximum(100);
@@ -478,8 +501,10 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 		pResult.add(slider);
 
 		bPlay = new JButton("Autoplay all solutions");
-		bPlay.setSize(130, 26);
-		bPlay.setLocation(10, 146);
+		bPlay.setBackground(Color.WHITE);
+		bPlay.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		bPlay.setSize(160, 30);
+		bPlay.setLocation(10, 140);
 		bPlay.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -540,8 +565,9 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 
 	public void setupDisplay() {
 		pDisplay = new JPanel();
+		pDisplay.setBackground(Color.WHITE);
 		pDisplay.setLayout(null);
-		pDisplay.setLocation(160, 0);
+		pDisplay.setLocation(200, 5);
 		pDisplay.setSize(displaySize[0], displaySize[1]);
 		pDisplay.setOpaque(true);
 		pDisplay.setVisible(true);
@@ -552,6 +578,7 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 
 	public void setupMenu() {
 		mBar = new JMenuBar();
+		mBar.setBackground(Color.WHITE);
 		mBar.setOpaque(true);
 
 		mFile = new JMenu("File");
@@ -751,7 +778,7 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 		contentPane.add(this);
 		frame.setJMenuBar(mBar);
 
-		frame.setLayout(new BorderLayout());
+		frame.getContentPane().setLayout(new BorderLayout());
 		frame.setSize(frameSize[0], frameSize[1]);
 		frame.setLocation(framePos[0], framePos[1]);
 		frame.setResizable(false);
@@ -765,8 +792,8 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 			System.exit(0);
 
 		if (e.getSource() == miAbout) {
-			JOptionPane.showMessageDialog(null, "Puzzle v1.0\n"
-					+ "Date: 11/22/2014\n" + "Author: Dawei Fan, Deyuan Guo",
+			JOptionPane.showMessageDialog(null, "Tiling Puzzle v1.0\n"
+					+ "Date: 11/24/2014\n" + "Designed by Dawei Fan and Deyuan Guo",
 					"About", JOptionPane.INFORMATION_MESSAGE);
 		}
 		if (e.getSource() == miRead) {
@@ -793,7 +820,7 @@ public class DisplayDancingLinks extends JPanel implements ActionListener {
 			/* Dancing Links Tiling Puzzle Solver */
 			DancingLinks dl = new DancingLinks(board, tileList);
 
-			/* Clear previous blosks if there are any. */
+			/* Clear previous blocks if there are any. */
 			if (this.pDisplay.getComponentCount() > 0) {
 				pDisplay.removeAll();
 				pDisplay.repaint();
