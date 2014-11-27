@@ -14,6 +14,7 @@ public class DLXTrail {
 	/******************** Private Member Variables ********************/
 
 	private Stack<DLXCell> trail = null;
+	private boolean isComplete = false;
 
 	/******************** Public Member Functions ********************/
 
@@ -28,15 +29,8 @@ public class DLXTrail {
 	public DLXCell top() { return trail.lastElement(); }
 	public boolean isEmpty() { return trail.isEmpty(); }
 	public void clear() { trail.clear(); }
-
-	@Override
-	public DLXTrail clone() {
-		DLXTrail copy = new DLXTrail();
-		for (int i = 0; i < trail.size(); i++) {
-			copy.push(trail.get(i));
-		}
-		return copy;
-	}
+	public boolean isComplete() { return isComplete; }
+	public void setComplete(boolean b) { isComplete = b; }
 
 	public void print() {
 		for (int i = 0; i < trail.size(); i++) {

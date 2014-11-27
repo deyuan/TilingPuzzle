@@ -43,40 +43,41 @@ public class DLXBasicSearch {
 
 	/**
 	 * Solve the puzzle and find all solutions.
-	 * @return a list of Trail of valid solutions
+	 * @return a list of valid solutions
 	 */
-	public List<DLXTrail> solve() {
+	public List<List<List<Integer>>> solve() {
 		Config.setSingleStepSearch(false);
 		Config.setSingleSolutionSearch(false);
 
-		List<DLXTrail> solutions = new ArrayList<DLXTrail>();
-
+		List<List<List<Integer>>> solutions =
+				new ArrayList<List<List<Integer>>>();
 		while (!Config.searchFinished()) {
 			solveSingleSolution();
-			solutions.add(Solution.clone());
+			if (Solution.size() > 0) {
+				solutions.add(solutionToPosition(Solution));
+			}
 		}
-
 		return solutions;
 	}
 
 	/**
 	 * Solve until find next solution.
-	 * @return Trail of a valid solution
+	 * @return a valid solution
 	 */
-	public DLXTrail solveSingleSolution() {
+	public List<List<Integer>> solveSingleSolution() {
 		Config.setSingleSolutionSearch(true);
 		searchLoop(Trail);
-		return Solution;
+		return solutionToPosition(Solution);
 	}
 
 	/**
 	 * Solve with only a single step search.
-	 * @return Trail of a partial solution
+	 * @return a partial solution
 	 */
-	public DLXTrail solveSingleStep() {
+	public List<List<Integer>> solveSingleStep() {
 		Config.setSingleStepSearch(true);
 		searchLoop(Trail);
-		return Solution;
+			return solutionToPosition(Solution);
 	}
 
 	/**
@@ -89,30 +90,12 @@ public class DLXBasicSearch {
 	}
 
 	/**
-	 * Get positions from stack O, the output format is a list of integers.
+	 * Return true if the last single step search finds a complete solution.
+	 * @return
 	 */
-	public List<List<Integer>> solutionToPosition(DLXTrail solution) {
-
-		List<List<Integer>> pos = new ArrayList<List<Integer>>();
-		for (int i = 0; i < Trail.size(); i++) {
-			List<Integer> tpos = new ArrayList<Integer>();
-
-			/* Find the leftmost cell */
-			DLXCell x = Trail.get(i);
-			while (x.L.col < x.col) x = x.L;
-
-			/* The first element in the list is the index of a tile,
-			 *  the others are indices of positions on board. */
-			tpos.add(x.C.col);
-			for (DLXCell j = x.R; j != x; j = j.R) {
-				tpos.add(j.C.col - DLA.numTiles);
-			}
-
-			pos.add(tpos);
-		}
-		return pos;
+	public boolean isCompleteSolution() {
+		return Solution.isComplete();
 	}
-
 	/******************** Private Member Functions ********************/
 
 	/**
@@ -188,10 +171,8 @@ public class DLXBasicSearch {
 	 */
 	private void searchRecur(int k) {
 
-		if (Config.verb) {
-			System.out.print("LV" + k + ": ");
-			Solution.print();
-		}
+		//if (Config.verb) { System.out.print("LV" + k + ": "); Solution.print(); }
+
 		if (DLA.H.R == DLA.H || DLA.H.L.col < DLA.numTiles) {
 			printSolution();
 			return;
@@ -221,7 +202,7 @@ public class DLXBasicSearch {
 	 * @param k
 	 */
 	private void searchLoop(DLXTrail trail) {
-		boolean foundSolution = false;
+		Solution.setComplete(false);
 
 		/* Directly Failed */
 		if (Config.isDirectlyFail()) return;
@@ -269,12 +250,14 @@ public class DLXBasicSearch {
 
 			/* Output */
 			if (DLA.H.R == DLA.H || DLA.H.L.col < DLA.numTiles) {
-				System.out.print("Find: ");
-				Solution.print();
-				foundSolution = true;
+				if (Config.verb) {
+					System.out.print("Find: ");
+					Solution.print();
+				}
+				Solution.setComplete(true);
 			}
 		} while (!Config.singleStepSearch() &&
-				!(Config.singleSolutionSearch() && foundSolution));
+				!(Config.singleSolutionSearch() && Solution.isComplete()));
 
 		return;
 	}
@@ -300,6 +283,33 @@ public class DLXBasicSearch {
 			System.out.print(") ");
 		}
 		System.out.println();
+	}
+
+	/**
+	 * Convert a solution trail into list of (tile index and tile positions).
+	 * @param solution
+	 * @return
+	 */
+	public List<List<Integer>> solutionToPosition(DLXTrail solution) {
+
+		List<List<Integer>> pos = new ArrayList<List<Integer>>();
+		for (int i = 0; i < Trail.size(); i++) {
+			List<Integer> tpos = new ArrayList<Integer>();
+
+			/* Find the leftmost cell */
+			DLXCell x = Trail.get(i);
+			while (x.L.col < x.col) x = x.L;
+
+			/* The first element in the list is the index of a tile,
+			 *  the others are indices of positions on board. */
+			tpos.add(x.C.col);
+			for (DLXCell j = x.R; j != x; j = j.R) {
+				tpos.add(j.C.col - DLA.numTiles);
+			}
+
+			pos.add(tpos);
+		}
+		return pos;
 	}
 
 }
