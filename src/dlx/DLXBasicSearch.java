@@ -23,11 +23,8 @@ public class DLXBasicSearch {
 	/** The DLXTrail for keeping searching trail (stack) */
 	private DLXTrail Trail = null;
 
-	/** The number of solutions */
-	private int cntSolution = 0;
-
-	/** The positions list for GUI to draw. */
-	private List<List<List<Integer>>> position;
+	/** The DLXTrail for keeping partial solution (stack) */
+	private DLXTrail Solution = null;
 
 	/******************** Public Member Functions ********************/
 
@@ -41,22 +38,80 @@ public class DLXBasicSearch {
 		Config = config;
 
 		Trail = new DLXTrail();
-		position = new ArrayList<List<List<Integer>>>();
+		Solution = new DLXTrail();
 	}
 
+	/**
+	 * Solve the puzzle and find all solutions.
+	 * @return a list of Trail of valid solutions
+	 */
+	public List<DLXTrail> solve() {
+		Config.setSingleStepSearch(false);
+		Config.setSingleSolutionSearch(false);
 
-	public void solve() {
-		if (!Config.isDirectlyFail())
-			search(0);
+		List<DLXTrail> solutions = new ArrayList<DLXTrail>();
+
+		while (!Config.searchFinished()) {
+			solveSingleSolution();
+			solutions.add(Solution.clone());
+		}
+
+		return solutions;
 	}
 
-	public List<List<List<Integer>>> getPosition() {
-		return position;
+	/**
+	 * Solve until find next solution.
+	 * @return Trail of a valid solution
+	 */
+	public DLXTrail solveSingleSolution() {
+		Config.setSingleSolutionSearch(true);
+		searchLoop(Trail);
+		return Solution;
 	}
 
-	public void setCntSolution(int n) { cntSolution = n; }
+	/**
+	 * Solve with only a single step search.
+	 * @return Trail of a partial solution
+	 */
+	public DLXTrail solveSingleStep() {
+		Config.setSingleStepSearch(true);
+		searchLoop(Trail);
+		return Solution;
+	}
 
-	public int getCntSolution() { return cntSolution; }
+	/**
+	 * Reset the whole DLX search so that we can start over again.
+	 */
+	public void reset() {
+		Trail.clear();
+		Solution.clear();
+		Config.setSearchFinished(false);
+	}
+
+	/**
+	 * Get positions from stack O, the output format is a list of integers.
+	 */
+	public List<List<Integer>> solutionToPosition(DLXTrail solution) {
+
+		List<List<Integer>> pos = new ArrayList<List<Integer>>();
+		for (int i = 0; i < Trail.size(); i++) {
+			List<Integer> tpos = new ArrayList<Integer>();
+
+			/* Find the leftmost cell */
+			DLXCell x = Trail.get(i);
+			while (x.L.col < x.col) x = x.L;
+
+			/* The first element in the list is the index of a tile,
+			 *  the others are indices of positions on board. */
+			tpos.add(x.C.col);
+			for (DLXCell j = x.R; j != x; j = j.R) {
+				tpos.add(j.C.col - DLA.numTiles);
+			}
+
+			pos.add(tpos);
+		}
+		return pos;
+	}
 
 	/******************** Private Member Functions ********************/
 
@@ -72,10 +127,10 @@ public class DLXBasicSearch {
 		DLXColumnHeader c = DLA.H.R;
 
 		/* Do we really need this to deal with extra tiles? */
-		//if (Config.isEnableExtra()) {
-		//	while (c.col < DLA.numTiles)
-		//		c = c.R;
-		//}
+		if (Config.isEnableExtra()) {
+			while (c.col < DLA.numTiles)
+				c = c.R;
+		}
 
 		if (minimizeBranchingFactor) {
 			int s = Integer.MAX_VALUE;
@@ -86,7 +141,7 @@ public class DLXBasicSearch {
 				}
 			}
 		}
-		//if (Config.verb) System.out.println("Choose column " + c.N);
+		//if (Config.verb) System.out.println("Choose column c" + c.col);
 		return c;
 	}
 
@@ -96,7 +151,7 @@ public class DLXBasicSearch {
 	 * @param c
 	 */
 	private void coverColumn(DLXColumnHeader c) {
-		// if (Config.verb) System.out.println("Cover " + c.N);
+		//if (Config.verb) System.out.println("Cover c" + c.col);
 		c.R.L = c.L;
 		c.L.R = c.R;
 		for (DLXCell i = c.D; i != c; i = i.D) {
@@ -114,7 +169,7 @@ public class DLXBasicSearch {
 	 * @param c
 	 */
 	private void uncoverColumn(DLXColumnHeader c) {
-		// if (Config.verb) System.out.println("Uncover " + c.N);
+		//if (Config.verb) System.out.println("Uncover c" + c.col);
 		for (DLXCell i = c.U; i != c; i = i.U) {
 			for (DLXCell j = i.L; j != i; j = j.L) {
 				j.C.S += 1;
@@ -127,31 +182,29 @@ public class DLXBasicSearch {
 	}
 
 	/**
-	 * Searching with Dancing Links.
+	 * Searching with Dancing Links (recursive version)
 	 *
 	 * @param k
 	 */
-	private void search(int k) {
+	private void searchRecur(int k) {
 
 		if (Config.verb) {
-			System.out.print("LV"+k+": ");
-			Trail.print();
+			System.out.print("LV" + k + ": ");
+			Solution.print();
 		}
 		if (DLA.H.R == DLA.H || DLA.H.L.col < DLA.numTiles) {
-			cntSolution++;
-			//setPosition(k);
-			printSolution(k);
+			printSolution();
 			return;
 		}
 		DLXColumnHeader c = chooseColumnObject();
 		coverColumn(c);
 		for (DLXCell r = c.D; r != c; r = r.D) {
-			Trail.push(r);
+			Solution.push(r);
 			for (DLXCell j = r.R; j != r; j = j.R) {
 				coverColumn(j.C);
 			}
-			search(k + 1);
-			r = Trail.pop();
+			searchRecur(k + 1);
+			r = Solution.pop();
 			c = r.C;
 			for (DLXCell j = r.L; j != r; j = j.L) {
 				uncoverColumn(j.C);
@@ -163,13 +216,77 @@ public class DLXBasicSearch {
 	}
 
 	/**
+	 * Searching with Dancing Links (while loop with stack version)
+	 *
+	 * @param k
+	 */
+	private void searchLoop(DLXTrail trail) {
+		boolean foundSolution = false;
+
+		/* Directly Failed */
+		if (Config.isDirectlyFail()) return;
+
+		/* If start from an empty trail */
+		if (!Config.searchFinished() && trail.isEmpty()) {
+			DLXColumnHeader c = chooseColumnObject();
+			for (DLXCell i = c.U; i != c; i = i.U) {
+				trail.push(i);
+			}
+		}
+
+		/* Search kernel */
+		do {
+			/* Backtracking */
+			while (!Solution.isEmpty() && Solution.top() == trail.top()) {
+				DLXCell t = Solution.pop();
+				trail.pop();
+				for (DLXCell i = t.L; i != t; i = i.L) {
+					uncoverColumn(i.C);
+				}
+				uncoverColumn(t.C);
+			}
+			if (trail.size() == 0) {
+				Config.setSearchFinished(true);
+				break; // finished
+			}
+
+			/* Search a cell */
+			DLXCell x = trail.top();
+			Solution.push(x);
+			coverColumn(x.C);
+			for (DLXCell i = x.R; i != x; i = i.R) {
+				coverColumn(i.C);
+			}
+
+			/* Search next level */
+			DLXColumnHeader c = chooseColumnObject();
+			if (c.S > 0) {
+				for (DLXCell i = c.U; i != c; i = i.U) {
+					trail.push(i);
+				}
+				continue;
+			}
+
+			/* Output */
+			if (DLA.H.R == DLA.H || DLA.H.L.col < DLA.numTiles) {
+				System.out.print("Find: ");
+				Solution.print();
+				foundSolution = true;
+			}
+		} while (!Config.singleStepSearch() &&
+				!(Config.singleSolutionSearch() && foundSolution));
+
+		return;
+	}
+
+	/**
 	 * Print out current solution
 	 * @param k
 	 */
-	private void printSolution(int k) {
-		System.out.print("Solution" + cntSolution + " (" + k + "): ");
-		for (int i = 0; i < Trail.size(); i++) {
-			DLXCell x = Trail.get(i);
+	private void printSolution() {
+		System.out.print("Solution with " + Solution.size() + " tiles: ");
+		for (int i = 0; i < Solution.size(); i++) {
+			DLXCell x = Solution.get(i);
 
 			/* Find the leftmost cell */
 			DLXCell tile = x;
@@ -183,30 +300,6 @@ public class DLXBasicSearch {
 			System.out.print(") ");
 		}
 		System.out.println();
-	}
-
-	/**
-	 * Get positions from stack O, the output format is a list of integers.
-	 */
-	private void setPosition(int k) {
-
-		List<List<Integer>> pos = new ArrayList<List<Integer>>();
-		for (int i = 0; i < Trail.size(); i++) {
-			List<Integer> tpos = new ArrayList<Integer>();
-			/* Add the tile number in order to choose a color. */
-			DLXCell x = Trail.get(i);
-
-			/* Find the leftmost cell */
-			DLXCell tile = x;
-			while (tile.L.col < tile.col) tile = tile.L;
-
-			tpos.add(tile.C.col);
-			for (DLXCell j = tile.R; j != tile; j = j.R) {
-				tpos.add(j.C.col);
-			}
-			pos.add(tpos);
-		}
-		position.add(pos);
 	}
 
 }

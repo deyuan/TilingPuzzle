@@ -13,25 +13,39 @@ public class DLXTrail {
 
 	/******************** Private Member Variables ********************/
 
-	private Stack<DLXCell> Trail = null;
+	private Stack<DLXCell> trail = null;
 
 	/******************** Public Member Functions ********************/
 
 	public DLXTrail() {
-		Trail = new Stack<DLXCell>();
+		trail = new Stack<DLXCell>();
 	}
 
-	public void push(DLXCell c) { Trail.push(c); }
-	public DLXCell pop() { return Trail.pop(); }
-	public int size() { return Trail.size(); }
-	public DLXCell get(int i) { return Trail.get(i); }
+	public void push(DLXCell c) { trail.push(c); }
+	public DLXCell pop() { return trail.pop(); }
+	public int size() { return trail.size(); }
+	public DLXCell get(int i) { return trail.get(i); }
+	public DLXCell top() { return trail.lastElement(); }
+	public boolean isEmpty() { return trail.isEmpty(); }
+	public void clear() { trail.clear(); }
+
+	@Override
+	public DLXTrail clone() {
+		DLXTrail copy = new DLXTrail();
+		for (int i = 0; i < trail.size(); i++) {
+			copy.push(trail.get(i));
+		}
+		return copy;
+	}
 
 	public void print() {
-		for (int i = 0; i < Trail.size(); i++) {
-			System.out.print("(r"+Trail.get(i).row+"c"+Trail.get(i).col+")");
+		for (int i = 0; i < trail.size(); i++) {
+			DLXCell x = trail.get(i);
+			System.out.print("(r" + x.row + "c" + x.col + ")");
 		}
 		System.out.println();
 	}
+
 	/******************** Private Member Functions ********************/
 
 }

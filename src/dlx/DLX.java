@@ -25,20 +25,32 @@ public class DLX {
 
 	/******************** Public Member Variables ********************/
 
+	/** Select the DLX algorithm version */
 	public int solverSelection = 0;
+
+	/** DLX algorithm configuration. */
+	public DLXConfig Config = null;
 
 	/******************** Private Member Variables ********************/
 
+	private Tile board = null;
+	private List<Tile> tiles = null;
 	private DLXBasicExactCoverArray basicECA = null;
 	private DLXBasicLinksArray basicDLA = null;
 	private DLXBasicSearch basicSearch = null;
-	private DLXConfig Config = null;
 
 	/******************** Public Member Functions ********************/
 
-	public DLX(Tile board, List<Tile> tiles) {
+	/**
+	 * Constructor of DLX.
+	 */
+	public DLX(Tile b, List<Tile> t) {
+		board = b;
+		tiles = t;
+
 		Config = new DLXConfig();
 		Config.setEnableSpin(true);
+		Config.setSingleSolutionSearch(true);
 
 		if (solverSelection == 0) {
 			basicECA = new DLXBasicExactCoverArray(board, tiles, Config);
@@ -47,18 +59,55 @@ public class DLX {
 		}
 	}
 
+	/**
+	 * Solve until find next solution.
+	 * @return a valid solution
+	 */
 	public DLXTrail nextSolution() {
 		return null;
 	}
 
+	/**
+	 * Solve with only a single step search.
+	 * @return a partial solution
+	 */
 	public DLXTrail nextSingleStep() {
 		return null;
 	}
 
-	public void solve() {
+	/**
+	 * Solve and find all solutions.
+	 * @return a list of solution
+	 */
+	public List<DLXTrail> solve() {
 		if (solverSelection == 0) {
 			basicSearch.solve();
+
+			resetSearch();
+			while (!Config.searchFinished()) {
+				basicSearch.solveSingleStep();
+			}
+
+			resetSearch();
+			while (!Config.searchFinished()) {
+				basicSearch.solveSingleSolution();
+			}
 		}
+		return null;
+	}
+
+	/**
+	 * Reset the DLX search.
+	 */
+	public void resetSearch() {
+		basicSearch.reset();
+		System.out.println("DLX search has been reset.");
+	}
+
+	/******************** Private Member Functions ********************/
+
+	private int[][] solutionTo2DArray(DLXTrail trail) {
+		return null;
 	}
 
 }

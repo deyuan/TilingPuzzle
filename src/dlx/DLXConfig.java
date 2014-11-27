@@ -29,6 +29,15 @@ public class DLXConfig {
 	/** Directly Fail */
 	private boolean directlyFail = false;
 
+	/** Search Finished */
+	private boolean searchFinished = false;
+
+	/** Single step search */
+	private boolean singleStepSearch = false;
+
+	/** Single step search */
+	private boolean singleSolutionSearch = false;
+
 	/******************** Public Member Functions ********************/
 
 	public DLXConfig() {
@@ -45,6 +54,15 @@ public class DLXConfig {
 
 	public boolean isDirectlyFail() { return directlyFail; }
 	public void setDirectlyFail(boolean b) { directlyFail = b; }
+
+	public boolean searchFinished() { return searchFinished; }
+	public void setSearchFinished(boolean b) { searchFinished = b; }
+
+	public boolean singleStepSearch() { return singleStepSearch; }
+	public void setSingleStepSearch(boolean b) { singleStepSearch = b; }
+
+	public boolean singleSolutionSearch() { return singleSolutionSearch; }
+	public void setSingleSolutionSearch(boolean b) { singleSolutionSearch = b; }
 
 	/******************** Private Member Functions ********************/
 
