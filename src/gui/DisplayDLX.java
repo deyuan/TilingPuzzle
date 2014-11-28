@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -149,7 +150,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	private static final int framePos[] = { 400, 20 };
 	private static final int displaySize[] = { 600, 480 };
 	private static final int displayPos[] = { 200, 5 };
-	private static final int gridWidth = 4;
+	private static final int gridWidth = 3;
 
 	private int sizeBlock;
 	private int sizeTile;
@@ -824,6 +825,31 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		int sizeGridV[] = { gridWidth, w * (sizeBlock + gridWidth) + gridWidth };
 		JPanel gridH[] = new JPanel[w + 1];
 		JPanel gridV[] = new JPanel[l + 1];
+		JPanel gridH_w[] = new JPanel[w + 1];
+		JPanel gridV_w[] = new JPanel[l + 1];
+
+		/* Add some white grids */
+		for (int i = 0; i <= w; i++) {
+			gridH_w[i] = new JPanel();
+			gridH_w[i].setBackground(Color.white);
+			gridH_w[i].setSize(sizeGridH[0] - 2, sizeGridH[1] - 2);
+			gridH_w[i].setLocation(origin[0] + 1, origin[1] + (sizeBlock + gridWidth)
+					* i + 1);
+			gridH_w[i].setOpaque(true);
+			gridH_w[i].setVisible(true);
+			pDisplay.add(gridH_w[i]);
+		}
+
+		for (int j = 0; j <= l; j++) {
+			gridV_w[j] = new JPanel();
+			gridV_w[j].setBackground(Color.white);
+			gridV_w[j].setSize(sizeGridV[0] - 2, sizeGridV[1] - 2);
+			gridV_w[j].setLocation(origin[0] + (sizeBlock + gridWidth) * j + 1,
+					origin[1] + 1);
+			gridV_w[j].setOpaque(true);
+			gridV_w[j].setVisible(true);
+			pDisplay.add(gridV_w[j]);
+		}
 
 		/* Setup horizontal and vertical grids */
 		for (int i = 0; i <= w; i++) {
@@ -1089,12 +1115,29 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	private List<Color> genColors(int n) {
 		List<Color> colors = new ArrayList<Color>();
 
+		/* Default color list. */
+		colors.addAll(Arrays.asList(
+				Color.cyan,
+				Color.blue,
+				Color.green,
+				Color.red,
+				Color.yellow,
+				new Color(46, 139, 87),
+				new Color(148, 0, 211),
+				new Color(135, 51, 36),
+				Color.magenta,
+				Color.gray,
+				Color.pink,
+				new Color(175, 255, 225),
+				new Color(130, 175, 190)
+				));
+
 		double goldenRatio = 0.618033988749895;
 		double hue = 0.0; //or use random start value between 0 and 1
 		double saturation = 0.5;
 		double value = 0.95;
 
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < n - colors.size(); i++) {
 			hue = (hue + goldenRatio) % 1.0;
 
 			/* HSV to RGB */
