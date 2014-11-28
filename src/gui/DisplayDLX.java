@@ -34,9 +34,9 @@ import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import dlx.DLX;
 import util.DataFileParser;
 import util.Tile;
+import dlx.DLX;
 
 /**
  * A class to display the result in a GUI. The DisplayResults instance has two
@@ -46,7 +46,7 @@ import util.Tile;
  *
  * @author David
  * @version 1.0 11/16/2014
- * 
+ *
  * 			1.1 11/27/2014
  * 			1, Used new class DLX to replace DancingLinks.
  *			2, Initialized board outside DLX.
@@ -54,20 +54,20 @@ import util.Tile;
 public class DisplayDLX extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * DLX instance.
-	 * 
+	 *
 	 */
 	private DLX dlx;
-		
+
 	/**
-	 * The solution got from DLX.solve. For every tile, the first element is the number of 
+	 * The solution got from DLX.solve. For every tile, the first element is the number of
 	 * the tile, others are positions.
-	 * 
+	 *
 	 */
 	private List<List<List<Integer>>> solution;
-	
+
 	/**
 	 * The number of possible solutions.
 	 */
@@ -75,11 +75,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 	private char board[][];
 
-	private final Color color[] = { Color.cyan, Color.blue, Color.green,
-			Color.red, Color.yellow, new Color(46, 139, 87),
-			new Color(148, 0, 211), new Color(135, 51, 36), Color.magenta,
-			Color.gray, Color.pink, new Color(175, 255, 225),
-			new Color(130, 175, 190) };
+	/** The color of each tiles */
+	private List<Color> colors = null;
 
 	/**
 	 * Control panel.
@@ -107,7 +104,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	JButton bSolveAll;
 	JButton bSolveStep;
 	JButton bSolveTrail;
-	
+
 	/**
 	 * Result panel.
 	 */
@@ -165,12 +162,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	private CalculateAll calculateAll = null;
 	private CalculateStep calculateStep = null;
 	private CalculateTrail calculateTrail = null;
-	
+
 	private class CalculateAll extends SwingWorker<List<List<List<Integer>>>, Void>{
 
 		@Override
 		protected List<List<List<Integer>>> doInBackground() {
-			
+
 			solution = new ArrayList<List<List<Integer>>>();
 			bSolveAll.setEnabled(false);
 			bSolveStep.setEnabled(false);
@@ -178,8 +175,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
 			dlx.Config.reset();
-			dlx.preProcess();		
-			cbExtra.setSelected(dlx.Config.isEnableExtra());					
+			dlx.preProcess();
+			cbExtra.setSelected(dlx.Config.isEnableExtra());
 			tResultInfo.setText("Calculating...");
 			List<List<List<Integer>>> s = dlx.solve();
 			return s;
@@ -201,12 +198,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				System.err.println("The background task has been canceled!");
 			}
 			numOfSolution = solution.size();
-													
+
 			/* After geting the numofSolution, set the min and max of the slider. */
 			slider.setMinimum(1);
 			slider.setMaximum(numOfSolution);
 			slider.setValue(1);
-			
+
 			if(numOfSolution == 0)
 				tResultInfo.setText("No solutions!");
 			else if(numOfSolution == 1)
@@ -214,9 +211,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			else
 				tResultInfo.setText(numOfSolution+" solutions!");
 		}
-		
+
 	}
-	
+
 	private class CalculateStep extends SwingWorker<Integer, List<List<Integer>>>{
 
 		@Override
@@ -228,15 +225,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
 			dlx.Config.reset();
-			dlx.preProcess();		
-			cbExtra.setSelected(dlx.Config.isEnableExtra());						
+			dlx.preProcess();
+			cbExtra.setSelected(dlx.Config.isEnableExtra());
 			tResultInfo.setText("Calculating...");
-					
+
 			int number = 0;
 
 			List<List<Integer>> sol = dlx.nextSolution();
 			while(sol!=null){
-				
+
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
@@ -251,18 +248,18 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			return number;
 		}
-		
+
 		@Override
 		protected void done(){
 			bSolveAll.setEnabled(true);
 			bSolveStep.setEnabled(true);
 			bSolveTrail.setEnabled(true);
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			
+
 			System.out.println("Finished!!!!");
 			System.out.println("number of solutions: "+solution.size());
-			
-			
+
+
 			try {
 				numOfSolution = get();
 			} catch (InterruptedException e) {
@@ -273,12 +270,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				e.printStackTrace();
 				System.err.println("The background task has been canceled!");
 			}
-													
+
 			/* After geting the numofSolution, set the min and max of the slider. */
 			slider.setMinimum(1);
 			slider.setMaximum(numOfSolution);
 			slider.setValue(1);
-			
+
 			if(numOfSolution == 0)
 				tResultInfo.setText("No solutions!");
 			else if(numOfSolution == 1)
@@ -286,16 +283,16 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			else
 				tResultInfo.setText(numOfSolution+" solutions!");
 		}
-		
+
 		@Override
 		protected void process(List<List<List<Integer>>> r){
 			cleanTiles();
-//			System.out.println("Processed: "+r.get(r.size()-1));			
+//			System.out.println("Processed: "+r.get(r.size()-1));
 			displayStep(r.get(r.size()-1));
 		}
-		
+
 	}
-	
+
 	private class CalculateTrail extends SwingWorker<List<List<List<Integer>>>, List<List<Integer>>>{
 
 		@Override
@@ -307,16 +304,16 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
 			dlx.Config.reset();
-			dlx.preProcess();		
-			cbExtra.setSelected(dlx.Config.isEnableExtra());			
-			
+			dlx.preProcess();
+			cbExtra.setSelected(dlx.Config.isEnableExtra());
+
 			tResultInfo.setText("Calculating...");
-					
+
 			int number = 0;
 
 			List<List<Integer>> sol = dlx.nextSingleStep();
 			while(sol!=null){
-				
+
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
@@ -332,7 +329,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			List<List<List<Integer>>> s = dlx.solve();
 			return s;
 		}
-		
+
 		@Override
 		protected void done(){
 			bSolveAll.setEnabled(true);
@@ -350,12 +347,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				System.err.println("The background task has been canceled!");
 			}
 			numOfSolution = solution.size();
-													
+
 			/* After geting the numofSolution, set the min and max of the slider. */
 			slider.setMinimum(1);
 			slider.setMaximum(numOfSolution);
 			slider.setValue(1);
-			
+
 			if(numOfSolution == 0)
 				tResultInfo.setText("No solutions!");
 			else if(numOfSolution == 1)
@@ -363,22 +360,22 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			else
 				tResultInfo.setText(numOfSolution+" solutions!");
 		}
-		
+
 		@Override
 		protected void process(List<List<List<Integer>>> r){
 			cleanTiles();
-	//		System.out.println("Processed: "+r.get(r.size()-1));			
+	//		System.out.println("Processed: "+r.get(r.size()-1));
 			displayStep(r.get(r.size()-1));
 		}
-		
+
 	}
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 	public DisplayDLX() {
 		super(null);
 		setBackground(Color.WHITE);
@@ -393,16 +390,16 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		setupControlPanel();
 		setupDisplay();
 	}
-	
+
 	/**
 	 * Setup DLX instance.
-	 * 
+	 *
 	 * @param dls
 	 */
 	public void setDLX(DLX d) {
 		dlx = d;
 	}
-	
+
 	public void setupControlPanel() {
 
 		pControl = new JPanel();
@@ -483,7 +480,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		cbExtra.setEnabled(false);
 		pConfig.add(cbExtra);
 
-		
+
 		cbRmSymm = new JCheckBox("Remove symmetry");
 		cbRmSymm.setBackground(Color.WHITE);
 		cbRmSymm.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
@@ -493,8 +490,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		cbRmSymm.setLocation(10, 110);
 		cbRmSymm.setEnabled(true);
 		pConfig.add(cbRmSymm);
-				
-		
+
+
 		bSolveAll = new JButton("Get all solutions");
 		bSolveAll.setBackground(Color.WHITE);
 		bSolveAll.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
@@ -502,7 +499,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+
 				calculateAll = new CalculateAll();
 				calculateAll.execute();
 			}
@@ -512,7 +509,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		bSolveAll.setLocation(10, 150);
 		pConfig.add(bSolveAll);
 
-		
+
 		bSolveStep = new JButton("Solve & display steps");
 		bSolveStep.setBackground(Color.WHITE);
 		bSolveStep.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
@@ -520,7 +517,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+
 				calculateStep = new CalculateStep();
 				calculateStep.execute();
 			}
@@ -529,7 +526,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		bSolveStep.setSize(160, 30);
 		bSolveStep.setLocation(10, 190);
 		pConfig.add(bSolveStep);
-		
+
 		bSolveTrail = new JButton("Solve & display trails");
 		bSolveTrail.setBackground(Color.WHITE);
 		bSolveTrail.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
@@ -537,7 +534,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+
 				calculateTrail = new CalculateTrail();
 				calculateTrail.execute();
 			}
@@ -545,8 +542,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		});
 		bSolveTrail.setSize(160, 30);
 		bSolveTrail.setLocation(10, 230);
-		pConfig.add(bSolveTrail);	
-		
+		pConfig.add(bSolveTrail);
+
 		pControl.add(pConfig);
 
 
@@ -789,7 +786,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		fc.setCurrentDirectory(new File(".\\tests"));
 
 	}
-	
+
 	/**
 	 * Initiate the board from input and draw the board.
 	 */
@@ -802,7 +799,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				board[i][j] = b[i][j];
 			}
 		}
-		
+
 		/*
 		 * Initialize board related size.
 		 * There should be some redundancy for the sizeblock, or the edges cannot
@@ -814,7 +811,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				- gridWidth;
 		sizeTile = sizeBlock + gridWidth;
 		System.out.println("Size of block: " + sizeBlock);
-		
+
 		/* There are n kind of colors in the board. */
 		Set<Character> set = new HashSet<Character>();
 
@@ -909,7 +906,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		for (int i = 0; i < number; i++) {
 			List<Integer> tilePos = new ArrayList<Integer>();
 			tilePos = pos.get(i);
-			Color c = color[tilePos.get(0)];
+			Color c = colors.get(tilePos.get(0));
 			for (int j = 1; j < tilePos.size(); j++) {
 				JPanel block = new JPanel();
 				block.setBackground(c);
@@ -938,7 +935,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		for (int i = 0; i < number; i++) {
 			List<Integer> tilePos = new ArrayList<Integer>();
 			tilePos = pos.get(i);
-			Color c = color[tilePos.get(0)];
+			Color c = colors.get(tilePos.get(0));
 			for (int j = 1; j < tilePos.size(); j++) {
 				JPanel block = new JPanel();
 				block.setBackground(c);
@@ -958,7 +955,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		}
 		pDisplay.repaint();
 	}
-	
+
 	private void cleanTiles() {
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board[0].length; j++) {
@@ -974,7 +971,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		}
 		pDisplay.repaint();
 	}
-	
+
 	/**
 	 * This is a map between the assigned number of the board in DLX and the real position
 	 * for drawing when there are holes in the board.
@@ -989,13 +986,13 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		List<Integer> missing = new ArrayList<Integer>();
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board[0].length; j++) {
-				if (board[i][j] == ' ') 
+				if (board[i][j] == ' ')
 					missing.add(i * board[0].length + j);
 			}
 		}
 
 		for (int i = 0; i < missing.size(); i++) {
-			for (int j = missing.get(i) - i; j < posMap.length; j++) 
+			for (int j = missing.get(i) - i; j < posMap.length; j++)
 				posMap[j]++;
 		}
 	}
@@ -1025,11 +1022,11 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			}
 
 			/* Delete all panels in the pDisplay if there are. */
-			pDisplay.removeAll();			
+			pDisplay.removeAll();
 			/* Reset configuration . */
 			cbEnableSpin.setSelected(false);
 			cbEnableSpinFlip.setSelected(false);
-			
+
 			DataFileParser dfp = new DataFileParser(file.getAbsolutePath());
 			/* Extract puzzle pieces, board are included in this list. */
 			List<Tile> tileList = dfp.ExtractTiles();
@@ -1037,22 +1034,25 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			Tile board = tileList.get(0);
 			tileList.remove(0);
 
+			/* Initiate the color list */
+			colors = genColors(tileList.size());
+
 			/* Initiate a new DLX Solver and set it. */
 			DLX dlx = new DLX(board, tileList);
 			setDLX(dlx);
-			
-			/* Initialize the board and posMap. */ 
+
+			/* Initialize the board and posMap. */
 			setupBoard(board.data);
 			setPosMap();
 			repaint();
 
 		}
 	}
-		
+
 	public static void createAndShowGUI() {
 
 		JFrame frame = new JFrame("Puzzle solver");
-		frame.setContentPane(new DisplayDLX());		
+		frame.setContentPane(new DisplayDLX());
 		frame.setJMenuBar(mBar);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout());
@@ -1061,7 +1061,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		frame.setResizable(false);
 		frame.setVisible(true);
 	}
-	
+
 	public static void main(String[] args) {
 		/*
 		try {
@@ -1076,9 +1076,48 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			public void run() {
 				createAndShowGUI();
 			}
-			
+
 		});
 
+	}
+
+	/**
+	 * Generate n colors for n different tiles.
+	 * @param n - the number of tiles
+	 * @return a list of Color
+	 */
+	private List<Color> genColors(int n) {
+		List<Color> colors = new ArrayList<Color>();
+
+		double goldenRatio = 0.618033988749895;
+		double hue = 0.0; //or use random start value between 0 and 1
+		double saturation = 0.5;
+		double value = 0.95;
+
+		for (int i = 0; i < n; i++) {
+			hue = (hue + goldenRatio) % 1.0;
+
+			/* HSV to RGB */
+			int h = (int)(hue * 6);
+			double f = hue * 6 - h;
+			double p = value * (1 - saturation);
+			double q = value * (1 - f * saturation);
+			double t = value * (1 - (1 - f) * saturation);
+
+			double r, g, b;
+			switch (h) {
+			case 0: r = value; g = t; b = p; break;
+			case 1: r = q; g = value; b = p; break;
+			case 2: r = p; g = value; b = t; break;
+			case 3: r = p; g = q; b = value; break;
+			case 4: r = t; g = p; b = value; break;
+			case 5: r = value; g = p; b = q; break;
+			default: throw new RuntimeException("Error in genColor.");
+			}
+
+			colors.add(new Color((int)(r*256), (int)(g*256), (int)(b*256)));
+		}
+		return colors;
 	}
 
 }
