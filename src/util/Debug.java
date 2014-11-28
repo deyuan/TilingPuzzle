@@ -1,5 +1,7 @@
 package util;
 
+import java.util.Arrays;
+
 public class Debug {
 	public static final boolean debug = true;
 
@@ -27,4 +29,5 @@ public class Debug {
 		if (debug)
 			System.out.println(str + d);
 	}
+	
 }
