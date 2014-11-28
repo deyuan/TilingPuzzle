@@ -3,7 +3,6 @@ package dlx;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * DLX Search Algorithm (Basic Version)
  * @author Deyuan Guo, Dawei Fan
@@ -36,7 +35,6 @@ public class DLXBasicSearch {
 	public DLXBasicSearch(DLXBasicLinksArray dla, DLXConfig config) {
 		DLA = dla;
 		Config = config;
-
 		Trail = new DLXTrail();
 		Solution = new DLXTrail();
 	}
@@ -118,6 +116,7 @@ public class DLXBasicSearch {
 		if (minimizeBranchingFactor) {
 			int s = Integer.MAX_VALUE;
 			for (DLXColumnHeader j = c; j != DLA.H; j = j.R) {
+				if (Config.isEnableExtra() && j.col < DLA.numTiles) continue;
 				if (j.S < s) {
 					c = j;
 					s = j.S;
@@ -169,6 +168,7 @@ public class DLXBasicSearch {
 	 *
 	 * @param k
 	 */
+	@SuppressWarnings("unused")
 	private void searchRecur(int k) {
 
 		//if (Config.verb) { System.out.print("LV" + k + ": "); Solution.print(); }
@@ -293,11 +293,11 @@ public class DLXBasicSearch {
 	public List<List<Integer>> solutionToPosition(DLXTrail solution) {
 
 		List<List<Integer>> pos = new ArrayList<List<Integer>>();
-		for (int i = 0; i < Trail.size(); i++) {
+		for (int i = 0; i < Solution.size(); i++) {
 			List<Integer> tpos = new ArrayList<Integer>();
 
 			/* Find the leftmost cell */
-			DLXCell x = Trail.get(i);
+			DLXCell x = Solution.get(i);
 			while (x.L.col < x.col) x = x.L;
 
 			/* The first element in the list is the index of a tile,

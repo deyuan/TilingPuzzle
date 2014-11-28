@@ -53,17 +53,19 @@ public class DLX {
 	public DLX(Tile b, List<Tile> t) {
 		board = b;
 		tiles = t;
-		Solutions = new ArrayList<List<List<Integer>>>();
-
 		Config = new DLXConfig();
-		Config.setEnableSpin(true);
-
+	}
+	
+	public void preProcess(){
+		
+		Solutions = new ArrayList<List<List<Integer>>>();
 		if (solverSelection == 0) {
 			basicECA = new DLXBasicExactCoverArray(board, tiles, Config);
 			basicDLA = new DLXBasicLinksArray(basicECA, Config);
 			basicSearch = new DLXBasicSearch(basicDLA, Config);
 		}
 	}
+	
 
 	/**
 	 * Solve until find next solution.
@@ -98,6 +100,7 @@ public class DLX {
 	 * @return a list of solution
 	 */
 	public List<List<List<Integer>>> solve() {
+		System.out.println("Extra? "+Config.isEnableExtra());
 		if (solverSelection == 0) {
 			Solutions.addAll(basicSearch.solve());
 		}
@@ -110,7 +113,7 @@ public class DLX {
 	public void resetSearch() {
 		if (solverSelection == 0) basicSearch.reset();
 		Solutions.clear();
-
+		Config.reset();
 		if (Config.verb) System.out.println("DLX search has been reset.");
 	}
 

@@ -43,6 +43,19 @@ public class DLXConfig {
 	public DLXConfig() {
 	}
 
+	/**
+	 * Reset the configuration before every new process. 
+	 */
+	public void reset(){
+//		enableSpin = false;
+//		enableSpinFlip = false;
+//		enableExtra = false;
+		directlyFail = false;
+		searchFinished = false;
+		singleStepSearch = false;
+		singleSolutionSearch = false;
+	}
+	
 	public boolean isEnableSpin() { return enableSpin; }
 	public void setEnableSpin(boolean b) { enableSpin = b; }
 
