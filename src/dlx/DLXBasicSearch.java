@@ -75,7 +75,7 @@ public class DLXBasicSearch {
 	public List<List<Integer>> solveSingleStep() {
 		Config.setSingleStepSearch(true);
 		searchLoop(Trail);
-			return solutionToPosition(Solution);
+		return solutionToPosition(Solution);
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class DLXBasicSearch {
 
 		/* Do we really need this to deal with extra tiles? */
 		if (Config.isEnableExtra()) {
-			while (c.col < DLA.numTiles)
+			while (c.col > 0 && c.col < DLA.numTiles)
 				c = c.R;
 		}
 

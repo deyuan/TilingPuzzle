@@ -55,9 +55,8 @@ public class DLX {
 		tiles = t;
 		Config = new DLXConfig();
 	}
-	
+
 	public void preProcess(){
-		
 		Solutions = new ArrayList<List<List<Integer>>>();
 		if (solverSelection == 0) {
 			basicECA = new DLXBasicExactCoverArray(board, tiles, Config);
@@ -65,7 +64,6 @@ public class DLX {
 			basicSearch = new DLXBasicSearch(basicDLA, Config);
 		}
 	}
-	
 
 	/**
 	 * Solve until find next solution.
@@ -76,7 +74,9 @@ public class DLX {
 		if (solverSelection == 0) {
 			solution = basicSearch.solveSingleSolution();
 		}
-		Solutions.add(solution);
+		if (isCompleteSolution()) {
+			Solutions.add(solution);
+		}
 		return solution;
 	}
 
