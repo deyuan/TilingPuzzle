@@ -291,13 +291,14 @@ public class DLXBasicSearch {
 	 * @return
 	 */
 	public List<List<Integer>> solutionToPosition(DLXTrail solution) {
+		if (solution.size() == 0) return null;
 
 		List<List<Integer>> pos = new ArrayList<List<Integer>>();
-		for (int i = 0; i < Solution.size(); i++) {
+		for (int i = 0; i < solution.size(); i++) {
 			List<Integer> tpos = new ArrayList<Integer>();
 
 			/* Find the leftmost cell */
-			DLXCell x = Solution.get(i);
+			DLXCell x = solution.get(i);
 			while (x.L.col < x.col) x = x.L;
 
 			/* The first element in the list is the index of a tile,
