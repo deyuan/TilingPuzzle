@@ -162,20 +162,24 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	private int origin[] = { 20, 20 };
 	private int originTile[] = { 20 + gridWidth / 2, 20 + gridWidth / 2 };
 
-	private Calculate calculate = null;
+	private CalculateAll calculateAll = null;
+	private CalculateStep calculateStep = null;
+	private CalculateTrail calculateTrail = null;
 	
-	private class Calculate extends SwingWorker<List<List<List<Integer>>>, Void>{
+	private class CalculateAll extends SwingWorker<List<List<List<Integer>>>, Void>{
 
 		@Override
 		protected List<List<List<Integer>>> doInBackground() {
 			
+			solution = new ArrayList<List<List<Integer>>>();
 			bSolveAll.setEnabled(false);
+			bSolveStep.setEnabled(false);
+			bSolveTrail.setEnabled(false);
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
 			dlx.Config.reset();
 			dlx.preProcess();		
-			cbExtra.setSelected(dlx.Config.isEnableExtra());			
-			
+			cbExtra.setSelected(dlx.Config.isEnableExtra());					
 			tResultInfo.setText("Calculating...");
 			List<List<List<Integer>>> s = dlx.solve();
 			return s;
@@ -183,6 +187,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		@Override
 		protected void done(){
 			bSolveAll.setEnabled(true);
+			bSolveStep.setEnabled(true);
+			bSolveTrail.setEnabled(true);
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			try {
 				solution = get();
@@ -211,6 +217,168 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		
 	}
 	
+	private class CalculateStep extends SwingWorker<Integer, List<List<Integer>>>{
+
+		@Override
+		protected Integer doInBackground() {
+			solution = new ArrayList<List<List<Integer>>>();
+			bSolveAll.setEnabled(false);
+			bSolveStep.setEnabled(false);
+			bSolveTrail.setEnabled(false);
+			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
+			dlx.Config.reset();
+			dlx.preProcess();		
+			cbExtra.setSelected(dlx.Config.isEnableExtra());						
+			tResultInfo.setText("Calculating...");
+					
+			int number = 0;
+
+			List<List<Integer>> sol = dlx.nextSolution();
+			while(sol!=null){
+				
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				number++;
+				solution.add(sol);
+				publish(sol);
+				sol =  dlx.nextSolution();
+			}
+
+			return number;
+		}
+		
+		@Override
+		protected void done(){
+			bSolveAll.setEnabled(true);
+			bSolveStep.setEnabled(true);
+			bSolveTrail.setEnabled(true);
+			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			
+			System.out.println("Finished!!!!");
+			System.out.println("number of solutions: "+solution.size());
+			
+			
+			try {
+				numOfSolution = get();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.err.println("The background task has been canceled!");
+			}
+													
+			/* After geting the numofSolution, set the min and max of the slider. */
+			slider.setMinimum(1);
+			slider.setMaximum(numOfSolution);
+			slider.setValue(1);
+			
+			if(numOfSolution == 0)
+				tResultInfo.setText("No solutions!");
+			else if(numOfSolution == 1)
+				tResultInfo.setText("Only 1 solution!");
+			else
+				tResultInfo.setText(numOfSolution+" solutions!");
+		}
+		
+		@Override
+		protected void process(List<List<List<Integer>>> r){
+			cleanTiles();
+//			System.out.println("Processed: "+r.get(r.size()-1));			
+			displayStep(r.get(r.size()-1));
+		}
+		
+	}
+	
+	private class CalculateTrail extends SwingWorker<List<List<List<Integer>>>, List<List<Integer>>>{
+
+		@Override
+		protected List<List<List<Integer>>> doInBackground() {
+			solution = new ArrayList<List<List<Integer>>>();
+			bSolveAll.setEnabled(false);
+			bSolveStep.setEnabled(false);
+			bSolveTrail.setEnabled(false);
+			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
+			dlx.Config.reset();
+			dlx.preProcess();		
+			cbExtra.setSelected(dlx.Config.isEnableExtra());			
+			
+			tResultInfo.setText("Calculating...");
+					
+			int number = 0;
+
+			List<List<Integer>> sol = dlx.nextSingleStep();
+			while(sol!=null){
+				
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				number++;
+				solution.add(sol);
+				publish(sol);
+				sol =  dlx.nextSingleStep();
+			}
+
+			List<List<List<Integer>>> s = dlx.solve();
+			return s;
+		}
+		
+		@Override
+		protected void done(){
+			bSolveAll.setEnabled(true);
+			bSolveStep.setEnabled(true);
+			bSolveTrail.setEnabled(true);
+			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			try {
+				solution = get();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.err.println("The background task has been canceled!");
+			}
+			numOfSolution = solution.size();
+													
+			/* After geting the numofSolution, set the min and max of the slider. */
+			slider.setMinimum(1);
+			slider.setMaximum(numOfSolution);
+			slider.setValue(1);
+			
+			if(numOfSolution == 0)
+				tResultInfo.setText("No solutions!");
+			else if(numOfSolution == 1)
+				tResultInfo.setText("Only 1 solution!");
+			else
+				tResultInfo.setText(numOfSolution+" solutions!");
+		}
+		
+		@Override
+		protected void process(List<List<List<Integer>>> r){
+			cleanTiles();
+	//		System.out.println("Processed: "+r.get(r.size()-1));			
+			displayStep(r.get(r.size()-1));
+		}
+		
+	}
+	
+	
+	
+	
+	
+	
+	
 	public DisplayDLX() {
 		super(null);
 		setBackground(Color.WHITE);
@@ -225,7 +393,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		setupControlPanel();
 		setupDisplay();
 	}
-
+	
 	/**
 	 * Setup DLX instance.
 	 * 
@@ -335,8 +503,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				calculate = new Calculate();
-				calculate.execute();
+				calculateAll = new CalculateAll();
+				calculateAll.execute();
 			}
 
 		});
@@ -353,8 +521,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				calculate = new Calculate();
-				calculate.execute();
+				calculateStep = new CalculateStep();
+				calculateStep.execute();
 			}
 
 		});
@@ -370,8 +538,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				calculate = new Calculate();
-				calculate.execute();
+				calculateTrail = new CalculateTrail();
+				calculateTrail.execute();
 			}
 
 		});
@@ -380,13 +548,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pConfig.add(bSolveTrail);	
 		
 		pControl.add(pConfig);
-		
-		
-		
-		
-		
-		
-		
+
 
 		/* Initialize result sub-panel. */
 		pResult = new JPanel();
@@ -511,6 +673,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			public void stateChanged(ChangeEvent arg0) {
 				// TODO Auto-generated method stub
 				tIndex.setText(Integer.toString(slider.getValue()));
+				cleanTiles();
+				displayResults(slider.getValue() - 1);
 			}
 
 		});
@@ -622,7 +786,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		mBar.add(mHelp);
 
 		fc = new JFileChooser();
-		fc.setCurrentDirectory(new File(".\\testcases"));
+		fc.setCurrentDirectory(new File(".\\tests"));
 
 	}
 	
@@ -767,6 +931,34 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 	}
 
+	public void displayStep(List<List<Integer>> pos) {
+
+		int number = pos.size();
+
+		for (int i = 0; i < number; i++) {
+			List<Integer> tilePos = new ArrayList<Integer>();
+			tilePos = pos.get(i);
+			Color c = color[tilePos.get(0)];
+			for (int j = 1; j < tilePos.size(); j++) {
+				JPanel block = new JPanel();
+				block.setBackground(c);
+				block.setSize(sizeTile, sizeTile);
+				int x = originTile[0]
+						+ (posMap[tilePos.get(j)] % (board[0].length))
+						* sizeTile;
+				int y = originTile[0]
+						+ (posMap[tilePos.get(j)] / (board[0].length))
+						* sizeTile;
+				block.setLocation(x, y);
+				block.setOpaque(true);
+				block.setVisible(true);
+				pDisplay.add(block);
+
+			}
+		}
+		pDisplay.repaint();
+	}
+	
 	private void cleanTiles() {
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board[0].length; j++) {
