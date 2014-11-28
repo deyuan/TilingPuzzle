@@ -29,5 +29,16 @@ public class Debug {
 		if (debug)
 			System.out.println(str + d);
 	}
-	
+
+	/**
+	 * Print out a 2D array.
+	 * @param a
+	 */
+	public void print2DArray(int[][] a) {
+		System.out.println("2D array (" + a.length + "x" + a[0].length + ")");
+		for (int i = 0; i < a.length; i++)
+			System.out.println(Arrays.toString(a[i]));
+		System.out.println();
+	}
+
 }
