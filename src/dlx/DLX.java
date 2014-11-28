@@ -54,6 +54,7 @@ public class DLX {
 		board = b;
 		tiles = t;
 		Config = new DLXConfig();
+		Config.verb = false;
 	}
 
 	public void preProcess(){
