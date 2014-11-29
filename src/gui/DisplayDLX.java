@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -879,8 +880,16 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			for (int j = 0; j < l; j++) {
 				if (board[i][j] == ' ') {
 
-					JPanel block = new JPanel();
-					block.setBackground(Color.BLACK);
+					JPanel block = new JPanel() {
+						@Override
+						public void paintComponent(Graphics g) {
+							for (int i = 0; i < sizeTile; i += 4) {
+								g.drawLine(sizeTile - i, 0, 0, sizeTile - i);
+								g.drawLine(sizeTile, i, i, sizeTile);
+							}
+						}
+					};
+					//block.setBackground(Color.gray);
 					block.setSize(sizeTile, sizeTile);
 					int x = originTile[0] + (j) * sizeTile;
 					int y = originTile[1] + (i) * sizeTile;
@@ -895,7 +904,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		}
 		Object o[] = set.toArray();
 
-		for (int s = 1; s < set.size(); s++) {
+		if (set.size() > 1)
+		for (int s = 0; s < set.size(); s++) {
 			for (int i = 0; i < w; i++) {
 				for (int j = 0; j < l; j++) {
 					if (board[i][j] == (char) o[s]) {
