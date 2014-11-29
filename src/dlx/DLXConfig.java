@@ -44,7 +44,7 @@ public class DLXConfig {
 	}
 
 	/**
-	 * Reset the configuration before every new process. 
+	 * Reset the configuration before every new process.
 	 */
 	public void reset(){
 //		enableSpin = false;
@@ -55,7 +55,7 @@ public class DLXConfig {
 		singleStepSearch = false;
 		singleSolutionSearch = false;
 	}
-	
+
 	public boolean isEnableSpin() { return enableSpin; }
 	public void setEnableSpin(boolean b) { enableSpin = b; }
 
@@ -76,6 +76,18 @@ public class DLXConfig {
 
 	public boolean singleSolutionSearch() { return singleSolutionSearch; }
 	public void setSingleSolutionSearch(boolean b) { singleSolutionSearch = b; }
+
+	public void print() {
+		System.out.println("DLXConfig Class:");
+		System.out.println("Spin = " + enableSpin);
+		System.out.println("Spin/Flip = " + enableSpinFlip);
+		System.out.println("Extra = " + enableExtra);
+		System.out.println("Directly fail = " + directlyFail);
+		System.out.println("Search finished = " + searchFinished);
+		System.out.println("Single step search = " + singleStepSearch);
+		System.out.println("Single solution search = " + singleSolutionSearch);
+		System.out.println();
+	}
 
 	/******************** Private Member Functions ********************/
 

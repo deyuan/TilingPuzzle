@@ -57,7 +57,10 @@ public class DLX {
 		Config.verb = false;
 	}
 
-	public void preProcess(){
+	/**
+	 * DLX instance can be configured before calling preProcess
+	 */
+	public void preProcess() {
 		Solutions = new ArrayList<List<List<Integer>>>();
 		if (solverSelection == 0) {
 			basicECA = new DLXBasicExactCoverArray(board, tiles, Config);
@@ -101,7 +104,6 @@ public class DLX {
 	 * @return a list of solution
 	 */
 	public List<List<List<Integer>>> solve() {
-		System.out.println("Extra? "+Config.isEnableExtra());
 		if (solverSelection == 0) {
 			Solutions.addAll(basicSearch.solve());
 		}
@@ -147,9 +149,15 @@ public class DLX {
 		int rows = board.data.length;
 		int cols = board.data[0].length;
 		int[][] view = new int[rows][cols];
+		int cnt = 0;
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-				view[i][j] = boardPosition[i * cols + j];
+				if (board.data[i][j] != Config.S) {
+					view[i][j] = boardPosition[cnt];
+					cnt++;
+				} else {
+					view[i][j] = -1;
+				}
 			}
 		}
 
@@ -160,16 +168,17 @@ public class DLX {
 	 * Print all the solutions.
 	 */
 	public void printAllSolutions() {
-		if (Config.verb) {
-			int[][] view = null;
-			for (int i = 0; i < Solutions.size(); i++) {
-				System.out.println("Solution " + i + ":");
-				view = solutionView(Solutions.get(i));
-				for (int j = 0; j < view.length; j++) {
-					System.out.println(Arrays.toString(view[j]));
-				}
-				System.out.println();
+		System.out.println();
+		System.out.println("Find " + Solutions.size() + " solutions!");
+		System.out.println();
+		int[][] view = null;
+		for (int i = 0; i < Solutions.size(); i++) {
+			System.out.println("Solution " + (i+1) + ":");
+			view = solutionView(Solutions.get(i));
+			for (int j = 0; j < view.length; j++) {
+				System.out.println(Arrays.toString(view[j]));
 			}
+			System.out.println();
 		}
 	}
 

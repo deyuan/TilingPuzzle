@@ -89,7 +89,7 @@ public class DLXBasicExactCoverArray {
 			dbg.print2DArray(boardidx);
 		}
 
-		
+
 		/* Calculate the area of the all tiles. */
 		int area = 0;
 		for (int i = 0; i < tiles.size(); i++)
@@ -98,7 +98,7 @@ public class DLXBasicExactCoverArray {
 		/* The area of the board is cnt. */
 		// System.out.println("Tiles area: "+area+" board area: "+cnt);
 		if (area > cnt) {
-			System.out.println("Extra is set to be true!");
+			if (Config.verb) System.out.println("Extra is set to be true!");
 			Config.setEnableExtra(true);
 		}
 
