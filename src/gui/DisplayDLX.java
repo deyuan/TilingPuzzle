@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
@@ -94,6 +95,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	 * to reduce the time complexity to O(1), an array is used.
 	 */
 	private int posMap[];
+
+	/**
+	 * The speed of the single step and single solution. from 1ms to 500ms.
+	 */
+	private int speed = 250;
+
 	/**
 	 * Configure panel
 	 */
@@ -105,6 +112,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	JButton bSolveAll;
 	JButton bSolveStep;
 	JButton bSolveTrail;
+	JButton bPause;
+	JButton bStop;
+	JSlider sSpeed;
 
 	/**
 	 * Result panel.
@@ -116,7 +126,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	JButton bPre;
 	JButton bNext;
 	JButton bPlay;
-	JSlider slider;
+	JSlider sNumSolution;
 
 	/* Menu related */
 	/**
@@ -138,6 +148,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	 */
 	private boolean isRunning = false;
 
+
+	/**
+	 * For single step and single solution.
+	 */
+	private boolean isPaused = false;
+
 	/**
 	 * For playing all solutions.
 	 */
@@ -146,7 +162,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	/**
 	 * Size parameters.
 	 */
-	private static final int frameSize[] = { 820, 540 };
+	private static final int frameSize[] = { 820, 610 };
 	private static final int framePos[] = { 400, 20 };
 	private static final int displaySize[] = { 600, 480 };
 	private static final int displayPos[] = { 200, 5 };
@@ -201,9 +217,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			numOfSolution = solution.size();
 
 			/* After geting the numofSolution, set the min and max of the slider. */
-			slider.setMinimum(1);
-			slider.setMaximum(numOfSolution);
-			slider.setValue(1);
+			sNumSolution.setMinimum(1);
+			sNumSolution.setMaximum(numOfSolution);
+			sNumSolution.setValue(1);
 
 			if(numOfSolution == 0)
 				tResultInfo.setText("No solutions!");
@@ -223,6 +239,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bSolveAll.setEnabled(false);
 			bSolveStep.setEnabled(false);
 			bSolveTrail.setEnabled(false);
+			bPause.setEnabled(true);
+			bStop.setEnabled(true);
+
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
 			dlx.Config.reset();
@@ -233,13 +252,19 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			int number = 0;
 
 			List<List<Integer>> sol = dlx.nextSolution();
-			while(sol!=null){
-
+			while(sol!=null && !isCancelled()){
+				while(isPaused){
+					try {
+						Thread.sleep(1);
+					} catch (InterruptedException e) {
+						System.err.println("Sleep Interrupt!");
+					}
+				};
 				try {
-					Thread.sleep(500);
+					Thread.sleep(speed);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.err.println("Sleep interrupt");
 				}
 				number++;
 				solution.add(sol);
@@ -255,6 +280,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bSolveAll.setEnabled(true);
 			bSolveStep.setEnabled(true);
 			bSolveTrail.setEnabled(true);
+			bPause.setEnabled(false);
+			bStop.setEnabled(false);
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 			System.out.println("Finished!!!!");
@@ -264,18 +291,17 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			try {
 				numOfSolution = get();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.err.println("The background task has been interrupt!");
 			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.err.println("The background task has been excuted incorrectly!");
+			} catch (CancellationException e){
 				System.err.println("The background task has been canceled!");
 			}
 
 			/* After geting the numofSolution, set the min and max of the slider. */
-			slider.setMinimum(1);
-			slider.setMaximum(numOfSolution);
-			slider.setValue(1);
+			sNumSolution.setMinimum(1);
+			sNumSolution.setMaximum(numOfSolution);
+			sNumSolution.setValue(1);
 
 			if(numOfSolution == 0)
 				tResultInfo.setText("No solutions!");
@@ -302,6 +328,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bSolveAll.setEnabled(false);
 			bSolveStep.setEnabled(false);
 			bSolveTrail.setEnabled(false);
+			bPause.setEnabled(true);
+			bStop.setEnabled(true);
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
 			dlx.Config.reset();
@@ -313,18 +341,24 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			int number = 0;
 
 			List<List<Integer>> sol = dlx.nextSingleStep();
-			while(sol!=null){
-
+			while(sol!=null && !isCancelled()){
+				while(isPaused){
+					try {
+						Thread.sleep(1);
+					} catch (InterruptedException e) {
+						System.err.println("Sleep Interrupt!");
+					}
+				};
 				try {
-					Thread.sleep(500);
+					Thread.sleep(speed);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.err.println("Sleep Interrupt!");
 				}
 				number++;
 				solution.add(sol);
 				publish(sol);
 				sol =  dlx.nextSingleStep();
+
 			}
 
 			List<List<List<Integer>>> s = dlx.solve();
@@ -336,6 +370,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bSolveAll.setEnabled(true);
 			bSolveStep.setEnabled(true);
 			bSolveTrail.setEnabled(true);
+			bPause.setEnabled(false);
+			bStop.setEnabled(false);
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			try {
 				solution = get();
@@ -350,9 +386,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			numOfSolution = solution.size();
 
 			/* After geting the numofSolution, set the min and max of the slider. */
-			slider.setMinimum(1);
-			slider.setMaximum(numOfSolution);
-			slider.setValue(1);
+			sNumSolution.setMinimum(1);
+			sNumSolution.setMaximum(numOfSolution);
+			sNumSolution.setValue(1);
 
 			if(numOfSolution == 0)
 				tResultInfo.setText("No solutions!");
@@ -365,16 +401,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		@Override
 		protected void process(List<List<List<Integer>>> r){
 			cleanTiles();
-	//		System.out.println("Processed: "+r.get(r.size()-1));
 			displayStep(r.get(r.size()-1));
 		}
 
 	}
-
-
-
-
-
 
 
 	public DisplayDLX() {
@@ -406,7 +436,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pControl = new JPanel();
 		pControl.setBackground(Color.WHITE);
 		pControl.setLocation(5, 5);
-		pControl.setSize(190, 460);
+		pControl.setSize(190, 540);
 		pControl.setOpaque(true);
 		pControl.setVisible(true);
 		pControl.setFocusable(true);
@@ -421,7 +451,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pConfig = new JPanel();
 		pConfig.setBackground(Color.WHITE);
 		pConfig.setLocation(5, 5);
-		pConfig.setSize(180, 270);
+		pConfig.setSize(180, 350);
 		pConfig.setOpaque(true);
 		pConfig.setVisible(true);
 		pConfig.setFocusable(true);
@@ -545,6 +575,79 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		bSolveTrail.setLocation(10, 230);
 		pConfig.add(bSolveTrail);
 
+
+		JLabel lSpeed = new JLabel("Speed");
+		lSpeed.setSize(40, 20);
+		lSpeed.setLocation(10, 265);
+		pConfig.add(lSpeed);
+
+		sSpeed = new JSlider(1, 500, 250);
+		sSpeed.setBackground(Color.WHITE);
+		sSpeed.setSize(160, 30);
+		sSpeed.setLocation(10, 280);
+		sSpeed.setSnapToTicks(false);
+		sSpeed.setPaintTicks(false);
+		sSpeed.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				speed = 501-sSpeed.getValue();
+			}
+
+		});
+		pConfig.add(sSpeed);
+
+
+		bPause = new JButton("Pause");
+
+		bPause.setBackground(Color.WHITE);
+		bPause.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		bPause.setEnabled(false);
+		bPause.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				isPaused = !isPaused;
+				if(isPaused){
+					bPause.setText("Resume");
+				}
+				else{
+					bPause.setText("Pause");
+				}
+			}
+
+		});
+		bPause.setSize(75, 30);
+		bPause.setLocation(10, 310);
+		pConfig.add(bPause);
+
+		bStop = new JButton("Stop");
+		bStop.setBackground(Color.WHITE);
+		bStop.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		bStop.setEnabled(false);
+		bStop.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				if(calculateStep!=null && calculateStep.getState() == SwingWorker.StateValue.STARTED){
+					calculateStep.cancel(true);
+					/* Reset something */
+
+				}
+				else if(calculateTrail!=null && calculateTrail.getState() == SwingWorker.StateValue.STARTED){
+					calculateTrail.cancel(true);
+//					calculateTrail.get
+				}
+
+			}
+
+		});
+		bStop.setSize(75, 30);
+		bStop.setLocation(95, 310);
+		pConfig.add(bStop);
+
+
 		pControl.add(pConfig);
 
 
@@ -552,7 +655,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pResult = new JPanel();
 		pResult.setBackground(Color.WHITE);
 		pResult.setSize(180, 180);
-		pResult.setLocation(5, 280);
+		pResult.setLocation(5, 360);
 		pResult.setOpaque(true);
 		pResult.setVisible(true);
 		pResult.setFocusable(true);
@@ -596,7 +699,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 					displayResults(id - 1);
 
 					/* Set slider. */
-					slider.setValue(id);
+					sNumSolution.setValue(id);
 				}
 
 				else {
@@ -625,7 +728,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 					cleanTiles();
 					displayResults(cur - 1);
 					/* Set slider. */
-					slider.setValue(cur);
+					sNumSolution.setValue(cur);
 				}
 			}
 
@@ -648,7 +751,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 					cleanTiles();
 					displayResults(cur - 1);
 					/* Set slider. */
-					slider.setValue(cur);
+					sNumSolution.setValue(cur);
 				}
 
 			}
@@ -656,28 +759,29 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		});
 		pResult.add(bNext);
 
-		slider = new JSlider();
-		slider.setBackground(Color.WHITE);
-		slider.setSize(160, 30);
-		slider.setLocation(10, 110);
-		slider.setExtent(0);
-		slider.setMinimum(1);
-		slider.setMaximum(100);
-		slider.setSnapToTicks(false);
-		slider.setPaintTicks(false);
-		slider.addChangeListener(new ChangeListener() {
+		sNumSolution = new JSlider();
+		sNumSolution.setBackground(Color.WHITE);
+		sNumSolution.setSize(160, 30);
+		sNumSolution.setLocation(10, 110);
+		sNumSolution.setExtent(0);
+		sNumSolution.setMinimum(1);
+		sNumSolution.setMaximum(100);
+		sNumSolution.setSnapToTicks(false);
+		sNumSolution.setPaintTicks(false);
+		sNumSolution.addChangeListener(new ChangeListener() {
 
 			@Override
 			public void stateChanged(ChangeEvent arg0) {
 				// TODO Auto-generated method stub
-				tIndex.setText(Integer.toString(slider.getValue()));
+				tIndex.setText(Integer.toString(sNumSolution.getValue()));
 				cleanTiles();
-				displayResults(slider.getValue() - 1);
+				if(sNumSolution.getValue()>=1 && sNumSolution.getValue()<=numOfSolution)
+					displayResults(sNumSolution.getValue() - 1);
 			}
 
 		});
 
-		pResult.add(slider);
+		pResult.add(sNumSolution);
 
 		bPlay = new JButton("Autoplay all solutions");
 		bPlay.setBackground(Color.WHITE);
@@ -709,7 +813,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 												.getText());
 										cleanTiles();
 										displayResults(i);
-										slider.setValue(i + 1);
+										sNumSolution.setValue(i + 1);
 										try {
 											Thread.sleep(500);
 										} catch (InterruptedException e) {
@@ -722,7 +826,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 								isThread = false;
 								isRunning = false;
 								bPlay.setText("Autoplay all solutions");
-								slider.setValue(1);
+								sNumSolution.setValue(1);
 							}
 						}).start();
 
@@ -784,7 +888,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		mBar.add(mHelp);
 
 		fc = new JFileChooser();
-		fc.setCurrentDirectory(new File(".\\tests"));
+		fc.setCurrentDirectory(new File(".\\testcases"));
 
 	}
 
@@ -1045,6 +1149,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				JOptionPane.showConfirmDialog(null, "No file is selected!",
 						"Warning", JOptionPane.CLOSED_OPTION,
 						JOptionPane.WARNING_MESSAGE);
+				return;
 			}
 
 			/* Delete all panels in the pDisplay if there are. */
