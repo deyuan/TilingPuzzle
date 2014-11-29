@@ -30,6 +30,9 @@ public class DLXCell {
 	/** The column of this cell in exact cover array */
 	public int col;
 
+	/** The id of the related tile, used for eliminating tile duplication */
+	public int tid;
+
 	/******************** Private Member Variables ********************/
 
 	/******************** Public Member Functions ********************/

@@ -61,6 +61,18 @@ public class DLXBasicLinksArray {
 		verifyDancingLinks();
 	}
 
+	/**
+	 * Return true if a column header is reachable from H.
+	 * @param col
+	 * @return
+	 */
+	public boolean isReachableColumnHeader(int col) {
+		for (DLXColumnHeader h = H.R; h.col <= col && h != H; h = h.R) {
+			if (h.col == col) return true;
+		}
+		return false;
+	}
+
 	/******************** Private Member Functions ********************/
 
 	/**
@@ -95,8 +107,10 @@ public class DLXBasicLinksArray {
 			CHA[i] = y;
 			if (i < numTiles) {
 				CHA[i].N = "T" + Integer.toString(i);
+				CHA[i].tid = i;
 			} else {
 				CHA[i].N = "_" + Integer.toString(i - numTiles);
+				CHA[i].tid = -1;
 			}
 		}
 
@@ -138,6 +152,7 @@ public class DLXBasicLinksArray {
 						prev.R = curr;
 						prev = curr;
 					}
+					curr.tid = leftmost.col;  // Assign tid for each DLXCell
 				}
 			}
 			curr.R = leftmost;

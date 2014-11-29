@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import util.DataFileParser;
 import util.Tile;
 
 /**
@@ -55,12 +56,31 @@ public class DLX {
 		tiles = t;
 		Config = new DLXConfig();
 		Config.verb = false;
+		Config.recognizeDuplica(tiles);
+	}
+
+	public DLX(String puzzleFilePath) {
+		DataFileParser dfp = new DataFileParser(puzzleFilePath);
+		/* Extract puzzle pieces, board are included in this list. */
+		tiles = dfp.ExtractTiles();
+		/* Get the board and the remained is tileList. */
+		board = tiles.get(0);
+		tiles.remove(0);
+
+		Config = new DLXConfig();
+		Config.verb = true;
+		Config.recognizeDuplica(tiles);
 	}
 
 	/**
 	 * DLX instance can be configured before calling preProcess
 	 */
 	public void preProcess() {
+		if (Config.verb) {
+			board.printTile();
+			for (Tile t: tiles) t.printTile();
+		}
+
 		Solutions = new ArrayList<List<List<Integer>>>();
 		if (solverSelection == 0) {
 			basicECA = new DLXBasicExactCoverArray(board, tiles, Config);
@@ -75,9 +95,9 @@ public class DLX {
 	 */
 	public List<List<Integer>> nextSolution() {
 		List<List<Integer>> solution = null;
-		if (solverSelection == 0) {
+		if (solverSelection == 0)
 			solution = basicSearch.solveSingleSolution();
-		}
+
 		if (isCompleteSolution()) {
 			Solutions.add(solution);
 		}
@@ -90,9 +110,8 @@ public class DLX {
 	 */
 	public List<List<Integer>> nextSingleStep() {
 		List<List<Integer>> solution = null;
-		if (solverSelection == 0) {
-			solution = basicSearch.solveSingleStep();
-		}
+		if (solverSelection == 0) solution = basicSearch.solveSingleStep();
+
 		if (isCompleteSolution()) {
 			Solutions.add(solution);
 		}
@@ -104,9 +123,7 @@ public class DLX {
 	 * @return a list of solution
 	 */
 	public List<List<List<Integer>>> solve() {
-		if (solverSelection == 0) {
-			Solutions.addAll(basicSearch.solve());
-		}
+		if (solverSelection == 0) Solutions.addAll(basicSearch.solve());
 		return Solutions;
 	}
 

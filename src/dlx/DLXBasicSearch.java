@@ -107,22 +107,52 @@ public class DLXBasicSearch {
 		/* Choose the first column */
 		DLXColumnHeader c = DLA.H.R;
 
-		/* Do we really need this to deal with extra tiles? */
-		if (Config.isEnableExtra()) {
-			while (c.col > 0 && c.col < DLA.numTiles)
-				c = c.R;
-		}
-
-		if (minimizeBranchingFactor) {
-			int s = Integer.MAX_VALUE;
-			for (DLXColumnHeader j = c; j != DLA.H; j = j.R) {
-				if (Config.isEnableExtra() && j.col < DLA.numTiles) continue;
-				if (j.S < s) {
-					c = j;
-					s = j.S;
+		/* Eliminate tile duplication: If duplicated tiles in Solution are
+		 * not in correct order, then return DLA.H to invoke backtracking */
+		if (Config.eliminateDuplica()) {
+			for (int i = 0; i < Solution.size(); i++) {
+				DLXCell x = Solution.get(i);
+				if (Config.duplica()[x.tid] != x.tid) {
+					int j = x.tid;
+					while (j > Config.duplica()[j]) {
+						j = Config.duplica()[j];
+						if (DLA.isReachableColumnHeader(j)) return DLA.H;
+					}
 				}
 			}
 		}
+
+		/* Choose the column with the smallest size or choose the leftmost */
+		if (minimizeBranchingFactor) {
+			int s = Integer.MAX_VALUE;
+			for (DLXColumnHeader h = c; h != DLA.H; h = h.R) {
+				/* skip tiles' column when extra tiles exist */
+				if (Config.isEnableExtra() && h.col < DLA.numTiles) continue;
+
+				/* skip duplicated tiles' column */
+				if (Config.eliminateDuplica() && h.col < DLA.numTiles) {
+					if(Config.duplica()[h.col] != h.col) continue;
+				}
+
+				/* choose the minimum */
+				if (h.S < s) {
+					c = h;
+					s = h.S;
+				}
+			}
+		} else {
+			/* Deal with extra tiles: skip tile columns */
+			if (Config.isEnableExtra()) {
+				while (c.col >= 0 && c.col < DLA.numTiles) c = c.R;
+			}
+
+			/* Deal with duplication: skip duplicated tile columns */
+			if (Config.eliminateDuplica()) {
+				while (c.col >= 0 && c.col < DLA.numTiles
+						&& Config.duplica()[c.col] != c.col) c = c.R;
+			}
+		}
+
 		//if (Config.verb) System.out.println("Choose column c" + c.col);
 		return c;
 	}

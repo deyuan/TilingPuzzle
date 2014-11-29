@@ -1,5 +1,9 @@
 package dlx;
 
+import java.util.List;
+
+import util.Tile;
+
 
 /**
  * DLX Algorithm Configuration
@@ -38,6 +42,17 @@ public class DLXConfig {
 	/** Single step search */
 	private boolean singleSolutionSearch = false;
 
+	/** Eliminate symmetry solution */
+	private boolean eliminateSymmetry = true;
+
+	/** Eliminate same solution due to duplicated tiles */
+	private boolean eliminateDuplica = true;
+
+	/** Tile duplication recodes */
+	private int[] duplica = null;
+	private int[] duplicaS = null;
+	private int[] duplicaSF = null;
+
 	/******************** Public Member Functions ********************/
 
 	public DLXConfig() {
@@ -54,6 +69,8 @@ public class DLXConfig {
 		searchFinished = false;
 		singleStepSearch = false;
 		singleSolutionSearch = false;
+		eliminateSymmetry = true;
+		eliminateDuplica = true;
 	}
 
 	public boolean isEnableSpin() { return enableSpin; }
@@ -77,16 +94,112 @@ public class DLXConfig {
 	public boolean singleSolutionSearch() { return singleSolutionSearch; }
 	public void setSingleSolutionSearch(boolean b) { singleSolutionSearch = b; }
 
+	public boolean eliminateSymmetry() { return eliminateSymmetry; }
+	public void setEliminateSymmetry(boolean b) { eliminateSymmetry = b; }
+
+	public boolean eliminateDuplica() { return eliminateDuplica; }
+	public void setEliminateDuplica(boolean b) { eliminateDuplica = b; }
+
+	/**
+	 * Return the reference of the correct duplica array.
+	 * @return
+	 */
+	public int[] duplica() {
+		if (enableSpinFlip) return duplicaSF;
+		if (enableSpin) return duplicaS;
+		return duplica;
+	}
+
 	public void print() {
 		System.out.println("DLXConfig Class:");
 		System.out.println("Spin = " + enableSpin);
 		System.out.println("Spin/Flip = " + enableSpinFlip);
 		System.out.println("Extra = " + enableExtra);
+		System.out.println("Eliminate symmetry = " + eliminateSymmetry);
+		System.out.println("Eliminate duplica = " + eliminateDuplica);
 		System.out.println("Directly fail = " + directlyFail);
 		System.out.println("Search finished = " + searchFinished);
 		System.out.println("Single step search = " + singleStepSearch);
 		System.out.println("Single solution search = " + singleSolutionSearch);
 		System.out.println();
+	}
+
+	/**
+	 * Recognize the duplicated tiles, i.e. fill in duplica/S/SF fields.
+	 * @param tiles - Tile list in area descending order
+	 */
+	public void recognizeDuplica(List<Tile> tiles) {
+		for (int i = 0; i < tiles.size(); i++) {
+			tiles.get(i).setId(i);
+			tiles.get(i).setDuplica(-1);
+			tiles.get(i).setDuplicaS(-1);
+			tiles.get(i).setDuplicaSF(-1);
+		}
+
+		int b = 0, e;
+		while (b < tiles.size()) {
+
+			/* Find the same area interval [b, e] */
+			for (e = b; e < tiles.size(); e++) {
+				if (tiles.get(e).area != tiles.get(b).area) {
+					break;
+				}
+			}
+			e--;
+
+			/* Recognize */
+			for (int i = e; i >= b; i--) {
+				Tile ti = tiles.get(i);
+				if (ti.getDuplica() == -1) {
+					ti.setDuplica(i);
+					Tile tprev = ti;
+					for (int j = i - 1; j >= b; j--) {
+						Tile tj = tiles.get(j);
+						if (tj.equal(ti)) {
+							tprev.setDuplica(j);
+							tj.setDuplica(i);
+							tprev = tj;
+						}
+					}
+				}
+				if (ti.getDuplicaS() == -1) {
+					ti.setDuplicaS(i);
+					Tile tprev = ti;
+					for (int j = i - 1; j >= b; j--) {
+						Tile tj = tiles.get(j);
+						if (tj.equalS(ti)) {
+							tprev.setDuplicaS(j);
+							tj.setDuplicaS(i);
+							tprev = tj;
+						}
+					}
+				}
+				if (ti.getDuplicaSF() == -1) {
+					ti.setDuplicaSF(i);
+					Tile tprev = ti;
+					for (int j = i - 1; j >= b; j--) {
+						Tile tj = tiles.get(j);
+						if (tj.equalSF(ti)) {
+							tprev.setDuplicaSF(j);
+							tj.setDuplicaSF(i);
+							tprev = tj;
+						}
+					}
+				}
+			}
+
+			/* Next iteration */
+			b = e + 1;
+		}
+
+		duplica = new int[tiles.size()];
+		duplicaS = new int[tiles.size()];
+		duplicaSF = new int[tiles.size()];
+		for (int i = 0; i < tiles.size(); i++) {
+			duplica[i] = tiles.get(i).getDuplica();
+			duplicaS[i] = tiles.get(i).getDuplicaS();
+			duplicaSF[i] = tiles.get(i).getDuplicaSF();
+		}
 	}
 
 	/******************** Private Member Functions ********************/

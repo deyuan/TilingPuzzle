@@ -61,6 +61,25 @@ public class Tile implements Comparable<Tile> {
 	 */
 	public int area;
 
+	/**
+	 * Use these to record the indices of the next duplicated tiles (as rings).
+	 * e.g. if (tileList.get(i).duplica == i) then tile i is identity;
+	 * else the next same tile index is tileList.get(i).duplica
+	 * Note: duplica index may not be the same in condition of spin/flip.
+	 */
+	private int id = -1;
+	private int duplica = -1;
+	private int duplicaS = -1;
+	private int duplicaSF = -1;
+	public void setId(int i) { id = i; }
+	public void setDuplica(int i) { duplica = i; }
+	public void setDuplicaS(int i) { duplicaS = i; }
+	public void setDuplicaSF(int i) { duplicaSF = i; }
+	public int getId() { return id; }
+	public int getDuplica() { return duplica; }
+	public int getDuplicaS() { return duplicaS; }
+	public int getDuplicaSF() { return duplicaSF; }
+
 	public Tile(char[][] t) {
 		w = t.length;
 		l = t[0].length;
@@ -132,9 +151,15 @@ public class Tile implements Comparable<Tile> {
 	}
 
 	public void printTile() {
-		System.out.println("Tile: ");
+		System.out.println("Tile ID = " + id);
+		System.out.print("Next = " + duplica);
+		System.out.print(", NextS = " + duplicaS);
+		System.out.println(", NextSF = " + duplicaSF);
+		System.out.print("Spin = " + spattern.size());
+		System.out.println(", Spin/Flip = " + sfpattern.size());
 		for (int i = 0; i < w; i++)
 			System.out.println(Arrays.toString(data[i]));
+		System.out.println();
 	}
 
 	/**
@@ -172,18 +197,62 @@ public class Tile implements Comparable<Tile> {
 		return t.area - area;
 	}
 
+	/**
+	 * Determine if two 2D char arrays are equal
+	 * @param a
+	 * @param b
+	 * @return
+	 */
 	public boolean equal(char[][] a, char[][] b) {
 		if (a.length != b.length || a[0].length != b[0].length)
 			return false;
-		int h = a.length;
-		int w = a[0].length;
-		for (int i = 0; i < h; i++) {
-			for (int j = 0; j < w; j++) {
+		for (int i = 0; i < a.length; i++) {
+			for (int j = 0; j < a[0].length; j++) {
 				if (a[i][j] != b[i][j])
 					return false;
 			}
 		}
-
 		return true;
 	}
+
+	/**
+	 * Determine if a tile is equal to current tile (without spin or flip)
+	 * @param t
+	 * @return
+	 */
+	public boolean equal(Tile t) {
+		if (area != t.area) return false;
+		return equal(data, t.data);
+	}
+
+	/**
+	 * Determine if a tile is equal to current tile (with spin)
+	 * @param t
+	 * @return
+	 */
+	public boolean equalS(Tile t) {
+		if (area != t.area) return false;
+		if (spattern.size() != t.spattern.size()) return false;
+		for (int i = 0; i < spattern.size(); i++) {
+			if (equal(spattern.get(i), t.spattern.get(0)))
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Determine if a tile is equal to current tile (with spin and flip)
+	 * @param t
+	 * @return
+	 */
+	public boolean equalSF(Tile t) {
+		if (area != t.area) return false;
+		if (sfpattern.size() != t.sfpattern.size()) return false;
+		for (int i = 0; i < sfpattern.size(); i++) {
+			if (equal(sfpattern.get(i), t.sfpattern.get(0)))
+				return true;
+		}
+		return false;
+	}
+
 }
