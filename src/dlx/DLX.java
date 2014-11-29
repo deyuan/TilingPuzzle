@@ -68,7 +68,7 @@ public class DLX {
 		tiles.remove(0);
 
 		Config = new DLXConfig();
-		Config.verb = true;
+		Config.verb = false;
 		Config.recognizeDuplica(tiles);
 	}
 
@@ -81,6 +81,7 @@ public class DLX {
 			for (Tile t: tiles) t.printTile();
 		}
 
+		Config.autoSetEliminateDuplica();
 		Solutions = new ArrayList<List<List<Integer>>>();
 		if (solverSelection == 0) {
 			basicECA = new DLXBasicExactCoverArray(board, tiles, Config);
@@ -123,6 +124,8 @@ public class DLX {
 	 * @return a list of solution
 	 */
 	public List<List<List<Integer>>> solve() {
+		Config.autoSetEliminateDuplica();
+		//Config.print();
 		if (solverSelection == 0) Solutions.addAll(basicSearch.solve());
 		return Solutions;
 	}

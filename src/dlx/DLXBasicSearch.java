@@ -235,7 +235,10 @@ public class DLXBasicSearch {
 		Solution.setComplete(false);
 
 		/* Directly Failed */
-		if (Config.isDirectlyFail()) return;
+		if (Config.isDirectlyFail()) {
+			Config.setSearchFinished(true);
+			return;
+		}
 
 		/* If start from an empty trail */
 		if (!Config.searchFinished() && trail.isEmpty()) {

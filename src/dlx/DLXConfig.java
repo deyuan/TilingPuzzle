@@ -69,8 +69,8 @@ public class DLXConfig {
 		searchFinished = false;
 		singleStepSearch = false;
 		singleSolutionSearch = false;
-		eliminateSymmetry = true;
-		eliminateDuplica = true;
+		eliminateSymmetry = false;
+		//eliminateDuplica = false;
 	}
 
 	public boolean isEnableSpin() { return enableSpin; }
@@ -99,6 +99,17 @@ public class DLXConfig {
 
 	public boolean eliminateDuplica() { return eliminateDuplica; }
 	public void setEliminateDuplica(boolean b) { eliminateDuplica = b; }
+	public void autoSetEliminateDuplica() {
+		for (int i = 0; i < duplica.length; i++) {
+			if ((duplica[i] != i) ||
+					(duplicaS[i] != i && enableSpin) ||
+					(duplicaSF[i] != i && enableSpinFlip)) {
+				eliminateDuplica = true;
+				return;
+			}
+		}
+		eliminateDuplica = false;
+	}
 
 	/**
 	 * Return the reference of the correct duplica array.
