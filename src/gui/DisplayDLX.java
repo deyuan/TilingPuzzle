@@ -202,9 +202,18 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		protected List<List<List<Integer>>> doInBackground() {
 
 			solution = new ArrayList<List<List<Integer>>>();
+
+			/* Disable all useless buttons to prevent incorrect operations. */
 			bSolveAll.setEnabled(false);
 			bSolveStep.setEnabled(false);
 			bSolveTrail.setEnabled(false);
+
+			bShowResult.setEnabled(false);
+			bPre.setEnabled(false);
+			bNext.setEnabled(false);
+			bPlay.setEnabled(false);
+
+
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
 			dlx.Config.reset();
@@ -219,6 +228,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bSolveAll.setEnabled(true);
 			bSolveStep.setEnabled(true);
 			bSolveTrail.setEnabled(true);
+
+			bShowResult.setEnabled(true);
+			bPre.setEnabled(true);
+			bNext.setEnabled(true);
+			bPlay.setEnabled(true);
+
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			try {
 				solution = get();
@@ -263,6 +278,11 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bPause.setEnabled(true);
 			bStop.setEnabled(true);
 
+			bShowResult.setEnabled(false);
+			bPre.setEnabled(false);
+			bNext.setEnabled(false);
+			bPlay.setEnabled(false);
+
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
 			dlx.Config.reset();
@@ -304,6 +324,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bSolveTrail.setEnabled(true);
 			bPause.setEnabled(false);
 			bStop.setEnabled(false);
+
+			bShowResult.setEnabled(true);
+			bPre.setEnabled(true);
+			bNext.setEnabled(true);
+			bPlay.setEnabled(true);
+
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 			System.out.println("Finished!!!!");
@@ -359,6 +385,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bSolveTrail.setEnabled(false);
 			bPause.setEnabled(true);
 			bStop.setEnabled(true);
+
+			bShowResult.setEnabled(false);
+			bPre.setEnabled(false);
+			bNext.setEnabled(false);
+			bPlay.setEnabled(false);
+
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
 			dlx.Config.reset();
@@ -401,6 +433,13 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bSolveTrail.setEnabled(true);
 			bPause.setEnabled(false);
 			bStop.setEnabled(false);
+
+			bShowResult.setEnabled(true);
+			bPre.setEnabled(true);
+			bNext.setEnabled(true);
+			bPlay.setEnabled(true);
+
+
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			try {
 				solution = get();
