@@ -233,9 +233,14 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			numOfSolution = solution.size();
 
 			/* After geting the numofSolution, set the min and max of the slider. */
+			/* Note: only when there is state change the solution could be displayed! */
 			sNumSolution.setMinimum(1);
 			sNumSolution.setMaximum(numOfSolution);
+			sNumSolution.setMinimum(0);
+			sNumSolution.setValue(0);
 			sNumSolution.setValue(1);
+			sNumSolution.setMinimum(1);
+
 
 			if(numOfSolution == 0)
 				tResultInfo.setText("No solutions!");
@@ -797,6 +802,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			@Override
 			public void stateChanged(ChangeEvent arg0) {
 				// TODO Auto-generated method stub
+				System.out.println("State changed!");
+
 				tIndex.setText(Integer.toString(sNumSolution.getValue()));
 				cleanTiles();
 				if(sNumSolution.getValue()>=1 && sNumSolution.getValue()<=numOfSolution)
@@ -972,7 +979,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		mBar.add(mHelp);
 
 		fc = new JFileChooser();
-		fc.setCurrentDirectory(new File("."));
+		fc.setCurrentDirectory(new File("./testcases"));
 
 	}
 
@@ -1258,6 +1265,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			/* Reset configuration . */
 			cbEnableSpin.setSelected(false);
 			cbEnableSpinFlip.setSelected(false);
+
+			/* Reset text field */
+			tResultInfo.setText("Press button to solve");
 
 			DataFileParser dfp = new DataFileParser(file.getAbsolutePath());
 			/* Extract puzzle pieces, board are included in this list. */
