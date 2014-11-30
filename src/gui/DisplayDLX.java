@@ -172,13 +172,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	/**
 	 * Size parameters.
 	 */
-	private static final int frameSize[] = { 820+300, 610 };
+	private static final int frameSize[] = { 820+340, 610 };
 	private static final int framePos[] = { 400, 20 };
-	private static final int displaySize[] = { 600, 500 };
-	private static final int displayPos[] = { 200, 5 };
-	private static final int tileListSize[] = { 300, 600 };
-	private static final int tileListPos[] = { 800, 5 };
+	private static final int displaySize[] = { 600, 535 };
+	private static final int displayPos[] = { 195, 10 };
+	private static final int tileListSize[] = { 340, 535 };
+	private static final int tileListPos[] = { 800, 10 };
 
+	private int OffsetX = 5;
+	private int OffsetY = 15;
 
 	private static final int gridWidth = 3;
 
@@ -442,44 +444,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		setupControlPanel();
 		setupDisplayPanel();
 		setupTileListPanel();
-		/* The background panel of tile list. */
-// 		JPanel content = new JPanel(new BorderLayout());
-//		JPanel content = new JPanel(null);
-//		content.setSize(tileListSize[0], tileListSize[1]);
-//		content.setLocation(tileListPos[0], tileListPos[1]);
-//		this.add(content);
-		/*
-		pTileList = new JPanel();
-		pTileList.setAutoscrolls(true);
-		pTileList.setPreferredSize(new Dimension(300, 900));
-
-		scroll = new JScrollPane(pTileList);
-		scroll.setViewportView(pTileList);
-		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		scroll.setPreferredSize(new Dimension(tileListSize[0], tileListSize[1]-300));
-		scroll.setLocation(tileListPos[0], tileListPos[1]);
-
-//		pTileList.setLocation(tileListPos[0], tileListPos[1]);
-//		this.add(pTileList);
-		content.add(scroll, BorderLayout.CENTER);
-		*/
-
-//		pTileList = new JPanel();
-//		pTileList.setSize(300, 700);
-//		pTileList.setSize(300, 700);
-//		pTileList.setPreferredSize(new Dimension(300, 800));
-		/*
-		scroll = new JScrollPane(pTileList);
-		scroll.setViewportView(pTileList);
-		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		scroll.setPreferredSize(new Dimension(tileListSize[0], tileListSize[1]-300));
-		scroll.setLocation(tileListPos[0], tileListPos[1]);
-		 */
-//		pTileList.setLocation(tileListPos[0], tileListPos[1]);
-//		content.add(pTileList);
-//		content.add(scroll, BorderLayout.CENTER);
 	}
 
 	/**
@@ -914,6 +878,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pDisplay.setOpaque(true);
 		pDisplay.setVisible(true);
 		pDisplay.setFocusable(true);
+		pDisplay.setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createTitledBorder("Solution"),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
 		this.add(pDisplay);
 	}
@@ -927,6 +894,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pTileList.setOpaque(true);
 		pTileList.setVisible(true);
 		pTileList.setFocusable(true);
+		pTileList.setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createTitledBorder("Tiles candidates"),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
 		this.add(pTileList);
 	}
@@ -949,21 +919,22 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		System.out.println("Max:"+lMax);
 
 		int grid = width/lMax;
+		JPanel block[] = new JPanel[t.size()];
 		for(int i = 0; i<t.size(); i++){
-			JPanel pic = new JPanel();
+			JPanel pic = new JPanel(null);
 			pic.setSize(100, 100);
-			pic.setLocation(i%3*100, i/3*100);
+			pic.setLocation(i%3*105+15, i/3*105+30);
 			pic.setBackground(Color.white);
 			pTileList.add(pic);
-//			scroll.add(pic);
+
 			for(int j = 0; j<t.get(i).data.length; j++){
 				for(int k = 0; k<t.get(i).data[0].length; k++){
 					if(t.get(i).data[j][k]!=' '){
-						JPanel block = new JPanel();
-						block.setBackground(colorList.get(i));
-						block.setSize(grid, grid);
-						block.setLocation(k*grid, j*grid);
-						pic.add(block);
+						block[i] = new JPanel();
+						block[i].setBackground(colorList.get(i));
+						block[i].setSize(grid, grid);
+						block[i].setLocation(k*grid, j*grid);
+						pic.add(block[i]);
 					}
 				}
 			}
@@ -1024,8 +995,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		 * be drawn.
 		 */
 		sizeBlock = Math.min(
-				(displaySize[0] - origin[0] - 5) / board[0].length,
-				(displaySize[1] - origin[1] - 5) / board.length)
+				(displaySize[0] - origin[0] - 20) / board[0].length,
+				(displaySize[1] - origin[1] - 20) / board.length)
 				- gridWidth;
 		sizeTile = sizeBlock + gridWidth;
 		System.out.println("Size of block: " + sizeBlock);
@@ -1037,6 +1008,11 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		int l = board[0].length;
 		System.out.println("Width: " + w + " Length: " + l);
 
+		/* Set offset, to make the board display in the middle. */
+		OffsetX = displaySize[0]/2 - (l * (sizeBlock + gridWidth) + gridWidth)/2-18;
+		OffsetY = displaySize[1]/2 - (w * (sizeBlock + gridWidth) + gridWidth)/2-10;
+
+
 		/* First is x, second is y. */
 		int sizeGridH[] = { l * (sizeBlock + gridWidth) + gridWidth, gridWidth };
 		int sizeGridV[] = { gridWidth, w * (sizeBlock + gridWidth) + gridWidth };
@@ -1045,13 +1021,13 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		JPanel gridH_w[] = new JPanel[w + 1];
 		JPanel gridV_w[] = new JPanel[l + 1];
 
-		/* Add some white grids */
+		/* Setup horizontal and vertical white grids */
 		for (int i = 0; i <= w; i++) {
 			gridH_w[i] = new JPanel();
 			gridH_w[i].setBackground(Color.white);
 			gridH_w[i].setSize(sizeGridH[0] - 2, sizeGridH[1] - 2);
-			gridH_w[i].setLocation(origin[0] + 1, origin[1] + (sizeBlock + gridWidth)
-					* i + 1);
+			gridH_w[i].setLocation(origin[0] + OffsetX, origin[1] + (sizeBlock + gridWidth)
+					* i + OffsetY);
 			gridH_w[i].setOpaque(true);
 			gridH_w[i].setVisible(true);
 			pDisplay.add(gridH_w[i]);
@@ -1061,20 +1037,20 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			gridV_w[j] = new JPanel();
 			gridV_w[j].setBackground(Color.white);
 			gridV_w[j].setSize(sizeGridV[0] - 2, sizeGridV[1] - 2);
-			gridV_w[j].setLocation(origin[0] + (sizeBlock + gridWidth) * j + 1,
-					origin[1] + 1);
+			gridV_w[j].setLocation(origin[0] + (sizeBlock + gridWidth) * j + OffsetX,
+					origin[1] + OffsetY);
 			gridV_w[j].setOpaque(true);
 			gridV_w[j].setVisible(true);
 			pDisplay.add(gridV_w[j]);
 		}
 
-		/* Setup horizontal and vertical grids */
+		/* Setup horizontal and vertical black grids */
 		for (int i = 0; i <= w; i++) {
 			gridH[i] = new JPanel();
 			gridH[i].setBackground(Color.black);
 			gridH[i].setSize(sizeGridH[0], sizeGridH[1]);
-			gridH[i].setLocation(origin[0], origin[1] + (sizeBlock + gridWidth)
-					* i);
+			gridH[i].setLocation(origin[0]+OffsetX-1, origin[1] + (sizeBlock + gridWidth)
+					* i+OffsetY-1);
 			gridH[i].setOpaque(true);
 			gridH[i].setVisible(true);
 			pDisplay.add(gridH[i]);
@@ -1084,8 +1060,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			gridV[j] = new JPanel();
 			gridV[j].setBackground(Color.black);
 			gridV[j].setSize(sizeGridV[0], sizeGridV[1]);
-			gridV[j].setLocation(origin[0] + (sizeBlock + gridWidth) * j,
-					origin[1]);
+			gridV[j].setLocation(origin[0] + (sizeBlock + gridWidth) * j+OffsetX-1,
+					origin[1]+OffsetY-1);
 			gridV[j].setOpaque(true);
 			gridV[j].setVisible(true);
 			pDisplay.add(gridV[j]);
@@ -1105,10 +1081,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 							}
 						}
 					};
-					//block.setBackground(Color.gray);
 					block.setSize(sizeTile, sizeTile);
-					int x = originTile[0] + (j) * sizeTile;
-					int y = originTile[1] + (i) * sizeTile;
+					int x = originTile[0] + (j) * sizeTile+OffsetX;
+					int y = originTile[1] + (i) * sizeTile+OffsetY;
 					block.setLocation(x, y);
 					/* Set it to transparent to display the chars on a board. */
 					block.setOpaque(true);
@@ -1118,8 +1093,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 					set.add(board[i][j]);
 			}
 		}
-		Object o[] = set.toArray();
 
+		Object o[] = set.toArray();
+		/* Setup board colors(now use chars to represent) if there are more than one colors. */
 		if (set.size() > 1)
 		for (int s = 0; s < set.size(); s++) {
 			for (int i = 0; i < w; i++) {
@@ -1130,8 +1106,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 						block.setSize(sizeTile / 2, sizeTile / 2);
 						block.setFont(new Font(block.getFont().getName(),
 								Font.BOLD, 28));
-						int x = originTile[0] + (j) * sizeTile + sizeTile / 3;
-						int y = originTile[1] + (i) * sizeTile + sizeTile / 3;
+						int x = originTile[0] + (j) * sizeTile + sizeTile / 3+OffsetX;
+						int y = originTile[1] + (i) * sizeTile + sizeTile / 3+OffsetY;
 						block.setLocation(x, y);
 						block.setOpaque(false);
 						block.setVisible(true);
@@ -1165,10 +1141,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				block.setSize(sizeTile, sizeTile);
 				int x = originTile[0]
 						+ (posMap[tilePos.get(j)] % (board[0].length))
-						* sizeTile;
+						* sizeTile+OffsetX;
 				int y = originTile[0]
 						+ (posMap[tilePos.get(j)] / (board[0].length))
-						* sizeTile;
+						* sizeTile+OffsetY;
 				block.setLocation(x, y);
 				block.setOpaque(true);
 				block.setVisible(true);
@@ -1194,10 +1170,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				block.setSize(sizeTile, sizeTile);
 				int x = originTile[0]
 						+ (posMap[tilePos.get(j)] % (board[0].length))
-						* sizeTile;
+						* sizeTile+OffsetX ;
 				int y = originTile[0]
 						+ (posMap[tilePos.get(j)] / (board[0].length))
-						* sizeTile;
+						* sizeTile+OffsetY;
 				block.setLocation(x, y);
 				block.setOpaque(true);
 				block.setVisible(true);
@@ -1209,11 +1185,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	}
 
 	private void cleanTiles() {
+
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board[0].length; j++) {
 				/* Avoid deleting the grids. */
-				int x = originTile[0] + j * sizeTile + gridWidth + 2;
-				int y = originTile[0] + i * sizeTile + gridWidth + 2;
+				int x = originTile[0] + j * sizeTile + gridWidth + 2+OffsetX;
+				int y = originTile[0] + i * sizeTile + gridWidth + 2+OffsetY;
 
 				if (board[i][j] != ' ') {
 					Component t = pDisplay.getComponentAt(x, y);
@@ -1315,7 +1292,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		frame.getContentPane().setLayout(new BorderLayout());
 		frame.setSize(frameSize[0], frameSize[1]);
 		frame.setLocation(framePos[0], framePos[1]);
-		frame.setResizable(true);
+		frame.setResizable(false);
 		frame.setVisible(true);
 	}
 
