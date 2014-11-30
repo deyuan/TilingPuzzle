@@ -43,9 +43,11 @@ public class DLXConfig {
 	private boolean singleSolutionSearch = false;
 
 	/** Eliminate symmetry solution */
-	private boolean eliminateSymmetry = true;
+	private boolean eliminateSymmetry = false;
 
-	/** Eliminate same solution due to duplicated tiles */
+	/** Eliminate same solution due to duplicated tiles
+	 *  Note it is enabled by default.
+	 */
 	private boolean eliminateDuplica = true;
 
 	/** Tile duplication recodes */
@@ -62,14 +64,12 @@ public class DLXConfig {
 	 * Reset the configuration before every new process.
 	 */
 	public void reset(){
-//		enableSpin = false;
-//		enableSpinFlip = false;
-//		enableExtra = false;
+		/* Reset all search related configuration. */
 		directlyFail = false;
 		searchFinished = false;
 		singleStepSearch = false;
 		singleSolutionSearch = false;
-		eliminateSymmetry = false;
+//		eliminateSymmetry = false;
 		//eliminateDuplica = false;
 	}
 
@@ -218,6 +218,7 @@ public class DLXConfig {
 			duplicaSF[i] = tiles.get(i).getDuplicaSF();
 		}
 	}
+
 
 	/******************** Private Member Functions ********************/
 

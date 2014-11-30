@@ -173,7 +173,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	 * Size parameters.
 	 */
 	private static final int frameSize[] = { 820+340, 610 };
-	private static final int framePos[] = { 400, 20 };
+	private static final int framePos[] = { 200, 20 };
 	private static final int displaySize[] = { 600, 535 };
 	private static final int displayPos[] = { 195, 10 };
 	private static final int tileListSize[] = { 340, 535 };
@@ -212,6 +212,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bPre.setEnabled(false);
 			bNext.setEnabled(false);
 			bPlay.setEnabled(false);
+			tIndex.setText("0");
 
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -221,6 +222,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
 			tResultInfo.setText("Calculating...");
 			List<List<List<Integer>>> s = dlx.solve();
+			dlx.printAllSolutions();
+//			System.out.println(s);
 			return s;
 		}
 		@Override
@@ -309,8 +312,11 @@ public class DisplayDLX extends JPanel implements ActionListener {
 					System.err.println("Sleep interrupt");
 				}
 				number++;
-				solution.add(sol);
-				publish(sol);
+
+				if(sol.get(0).get(0)!=-1){
+					solution.add(sol);
+					publish(sol);
+				}
 				sol =  dlx.nextSolution();
 			}
 
@@ -398,8 +404,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
 
 			tResultInfo.setText("Calculating...");
-
-			int number = 0;
+			tIndex.setText("0");
 
 			List<List<Integer>> sol = dlx.nextSingleStep();
 			while(sol!=null && !isCancelled()){
@@ -415,11 +420,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				} catch (InterruptedException e) {
 					System.err.println("Sleep Interrupt!");
 				}
-				number++;
 				solution.add(sol);
 				publish(sol);
 				sol =  dlx.nextSingleStep();
-
 			}
 
 			List<List<List<Integer>>> s = dlx.solve();
@@ -588,6 +591,16 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		cbRmSymm.setSize(160, 30);
 		cbRmSymm.setLocation(10, 110);
 		cbRmSymm.setEnabled(true);
+		cbRmSymm.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (cbRmSymm.isSelected())
+					dlx.Config.setEliminateSymmetry(true);
+				else
+					dlx.Config.setEliminateSymmetry(false);
+			}
+
+		});
 		pConfig.add(cbRmSymm);
 
 
@@ -840,9 +853,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			@Override
 			public void stateChanged(ChangeEvent arg0) {
-				// TODO Auto-generated method stub
-				System.out.println("State changed!");
-
 				tIndex.setText(Integer.toString(sNumSolution.getValue()));
 				cleanTiles();
 				if(sNumSolution.getValue()>=1 && sNumSolution.getValue()<=numOfSolution)
@@ -1119,6 +1129,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				if (board[i][j] == ' ') {
 
 					JPanel block = new JPanel() {
+						private static final long serialVersionUID = 1L;
+
 						@Override
 						public void paintComponent(Graphics g) {
 							for (int i = 0; i < sizeTile; i += 4) {
@@ -1163,8 +1175,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				}
 			}
 		}
-
-//		System.out.println(set);
 	}
 
 	public void displayResults(int id) {
@@ -1272,6 +1282,63 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		}
 	}
 
+	/**
+	 * Generate n colors for n different tiles.
+	 * @param n - the number of tiles
+	 * @return a list of Color
+	 */
+	private List<Color> genColors(int n) {
+		List<Color> colors = new ArrayList<Color>();
+
+		/* Default color list. */
+		colors.addAll(Arrays.asList(
+				Color.cyan,
+				Color.blue,
+				Color.green,
+				Color.red,
+				Color.yellow,
+				new Color(46, 139, 87),
+				new Color(148, 0, 211),
+				new Color(135, 51, 36),
+				Color.magenta,
+				Color.gray,
+				Color.pink,
+				new Color(175, 255, 225),
+				new Color(130, 175, 190)
+				));
+
+		double goldenRatio = 0.618033988749895;
+		double hue = 0.0; //or use random start value between 0 and 1
+		double saturation = 0.5;
+		double value = 0.95;
+
+		int m = n - colors.size();
+		for (int i = 0; i < m; i++) {
+			hue = (hue + goldenRatio) % 1.0;
+
+			/* HSV to RGB */
+			int h = (int)(hue * 6);
+			double f = hue * 6 - h;
+			double p = value * (1 - saturation);
+			double q = value * (1 - f * saturation);
+			double t = value * (1 - (1 - f) * saturation);
+
+			double r, g, b;
+			switch (h) {
+			case 0: r = value; g = t; b = p; break;
+			case 1: r = q; g = value; b = p; break;
+			case 2: r = p; g = value; b = t; break;
+			case 3: r = p; g = q; b = value; break;
+			case 4: r = t; g = p; b = value; break;
+			case 5: r = value; g = p; b = q; break;
+			default: throw new RuntimeException("Error in genColor.");
+			}
+
+			colors.add(new Color((int)(r*256), (int)(g*256), (int)(b*256)));
+		}
+		return colors;
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == miExit)
@@ -1307,6 +1374,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			/* Reset text field */
 			tResultInfo.setText("Press button to solve");
+			tIndex.setText("0");
 
 			DataFileParser dfp = new DataFileParser(file.getAbsolutePath());
 			/* Extract puzzle pieces, board are included in this list. */
@@ -1364,60 +1432,5 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 	}
 
-	/**
-	 * Generate n colors for n different tiles.
-	 * @param n - the number of tiles
-	 * @return a list of Color
-	 */
-	private List<Color> genColors(int n) {
-		List<Color> colors = new ArrayList<Color>();
 
-		/* Default color list. */
-		colors.addAll(Arrays.asList(
-				Color.cyan,
-				Color.blue,
-				Color.green,
-				Color.red,
-				Color.yellow,
-				new Color(46, 139, 87),
-				new Color(148, 0, 211),
-				new Color(135, 51, 36),
-				Color.magenta,
-				Color.gray,
-				Color.pink,
-				new Color(175, 255, 225),
-				new Color(130, 175, 190)
-				));
-
-		double goldenRatio = 0.618033988749895;
-		double hue = 0.0; //or use random start value between 0 and 1
-		double saturation = 0.5;
-		double value = 0.95;
-
-		int m = n - colors.size();
-		for (int i = 0; i < m; i++) {
-			hue = (hue + goldenRatio) % 1.0;
-
-			/* HSV to RGB */
-			int h = (int)(hue * 6);
-			double f = hue * 6 - h;
-			double p = value * (1 - saturation);
-			double q = value * (1 - f * saturation);
-			double t = value * (1 - (1 - f) * saturation);
-
-			double r, g, b;
-			switch (h) {
-			case 0: r = value; g = t; b = p; break;
-			case 1: r = q; g = value; b = p; break;
-			case 2: r = p; g = value; b = t; break;
-			case 3: r = p; g = q; b = value; break;
-			case 4: r = t; g = p; b = value; break;
-			case 5: r = value; g = p; b = q; break;
-			default: throw new RuntimeException("Error in genColor.");
-			}
-
-			colors.add(new Color((int)(r*256), (int)(g*256), (int)(b*256)));
-		}
-		return colors;
-	}
 }

@@ -145,6 +145,7 @@ public class DLXSymmetry {
 	 *
 	 * @return result
 	 */
+	@SuppressWarnings("unused")
 	private static  int[][] rotateC0(int data[][]) {
 		return data;
 	}

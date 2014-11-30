@@ -48,6 +48,7 @@ public class DLX {
 	private DLXBasicSearch basicSearch = null;
 
 	private List<List<List<Integer>>> Solutions = null;
+	private List<int[][]> ViewList = null;
 
 	/******************** Public Member Functions ********************/
 
@@ -76,6 +77,27 @@ public class DLX {
 	}
 
 	/**
+	 * Detect symmetric operation.
+	 * This is just a pseudo code.
+	 */
+	public void detectSymmetric(){
+
+		if(Config.eliminateSymmetry()){
+			if(Config.isEnableSpinFlip() && board.spattern.size()!=8){
+				//Calculating with all symmetric patterns.
+			}
+			else if(Config.isEnableSpin() && board.spattern.size()!=4){
+				//Calculating with spin symmetric patterns.
+			}
+			else
+				; //Do nothing
+		}
+	}
+
+
+
+
+	/**
 	 * DLX instance can be configured before calling preProcess
 	 */
 	public void preProcess() {
@@ -86,6 +108,7 @@ public class DLX {
 
 		Config.autoSetEliminateDuplica();
 		Solutions = new ArrayList<List<List<Integer>>>();
+		ViewList = new ArrayList<int[][]>();
 		if (solverSelection == 0) {
 			basicECA = new DLXBasicExactCoverArray(board, tiles, Config);
 			basicDLA = new DLXBasicLinksArray(basicECA, Config);
@@ -103,7 +126,67 @@ public class DLX {
 			solution = basicSearch.solveSingleSolution();
 
 		if (isCompleteSolution()) {
-			Solutions.add(solution);
+
+			int view[][] = solutionView(solution);
+			/* Check the solution is a unique solution. */
+			/* The first solution. */
+			if(ViewList.size()==0){
+				Solutions.add(solution);
+				ViewList.add(view);
+				return solution;
+			}
+			else{
+				/* Remove symmetry. */
+				if(Config.eliminateSymmetry()&&Config.isEnableSpinFlip()){
+					System.out.println("We are here! rmsymm+sf");
+
+
+					if(DLXSymmetry.isAsymmetricList(view, ViewList, true)){
+						Solutions.add(solution);
+						ViewList.add(view);
+						return solution;
+					}
+					else{
+						List<Integer> err= new ArrayList<Integer>();
+						err.add(-1);
+						solution.add(err);
+						return solution;
+					}
+
+
+				}
+				else if(Config.eliminateSymmetry()&&Config.isEnableSpin()){
+					System.out.println("We are here! rmsymm+s");
+
+					System.out.println("This time View: ");
+					DLXSymmetry.printMatrix(view);
+					System.out.println("This time View List: ");
+
+					for(int i = 0; i<ViewList.size(); i++)
+						DLXSymmetry.printMatrix(ViewList.get(i));
+
+					if(DLXSymmetry.isAsymmetricList(view, ViewList, false)){
+						Solutions.add(solution);
+						ViewList.add(view);
+						return solution;
+					}
+					else{
+						System.out.println("Not added!");
+						List<Integer> err= new ArrayList<Integer>();
+						err.add(-1);
+						solution.add(err);
+						return solution;
+					}
+				}
+				/* Don't remove symmetry. */
+				else{
+					System.out.println("We are here! none! "+Config.eliminateSymmetry());
+					ViewList.add(solutionView(solution));
+					Solutions.add(solution);
+					return solution;
+				}
+			}
+
 		}
 		return solution;
 	}
