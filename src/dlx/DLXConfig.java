@@ -74,10 +74,16 @@ public class DLXConfig {
 	}
 
 	public boolean isEnableSpin() { return enableSpin; }
-	public void setEnableSpin(boolean b) { enableSpin = b; }
+	public void setEnableSpin(boolean b) {
+		enableSpin = b;
+		if (b == false) enableSpinFlip = false;
+	}
 
 	public boolean isEnableSpinFlip() { return enableSpinFlip; }
-	public void setEnableSpinFlip(boolean b) { enableSpinFlip = b; }
+	public void setEnableSpinFlip(boolean b) {
+		enableSpinFlip = b;
+		if (b == true) enableSpin = true;
+	}
 
 	public boolean isEnableExtra() { return enableExtra; }
 	public void setEnableExtra(boolean b) { enableExtra = b; }

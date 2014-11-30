@@ -97,6 +97,25 @@ public class DLXBasicSearch {
 	/******************** Private Member Functions ********************/
 
 	/**
+	 * Determine if duplicated tiles are used in order in current solution.
+	 * @return true if in order
+	 */
+	private boolean duplicatedTilesUsedInOrder() {
+		for (int i = 0; i < Solution.size(); i++) {
+			DLXCell x = Solution.get(i);
+			if (Config.duplica()[x.tid] != x.tid) {
+				int j = x.tid;
+				while (j > Config.duplica()[j]) {
+					j = Config.duplica()[j];
+					if (DLA.isReachableColumnHeader(j))
+						return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Choose Column Object - Part of the Dancing Link Algorithm
 	 *
 	 * @return reference to a column object
@@ -110,16 +129,7 @@ public class DLXBasicSearch {
 		/* Eliminate tile duplication: If duplicated tiles in Solution are
 		 * not in correct order, then return DLA.H to invoke backtracking */
 		if (Config.eliminateDuplica()) {
-			for (int i = 0; i < Solution.size(); i++) {
-				DLXCell x = Solution.get(i);
-				if (Config.duplica()[x.tid] != x.tid) {
-					int j = x.tid;
-					while (j > Config.duplica()[j]) {
-						j = Config.duplica()[j];
-						if (DLA.isReachableColumnHeader(j)) return DLA.H;
-					}
-				}
-			}
+			if (!duplicatedTilesUsedInOrder()) return DLA.H;
 		}
 
 		/* Choose the column with the smallest size or choose the leftmost */
@@ -283,11 +293,13 @@ public class DLXBasicSearch {
 
 			/* Output */
 			if (DLA.H.R == DLA.H || DLA.H.L.col < DLA.numTiles) {
-				if (Config.verb) {
-					System.out.print("Find: ");
-					Solution.print();
+				if (!Config.eliminateDuplica() || duplicatedTilesUsedInOrder()) {
+					if (Config.verb) {
+						System.out.print("Find: ");
+						Solution.print();
+					}
+					Solution.setComplete(true);
 				}
-				Solution.setComplete(true);
 			}
 		} while (!Config.singleStepSearch() &&
 				!(Config.singleSolutionSearch() && Solution.isComplete()));

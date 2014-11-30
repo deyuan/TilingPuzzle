@@ -11,6 +11,9 @@ import util.Tile;
  * Class DLX. Public interface by Main or GUI.
  * @author Deyuan Guo, Dawei Fan
  *
+ * @version 2.1 Support eliminating duplicated solutions caused by identical
+ *          tiles. 11/29/2014
+ *
  * @version 2.0 Support single step and single solution searching. 11/27/2014
  *
  * @version 1.1 Split the algorithm into several files. 11/26/2014
