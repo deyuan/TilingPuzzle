@@ -97,12 +97,12 @@ public class DLXBasicSearch {
 	/******************** Private Member Functions ********************/
 
 	/**
-	 * Determine if duplicated tiles are used in order in current solution.
+	 * Determine if duplicated tiles are used in order in current trail.
 	 * @return true if in order
 	 */
-	private boolean duplicatedTilesUsedInOrder() {
-		for (int i = 0; i < Solution.size(); i++) {
-			DLXCell x = Solution.get(i);
+	private boolean duplicatedTilesUsedInOrder(DLXTrail trail) {
+		for (int i = 0; i < trail.size(); i++) {
+			DLXCell x = trail.get(i);
 			if (Config.duplica()[x.tid] != x.tid) {
 				int j = x.tid;
 				while (j > Config.duplica()[j]) {
@@ -116,6 +116,27 @@ public class DLXBasicSearch {
 	}
 
 	/**
+	 * Push all the choices for next level search.
+	 * So duplication and symmetry can be eliminated here.
+	 * @param trail
+	 * @param c
+	 */
+	private void pushNextLevelSearch(DLXTrail trail, DLXColumnHeader c) {
+		for (DLXCell i = c.U; i != c; i = i.U) {
+			/* TODO: if need to eliminate symmetry, only push non-symmetry
+			 * row of the first tile. */
+
+			trail.push(i);
+			/* Eliminate tile duplication: If duplicated tiles in
+			 * Trail are not used in correct order, then pop them */
+			if (Config.eliminateDuplica()) {
+				if (!duplicatedTilesUsedInOrder(trail))
+					trail.pop();
+			}
+		}
+	}
+
+	/**
 	 * Choose Column Object - Part of the Dancing Link Algorithm
 	 *
 	 * @return reference to a column object
@@ -125,12 +146,6 @@ public class DLXBasicSearch {
 
 		/* Choose the first column */
 		DLXColumnHeader c = DLA.H.R;
-
-		/* Eliminate tile duplication: If duplicated tiles in Solution are
-		 * not in correct order, then return DLA.H to invoke backtracking */
-		if (Config.eliminateDuplica()) {
-			if (!duplicatedTilesUsedInOrder()) return DLA.H;
-		}
 
 		/* Choose the column with the smallest size or choose the leftmost */
 		if (minimizeBranchingFactor) {
@@ -165,6 +180,22 @@ public class DLXBasicSearch {
 
 		//if (Config.verb) System.out.println("Choose column c" + c.col);
 		return c;
+	}
+
+	/**
+	 * Choose the first Column Object - for eliminating symmetry
+	 *
+	 * @return reference to a column object
+	 */
+	private DLXColumnHeader chooseFirstColumnObject() {
+		/* Normal selection */
+		if (!Config.eliminateSymmetry() || Config.isEnableExtra()) {
+			return chooseColumnObject();
+		}
+
+		/* TODO: Symmetry: select the leader tile column */
+
+		return chooseColumnObject();
 	}
 
 	/**
@@ -204,6 +235,99 @@ public class DLXBasicSearch {
 	}
 
 	/**
+	 * Searching with Dancing Links (while loop with stack version)
+	 *
+	 * @param k
+	 */
+	private void searchLoop(DLXTrail trail) {
+		Solution.setComplete(false);
+
+		/* Directly Failed */
+		if (Config.isDirectlyFail()) {
+			Config.setSearchFinished(true);
+			return;
+		}
+
+		/* If start from an empty trail */
+		if (!Config.searchFinished() && trail.isEmpty()) {
+			DLXColumnHeader c = chooseFirstColumnObject();
+			pushNextLevelSearch(trail, c);
+		}
+
+		/* Search kernel */
+		do {
+			/* Backtracking */
+			while (!Solution.isEmpty() && Solution.top() == trail.top()) {
+				DLXCell t = Solution.pop();
+				trail.pop();
+				for (DLXCell i = t.L; i != t; i = i.L) {
+					uncoverColumn(i.C);
+				}
+				uncoverColumn(t.C);
+			}
+			if (trail.size() == 0) {
+				Config.setSearchFinished(true);
+				break; // finished
+			}
+
+			/* Search a cell */
+			DLXCell x = trail.top();
+			Solution.push(x);
+			coverColumn(x.C);
+			for (DLXCell i = x.R; i != x; i = i.R) {
+				coverColumn(i.C);
+			}
+
+			/* Search next level */
+			DLXColumnHeader c = chooseColumnObject();
+			if (c.S > 0) {
+				pushNextLevelSearch(trail, c);
+				continue;
+			} else {
+				/* Output */
+				if (DLA.H.R == DLA.H || DLA.H.L.col < DLA.numTiles) {
+					if (Config.verb) {
+						System.out.print("Find: ");
+						Solution.print();
+					}
+					Solution.setComplete(true);
+				}
+			}
+		} while (!Config.singleStepSearch() &&
+				!(Config.singleSolutionSearch() && Solution.isComplete()));
+
+		return;
+	}
+
+	/**
+	 * Convert a solution trail into list of (tile index and tile positions).
+	 * @param solution
+	 * @return
+	 */
+	public List<List<Integer>> solutionToPosition(DLXTrail solution) {
+		if (solution.size() == 0) return null;
+
+		List<List<Integer>> pos = new ArrayList<List<Integer>>();
+		for (int i = 0; i < solution.size(); i++) {
+			List<Integer> tpos = new ArrayList<Integer>();
+
+			/* Find the leftmost cell */
+			DLXCell x = solution.get(i);
+			while (x.L.col < x.col) x = x.L;
+
+			/* The first element in the list is the index of a tile,
+			 *  the others are indices of positions on board. */
+			tpos.add(x.C.col);
+			for (DLXCell j = x.R; j != x; j = j.R) {
+				tpos.add(j.C.col - DLA.numTiles);
+			}
+
+			pos.add(tpos);
+		}
+		return pos;
+	}
+
+	/**
 	 * Searching with Dancing Links (recursive version)
 	 *
 	 * @param k
@@ -237,77 +361,6 @@ public class DLXBasicSearch {
 	}
 
 	/**
-	 * Searching with Dancing Links (while loop with stack version)
-	 *
-	 * @param k
-	 */
-	private void searchLoop(DLXTrail trail) {
-		Solution.setComplete(false);
-
-		/* Directly Failed */
-		if (Config.isDirectlyFail()) {
-			Config.setSearchFinished(true);
-			return;
-		}
-
-		/* If start from an empty trail */
-		if (!Config.searchFinished() && trail.isEmpty()) {
-			DLXColumnHeader c = chooseColumnObject();
-			for (DLXCell i = c.U; i != c; i = i.U) {
-				trail.push(i);
-			}
-		}
-
-		/* Search kernel */
-		do {
-			/* Backtracking */
-			while (!Solution.isEmpty() && Solution.top() == trail.top()) {
-				DLXCell t = Solution.pop();
-				trail.pop();
-				for (DLXCell i = t.L; i != t; i = i.L) {
-					uncoverColumn(i.C);
-				}
-				uncoverColumn(t.C);
-			}
-			if (trail.size() == 0) {
-				Config.setSearchFinished(true);
-				break; // finished
-			}
-
-			/* Search a cell */
-			DLXCell x = trail.top();
-			Solution.push(x);
-			coverColumn(x.C);
-			for (DLXCell i = x.R; i != x; i = i.R) {
-				coverColumn(i.C);
-			}
-
-			/* Search next level */
-			DLXColumnHeader c = chooseColumnObject();
-			if (c.S > 0) {
-				for (DLXCell i = c.U; i != c; i = i.U) {
-					trail.push(i);
-				}
-				continue;
-			}
-
-			/* Output */
-			if (DLA.H.R == DLA.H || DLA.H.L.col < DLA.numTiles) {
-				if (!Config.eliminateDuplica() || duplicatedTilesUsedInOrder()) {
-					if (Config.verb) {
-						System.out.print("Find: ");
-						Solution.print();
-					}
-					Solution.setComplete(true);
-				}
-			}
-		} while (!Config.singleStepSearch() &&
-				!(Config.singleSolutionSearch() && Solution.isComplete()));
-
-		return;
-	}
-
-	/**
 	 * Print out current solution
 	 * @param k
 	 */
@@ -328,34 +381,6 @@ public class DLXBasicSearch {
 			System.out.print(") ");
 		}
 		System.out.println();
-	}
-
-	/**
-	 * Convert a solution trail into list of (tile index and tile positions).
-	 * @param solution
-	 * @return
-	 */
-	public List<List<Integer>> solutionToPosition(DLXTrail solution) {
-		if (solution.size() == 0) return null;
-
-		List<List<Integer>> pos = new ArrayList<List<Integer>>();
-		for (int i = 0; i < solution.size(); i++) {
-			List<Integer> tpos = new ArrayList<Integer>();
-
-			/* Find the leftmost cell */
-			DLXCell x = solution.get(i);
-			while (x.L.col < x.col) x = x.L;
-
-			/* The first element in the list is the index of a tile,
-			 *  the others are indices of positions on board. */
-			tpos.add(x.C.col);
-			for (DLXCell j = x.R; j != x; j = j.R) {
-				tpos.add(j.C.col - DLA.numTiles);
-			}
-
-			pos.add(tpos);
-		}
-		return pos;
 	}
 
 }
