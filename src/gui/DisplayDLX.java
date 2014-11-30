@@ -30,10 +30,12 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -47,7 +49,7 @@ import dlx.DLX;
  * two parts, configuration and result display. Previously Control panel is
  * programmed in a stand-alone class.
  *
- * @author David
+ * @author Dawei Fan, Deyuan Guo
  * @version 1.0 11/16/2014
  *
  * 			1.1 11/27/2014
@@ -129,6 +131,13 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	JButton bPlay;
 	JSlider sNumSolution;
 
+	/**
+	 * TileListPanel
+	 */
+	JPanel pTileList;
+	JScrollPane scroll;
+
+
 	/* Menu related */
 	/**
 	 * Declare of menu variables. b- for button, t- for text field, l- for
@@ -163,10 +172,14 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	/**
 	 * Size parameters.
 	 */
-	private static final int frameSize[] = { 820, 610 };
+	private static final int frameSize[] = { 820+300, 610 };
 	private static final int framePos[] = { 400, 20 };
-	private static final int displaySize[] = { 600, 480 };
+	private static final int displaySize[] = { 600, 500 };
 	private static final int displayPos[] = { 200, 5 };
+	private static final int tileListSize[] = { 300, 600 };
+	private static final int tileListPos[] = { 800, 5 };
+
+
 	private static final int gridWidth = 3;
 
 	private int sizeBlock;
@@ -249,6 +262,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			dlx.preProcess();
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
 			tResultInfo.setText("Calculating...");
+			tIndex.setText("0");
 
 			int number = 0;
 
@@ -315,8 +329,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		@Override
 		protected void process(List<List<List<Integer>>> r){
 			cleanTiles();
-//			System.out.println("Processed: "+r.get(r.size()-1));
 			displayStep(r.get(r.size()-1));
+			String s = tResultInfo.getText();
+			String t =s.replaceAll("Calculating...", "");
+
+			if(t.length()==0)
+				t="0 solutions";
+			String y =t.replaceAll(" solutions", "");
+			int i = Integer.parseInt(y);
+			tResultInfo.setText("Calculating..." + (i+1) +" solutions");
 		}
 
 	}
@@ -407,7 +428,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 	}
 
-
 	public DisplayDLX() {
 		super(null);
 		setBackground(Color.WHITE);
@@ -420,7 +440,46 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		setupMenu();
 		setupControlPanel();
-		setupDisplay();
+		setupDisplayPanel();
+		setupTileListPanel();
+		/* The background panel of tile list. */
+// 		JPanel content = new JPanel(new BorderLayout());
+//		JPanel content = new JPanel(null);
+//		content.setSize(tileListSize[0], tileListSize[1]);
+//		content.setLocation(tileListPos[0], tileListPos[1]);
+//		this.add(content);
+		/*
+		pTileList = new JPanel();
+		pTileList.setAutoscrolls(true);
+		pTileList.setPreferredSize(new Dimension(300, 900));
+
+		scroll = new JScrollPane(pTileList);
+		scroll.setViewportView(pTileList);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scroll.setPreferredSize(new Dimension(tileListSize[0], tileListSize[1]-300));
+		scroll.setLocation(tileListPos[0], tileListPos[1]);
+
+//		pTileList.setLocation(tileListPos[0], tileListPos[1]);
+//		this.add(pTileList);
+		content.add(scroll, BorderLayout.CENTER);
+		*/
+
+//		pTileList = new JPanel();
+//		pTileList.setSize(300, 700);
+//		pTileList.setSize(300, 700);
+//		pTileList.setPreferredSize(new Dimension(300, 800));
+		/*
+		scroll = new JScrollPane(pTileList);
+		scroll.setViewportView(pTileList);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scroll.setPreferredSize(new Dimension(tileListSize[0], tileListSize[1]-300));
+		scroll.setLocation(tileListPos[0], tileListPos[1]);
+		 */
+//		pTileList.setLocation(tileListPos[0], tileListPos[1]);
+//		content.add(pTileList);
+//		content.add(scroll, BorderLayout.CENTER);
 	}
 
 	/**
@@ -792,7 +851,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		bPlay.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-
 				System.out.println("Is running: " + isRunning);
 				System.out.println("There is a thread? " + isThread);
 
@@ -847,7 +905,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		this.add(pControl);
 	}
 
-	public void setupDisplay() {
+	public void setupDisplayPanel() {
 		pDisplay = new JPanel();
 		pDisplay.setBackground(Color.WHITE);
 		pDisplay.setLayout(null);
@@ -858,6 +916,60 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pDisplay.setFocusable(true);
 
 		this.add(pDisplay);
+	}
+
+	public void setupTileListPanel(){
+		pTileList = new JPanel();
+		pTileList.setBackground(Color.WHITE);
+		pTileList.setLayout(null);
+		pTileList.setSize(tileListSize[0], tileListSize[1]);
+		pTileList.setLocation(tileListPos[0], tileListPos[1]);
+		pTileList.setOpaque(true);
+		pTileList.setVisible(true);
+		pTileList.setFocusable(true);
+
+		this.add(pTileList);
+	}
+
+	private void setupTileList(List<Tile> t){
+
+
+		List<Color> colorList = genColors(t.size());
+		for(int i = 0; i<t.size(); i++){
+			t.get(i).printTile();
+		}
+
+
+		final int width = 100;
+		int lMax = Math.max(t.get(0).l, t.get(0).w);
+		for(int i = 1; i<t.size(); i++){
+			if(lMax<  Math.max(t.get(i).l, t.get(i).w))
+				lMax = Math.max(t.get(i).l, t.get(i).w);
+		}
+		System.out.println("Max:"+lMax);
+
+		int grid = width/lMax;
+		for(int i = 0; i<t.size(); i++){
+			JPanel pic = new JPanel();
+			pic.setSize(100, 100);
+			pic.setLocation(i%3*100, i/3*100);
+//			pic.setBackground(Color.white);
+			pTileList.add(pic);
+//			scroll.add(pic);
+			for(int j = 0; j<t.get(i).data.length; j++){
+				for(int k = 0; k<t.get(i).data[0].length; k++){
+					if(t.get(i).data[j][k]!=' '){
+						JPanel block = new JPanel();
+						block.setBackground(colorList.get(i));
+						block.setSize(grid, grid);
+						block.setLocation(k*grid, j*grid);
+						pic.add(block);
+					}
+				}
+			}
+		}
+
+
 	}
 
 	public void setupMenu() {
@@ -1162,8 +1274,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				return;
 			}
 
-			/* Delete all panels in the pDisplay if there are. */
+			/* Delete all panels in the pDisplay and pTileList if there are. */
+			pTileList.removeAll();
 			pDisplay.removeAll();
+
 			/* Reset configuration . */
 			cbEnableSpin.setSelected(false);
 			cbEnableSpinFlip.setSelected(false);
@@ -1185,6 +1299,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			/* Initialize the board and posMap. */
 			setupBoard(board.data);
 			setPosMap();
+			/* Initialize and display the tile. */
+			setupTileList(tileList);
 			repaint();
 
 		}
@@ -1199,18 +1315,18 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		frame.getContentPane().setLayout(new BorderLayout());
 		frame.setSize(frameSize[0], frameSize[1]);
 		frame.setLocation(framePos[0], framePos[1]);
-		frame.setResizable(false);
+		frame.setResizable(true);
 		frame.setVisible(true);
 	}
 
 	public static void main(String[] args) {
-		/*
+
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		*/
+
 		SwingUtilities.invokeLater(new Runnable(){
 
 			@Override
@@ -1278,5 +1394,4 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		}
 		return colors;
 	}
-
 }
