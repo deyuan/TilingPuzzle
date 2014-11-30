@@ -889,7 +889,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		mBar.add(mHelp);
 
 		fc = new JFileChooser();
-		fc.setCurrentDirectory(new File(".\\testcases"));
+		fc.setCurrentDirectory(new File("."));
 
 	}
 
@@ -1252,7 +1252,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		double saturation = 0.5;
 		double value = 0.95;
 
-		for (int i = 0; i < n - colors.size(); i++) {
+		int m = n - colors.size();
+		for (int i = 0; i < m; i++) {
 			hue = (hue + goldenRatio) % 1.0;
 
 			/* HSV to RGB */
