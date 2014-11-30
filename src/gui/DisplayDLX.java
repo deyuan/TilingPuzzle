@@ -953,7 +953,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			JPanel pic = new JPanel();
 			pic.setSize(100, 100);
 			pic.setLocation(i%3*100, i/3*100);
-//			pic.setBackground(Color.white);
+			pic.setBackground(Color.white);
 			pTileList.add(pic);
 //			scroll.add(pic);
 			for(int j = 0; j<t.get(i).data.length; j++){
