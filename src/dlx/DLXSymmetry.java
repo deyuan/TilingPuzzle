@@ -1,7 +1,9 @@
 package dlx;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DLXSymmetry {
 
@@ -76,13 +78,16 @@ public class DLXSymmetry {
 	 * @return result
 	 */
 	private static boolean checkfrotateC0(int data[][], int result[][]) {
+		// For detecting tile duplication
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 		int w = data.length;
 		int l = data[0].length;
 
 		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < l; j++){
-				if(result[i][l - j - 1] != data[i][j])
-					return false;
+			for (int j = 0; j < l; j++) {
+				int t1 = result[i][l - j - 1];
+				int t2 = data[i][j];
+				if (!matched(t1, t2, map)) return false;
 			}
 		}
 		return true;
@@ -94,13 +99,16 @@ public class DLXSymmetry {
 	 * @return result
 	 */
 	private static boolean checkfrotateC1(int data[][], int result[][]) {
+		// For detecting tile duplication
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 		int w = data.length;
 		int l = data[0].length;
 
 		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < l; j++){
-				if(result[j][w - i - 1] != data[i][l - 1 - j])
-					return false;
+			for (int j = 0; j < l; j++) {
+				int t1 = result[l - j - 1][w - i - 1];
+				int t2 = data[i][j];
+				if (!matched(t1, t2, map)) return false;
 			}
 		}
 		return true;
@@ -112,13 +120,16 @@ public class DLXSymmetry {
 	 * @return result
 	 */
 	private static boolean checkfrotateC2(int data[][], int result[][]) {
+		// For detecting tile duplication
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 		int w = data.length;
 		int l = data[0].length;
 
 		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < l; j++){
-				if(result[w - i - 1][l - j - 1] != data[i][l - 1 - j])
-					return false;
+			for (int j = 0; j < l; j++) {
+				int t1 = result[w - i - 1][j];
+				int t2 = data[i][j];
+				if (!matched(t1, t2, map)) return false;
 			}
 		}
 		return true;
@@ -130,15 +141,17 @@ public class DLXSymmetry {
 	 * @return result
 	 */
 	private static boolean checkfrotateC3(int data[][], int result[][]) {
+		// For detecting tile duplication
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 		int w = data.length;
 		int l = data[0].length;
 
 		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < l; j++){
-				if(result[l - 1 - j][i] != data[i][l - 1 - j])
-					return false;
+			for (int j = 0; j < l; j++) {
+				int t1 = result[j][i];
+				int t2 = data[i][j];
+				if (!matched(t1, t2, map)) return false;
 			}
-
 		}
 		return true;
 	}
@@ -149,13 +162,16 @@ public class DLXSymmetry {
 	 * @return result
 	 */
 	private static boolean checkrotateC0(int data[][], int result[][]) {
+		// For detecting tile duplication
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 		int w = data.length;
 		int l = data[0].length;
 
 		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < l; j++){
-				if(result[i][j] != data[i][j])
-					return false;
+			for (int j = 0; j < l; j++) {
+				int t1 = result[i][j];
+				int t2 = data[i][j];
+				if (!matched(t1, t2, map)) return false;
 			}
 		}
 		return true;
@@ -167,15 +183,17 @@ public class DLXSymmetry {
 	 * @return result
 	 */
 	private static boolean checkrotateC1(int data[][], int result[][]) {
+		// For detecting tile duplication
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 		int w = data.length;
 		int l = data[0].length;
 
 		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < l; j++){
-				if(result[j][w - i - 1] != data[i][j])
-					return false;
+			for (int j = 0; j < l; j++) {
+				int t1 = result[j][w - i - 1];
+				int t2 = data[i][j];
+				if (!matched(t1, t2, map)) return false;
 			}
-
 		}
 		return true;
 	}
@@ -186,15 +204,17 @@ public class DLXSymmetry {
 	 * @return result
 	 */
 	private static boolean checkrotateC2(int data[][], int result[][]) {
+		// For detecting tile duplication
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 		int w = data.length;
 		int l = data[0].length;
 
 		for (int i = 0; i < w; i++) {
 			for (int j = 0; j < l; j++){
-				if(result[w - i - 1][l - j - 1] != data[i][j])
-					return false;
+				int t1 = result[w - i - 1][l - j - 1];
+				int t2 = data[i][j];
+				if (!matched(t1, t2, map)) return false;
 			}
-
 		}
 		return true;
 	}
@@ -205,16 +225,56 @@ public class DLXSymmetry {
 	 * @return result
 	 */
 	private static boolean checkrotateC3(int data[][], int result[][]) {
+		// For detecting tile duplication
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 		int w = data.length;
 		int l = data[0].length;
 
 		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < l; j++){
-				if(result[l - 1 - j][i] != data[i][j])
-					return false;
+			for (int j = 0; j < l; j++) {
+				int t1 = result[l - j - 1][i];
+				int t2 = data[i][j];
+				if (!matched(t1, t2, map)) return false;
 			}
-
 		}
 		return true;
 	}
+
+	/**
+	 * Determine if two tile id are matched.
+	 * @param t1
+	 * @param t2
+	 * @param map
+	 * @return
+	 */
+	private static boolean matched(int t1, int t2, Map<Integer, Integer> map) {
+		if (t1 >= 0 && Config.eliminateDuplica()) {
+			if (Config.duplica()[t1] == t1) { //unique tile
+				if (t1 != t2) return false;
+			} else { //duplicated tile, a map is needed.
+				if (map.containsKey(t1)) {
+					if (map.get(t1) != t2) return false;
+				} else {
+					boolean same = false;
+					if (t1 == t2) { // map to itself
+						same = true;
+						map.put(t1, t2);
+					} else for (int k = Config.duplica()[t1];
+									k != t1;
+									k = Config.duplica()[k]) {
+						if (k == t2) {
+							same = true;
+							map.put(t1, t2);
+							break;
+						}
+					}
+					if (!same) return false;
+				}
+			}
+		} else { //just compare them
+			if (t1 != t2) return false;
+		}
+		return true;
+	}
+
 }
