@@ -222,7 +222,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			dlx.Config.reset();
 			dlx.preProcess();
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
-			tResultInfo.setText("Calculating...");
+			tResultInfo.setText("Searching...");
 			solution.addAll(dlx.solveAll());
 
 //			dlx.printAllSolutions();
@@ -295,7 +295,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			dlx.Config.reset();
 			dlx.preProcess();
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
-			tResultInfo.setText("Calculating...");
+			tResultInfo.setText("Searching...");
 			tIndex.setText("0");
 
 			int number = 0;
@@ -373,13 +373,13 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			cleanTiles();
 			displayStep(r.get(r.size()-1));
 			String s = tResultInfo.getText();
-			String t =s.replaceAll("Calculating...", "");
+			String t =s.replaceAll("Searching...", "");
 
 			if(t.length()==0)
 				t="0 solutions";
 			String y =t.replaceAll(" solutions", "");
 			int i = Integer.parseInt(y);
-			tResultInfo.setText("Calculating..." + (i+1) +" solutions");
+			tResultInfo.setText("Searching..." + (i+1) +" solutions");
 		}
 
 	}
@@ -406,7 +406,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			dlx.preProcess();
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
 
-			tResultInfo.setText("Calculating...");
+			tResultInfo.setText("Searching...");
 			tIndex.setText("0");
 
 			List<List<Integer>> sol = dlx.nextSingleStep();
@@ -477,7 +477,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			displayStep(r.get(r.size()-1));
 
 			String s = tResultInfo.getText();
-			String t =s.replaceAll("Calculating...", "");
+			String t =s.replaceAll("Searching...", "");
 
 			if(t.length()==0)
 				t="0 solutions";
@@ -486,7 +486,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			int i = Integer.parseInt(y);
 			int j = dlx.getSolutions().size();
 			if(j > i);
-			tResultInfo.setText("Calculating..." + j +" solutions");
+			tResultInfo.setText("Searching..." + j +" solutions");
 
 		}
 
@@ -548,7 +548,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		pConfig.setLayout(null);
 
-		cbEnableSpin = new JCheckBox("Enable spin");
+		cbEnableSpin = new JCheckBox("Enable Rotation");
 		cbEnableSpin.setBackground(Color.WHITE);
 		cbEnableSpin.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		cbEnableSpin.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -571,7 +571,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		});
 		pConfig.add(cbEnableSpin);
 
-		cbEnableSpinFlip = new JCheckBox("Enable spin + flip");
+		cbEnableSpinFlip = new JCheckBox("Rotation + Reflection");
 		cbEnableSpinFlip.setBackground(Color.WHITE);
 		cbEnableSpinFlip.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		cbEnableSpinFlip.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -594,7 +594,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		});
 		pConfig.add(cbEnableSpinFlip);
 
-		cbExtra = new JCheckBox("Extra blocks");
+		cbExtra = new JCheckBox("Extra Blocks");
 		cbExtra.setBackground(Color.WHITE);
 		cbExtra.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		cbExtra.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -605,7 +605,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pConfig.add(cbExtra);
 
 
-		cbRmSymm = new JCheckBox("Remove symmetry");
+		cbRmSymm = new JCheckBox("Remove Symmetry");
 		cbRmSymm.setBackground(Color.WHITE);
 		cbRmSymm.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		cbRmSymm.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -626,7 +626,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pConfig.add(cbRmSymm);
 
 
-		bSolveAll = new JButton("Get all solutions");
+		bSolveAll = new JButton("Get All Solutions");
 		bSolveAll.setBackground(Color.WHITE);
 		bSolveAll.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bSolveAll.addActionListener(new ActionListener() {
@@ -644,7 +644,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pConfig.add(bSolveAll);
 
 
-		bSolveStep = new JButton("Solve & display steps");
+		bSolveStep = new JButton("Display Solutions!");
 		bSolveStep.setBackground(Color.WHITE);
 		bSolveStep.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bSolveStep.addActionListener(new ActionListener() {
@@ -661,7 +661,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		bSolveStep.setLocation(10, 190);
 		pConfig.add(bSolveStep);
 
-		bSolveTrail = new JButton("Solve & display trails");
+		bSolveTrail = new JButton("Display Single Steps!");
 		bSolveTrail.setBackground(Color.WHITE);
 		bSolveTrail.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bSolveTrail.addActionListener(new ActionListener() {
@@ -793,6 +793,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		// tIndex.setMaximumSize(new Dimension(80, 25));
 		tIndex.setVisible(true);
 		tIndex.setLocation(10, 50);
+		tIndex.setHorizontalAlignment(SwingConstants.CENTER);
 		pResult.add(tIndex);
 
 		bShowResult = new JButton("Show!");
@@ -894,7 +895,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		pResult.add(sNumSolution);
 
-		bPlay = new JButton("Autoplay all solutions");
+		bPlay = new JButton("Autoplay All Solutions");
 		bPlay.setBackground(Color.WHITE);
 		bPlay.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bPlay.setSize(160, 30);
@@ -980,7 +981,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pTileList.setVisible(true);
 		pTileList.setFocusable(true);
 		pTileList.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Tiles candidates"),
+				BorderFactory.createTitledBorder("Tiles Candidates"),
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
 		this.add(pTileList);
@@ -1056,7 +1057,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		mBar.add(mHelp);
 
 		fc = new JFileChooser();
-		fc.setCurrentDirectory(new File("./tests"));
+		fc.setCurrentDirectory(new File("."));
 
 	}
 
