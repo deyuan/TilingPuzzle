@@ -195,8 +195,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	private int originTile[] = { 20 + gridWidth / 2, 20 + gridWidth / 2 };
 
 	private CalculateAll calculateAll = null;
-	private CalculateStep calculateStep = null;
-	private CalculateTrail calculateTrail = null;
+	private CalculateSingleSolution calculateSSol = null;
+	private CalculateSingleStep calculateSStep = null;
 
 	private class CalculateAll extends SwingWorker<List<List<List<Integer>>>, Void>{
 
@@ -274,7 +274,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 	}
 
-	private class CalculateStep extends SwingWorker<Integer, List<List<Integer>>>{
+	private class CalculateSingleSolution extends SwingWorker<Integer, List<List<Integer>>>{
 
 		@Override
 		protected Integer doInBackground() {
@@ -384,7 +384,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 	}
 
-	private class CalculateTrail extends SwingWorker<List<List<List<Integer>>>, List<List<Integer>>>{
+	private class CalculateSingleStep extends SwingWorker<List<List<List<Integer>>>, List<List<Integer>>>{
 
 		@Override
 		protected List<List<List<Integer>>> doInBackground() {
@@ -514,11 +514,11 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	 *
 	 * @param dlx
 	 */
-	public void setDLX(DLX d) {
+	private void setDLX(DLX d) {
 		dlx = d;
 	}
 
-	public void setupControlPanel() {
+	private void setupControlPanel() {
 
 		pControl = new JPanel();
 		pControl.setBackground(Color.WHITE);
@@ -652,8 +652,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				calculateStep = new CalculateStep();
-				calculateStep.execute();
+				calculateSSol = new CalculateSingleSolution();
+				calculateSSol.execute();
 			}
 
 		});
@@ -669,8 +669,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				calculateTrail = new CalculateTrail();
-				calculateTrail.execute();
+				calculateSStep = new CalculateSingleStep();
+				calculateSStep.execute();
 			}
 
 		});
@@ -745,14 +745,11 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				if(calculateStep!=null && calculateStep.getState() == SwingWorker.StateValue.STARTED){
-					calculateStep.cancel(true);
-					/* Reset something */
-
+				if(calculateSSol!=null && calculateSSol.getState() == SwingWorker.StateValue.STARTED){
+					calculateSSol.cancel(true);
 				}
-				else if(calculateTrail!=null && calculateTrail.getState() == SwingWorker.StateValue.STARTED){
-					calculateTrail.cancel(true);
-//					calculateTrail.get
+				else if(calculateSStep!=null && calculateSStep.getState() == SwingWorker.StateValue.STARTED){
+					calculateSStep.cancel(true);
 				}
 
 			}
@@ -957,7 +954,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		this.add(pControl);
 	}
 
-	public void setupDisplayPanel() {
+	private void setupDisplayPanel() {
 		pDisplay = new JPanel();
 		pDisplay.setBackground(Color.WHITE);
 		pDisplay.setLayout(null);
@@ -973,7 +970,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		this.add(pDisplay);
 	}
 
-	public void setupTileListPanel(){
+	private void setupTileListPanel(){
 		pTileList = new JPanel();
 		pTileList.setBackground(Color.WHITE);
 		pTileList.setLayout(null);
@@ -1030,7 +1027,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 	}
 
-	public void setupMenu() {
+	private void setupMenu() {
 		mBar = new JMenuBar();
 		mBar.setBackground(Color.WHITE);
 		mBar.setOpaque(true);
@@ -1066,7 +1063,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	/**
 	 * Initiate the board from input and draw the board.
 	 */
-	public void setupBoard(char[][] b) {
+	private void setupBoard(char[][] b) {
 
 		/* Initialize board array. */
 		board = new char[b.length][b[0].length];
@@ -1398,7 +1395,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			File file = null;
 			if (fc.showOpenDialog(DisplayDLX.this) == JFileChooser.APPROVE_OPTION) {
 				file = fc.getSelectedFile();
-				System.out.println(file.getAbsolutePath());
+			//	System.out.println(file.getAbsolutePath());
+				System.out.println(file.getName());
 			}
 			// not select any files
 			else {
@@ -1421,6 +1419,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			tResultInfo.setText("Press button to solve");
 			tIndex.setText("0");
 
+			pDisplay.setBorder(BorderFactory.createCompoundBorder(
+					BorderFactory.createTitledBorder("Solution ("+file.getName()+")"),
+					BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 			DataFileParser dfp = new DataFileParser(file.getAbsolutePath());
 			/* Extract puzzle pieces, board are included in this list. */
 			List<Tile> tileList = dfp.ExtractTiles();
@@ -1447,7 +1448,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 	public static void createAndShowGUI() {
 
-		JFrame frame = new JFrame("Puzzle solver");
+		JFrame frame = new JFrame("Tilling Puzzle Solver");
 		frame.setContentPane(new DisplayDLX());
 		frame.setJMenuBar(mBar);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
