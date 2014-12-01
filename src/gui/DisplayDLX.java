@@ -224,9 +224,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
 			tResultInfo.setText("Calculating...");
 			solution.addAll(dlx.solveAll());
+
 //			dlx.printAllSolutions();
-			System.out.println("In background:");
-			System.out.println(solution);
+//			System.out.println("In background:");
+//			System.out.println(solution);
 			return solution;
 		}
 		@Override
@@ -338,11 +339,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
-			System.out.println("Finished!!!!");
-			System.out.println("number of solutions: "+solution.size());
-			System.out.println("numOfSolution: "+numOfSolution);
-			System.out.println(dlx.Config.isEnableSpin());
-			System.out.println(dlx.Config.isEnableSpinFlip());
 			/*
 			try {
 				numOfSolution = get();
@@ -373,7 +369,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		@Override
 		protected void process(List<List<List<Integer>>> r){
-			System.out.println("The size of the list: "+r.size());
+//			System.out.println("The size of the list: "+r.size());
 			cleanTiles();
 			displayStep(r.get(r.size()-1));
 			String s = tResultInfo.getText();
@@ -994,7 +990,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			if (lMax < Math.max(t.get(i).l, t.get(i).w))
 				lMax = Math.max(t.get(i).l, t.get(i).w);
 		}
-		System.out.println("Max:"+lMax);
 
 		int grid = width / lMax - 1;
 		if (grid == 0) grid = 1; // too small?
@@ -1079,14 +1074,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				(displaySize[1] - origin[1] - 20) / board.length)
 				- gridWidth;
 		sizeTile = sizeBlock + gridWidth;
-		System.out.println("Size of block: " + sizeBlock);
 
 		/* There are n kind of colors in the board. */
 		Set<Character> set = new HashSet<Character>();
 
 		int w = board.length;
 		int l = board[0].length;
-		System.out.println("Width: " + w + " Length: " + l);
 
 		/* Set offset, to make the board display in the middle. */
 		OffsetX = displaySize[0]/2 - (l * (sizeBlock + gridWidth) + gridWidth)/2-18;

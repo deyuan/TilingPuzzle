@@ -1,9 +1,7 @@
 package dlx;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class DLXSymmetry {
 
@@ -20,28 +18,30 @@ public class DLXSymmetry {
 
 		/* Width == height. At most 8 symmetric patterns.*/
 		if (cur.length == cur[0].length) {
-			if (equalValue(cur, pattern)
-					||equalValue(cur, rotateC1(pattern))
-					||equalValue(cur, rotateC2(pattern))
-					||equalValue(cur, rotateC3(pattern))
-					||equalValue(cur, frotateC0(pattern))
-					||equalValue(cur, frotateC1(pattern))
-					||equalValue(cur, frotateC2(pattern))
-					||equalValue(cur, frotateC3(pattern)))
+			if (checkrotateC0(cur, pattern)
+					||checkrotateC1(cur, pattern)
+					||checkrotateC2(cur, pattern)
+					||checkrotateC3(cur, pattern)
+					||checkfrotateC0(cur, pattern)
+					||checkfrotateC1(cur, pattern)
+					||checkfrotateC2(cur, pattern)
+					||checkfrotateC3(cur, pattern))
 				return false;
 			else
 				return true;
 		}
+
 		/* Width != height. At most 4 symmetric patterns.*/
 		else {
-			if (equalValue(cur, pattern)
-					||equalValue(cur, rotateC2(pattern))
-					||equalValue(cur, frotateC0(pattern))
-					||equalValue(cur, frotateC2(pattern)))
+			if (checkrotateC0(cur, pattern)
+					||checkrotateC2(cur, pattern)
+					||checkfrotateC0(cur, pattern)
+					||checkfrotateC2(cur, pattern))
 				return false;
 			else
 				return true;
 		}
+
 	}
 
 	/**
@@ -64,21 +64,28 @@ public class DLXSymmetry {
 	}
 
 
+	public static void printMatrix(int d[][]) {
+		System.out.println();
+		for (int i = 0; i < d.length; i++)
+			System.out.println(Arrays.toString(d[i]));
+	}
+
 	/**
 	 * Flip the matrix horizontally, rotate clockwise by 0.
 	 *
 	 * @return result
 	 */
-	private static  int[][] frotateC0(int data[][]) {
+	private static boolean checkfrotateC0(int data[][], int result[][]) {
 		int w = data.length;
 		int l = data[0].length;
-		int result[][] = new int[w][l];
 
 		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < l; j++)
-				result[i][l - j - 1] = data[i][j];
+			for (int j = 0; j < l; j++){
+				if(result[i][l - j - 1] != data[i][j])
+					return false;
+			}
 		}
-		return result;
+		return true;
 	}
 
 	/**
@@ -86,16 +93,17 @@ public class DLXSymmetry {
 	 *
 	 * @return result
 	 */
-	private static  int[][] frotateC1(int data[][]) {
+	private static boolean checkfrotateC1(int data[][], int result[][]) {
 		int w = data.length;
 		int l = data[0].length;
-		int result[][] = new int[l][w];
 
 		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < l; j++)
-				result[j][w - i - 1] = data[i][l - 1 - j];
+			for (int j = 0; j < l; j++){
+				if(result[j][w - i - 1] != data[i][l - 1 - j])
+					return false;
+			}
 		}
-		return result;
+		return true;
 	}
 
 	/**
@@ -103,16 +111,17 @@ public class DLXSymmetry {
 	 *
 	 * @return result
 	 */
-	private static  int[][] frotateC2(int data[][]) {
+	private static boolean checkfrotateC2(int data[][], int result[][]) {
 		int w = data.length;
 		int l = data[0].length;
-		int result[][] = new int[w][l];
 
 		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < l; j++)
-				result[w - i - 1][l - j - 1] = data[i][l - 1 - j];
+			for (int j = 0; j < l; j++){
+				if(result[w - i - 1][l - j - 1] != data[i][l - 1 - j])
+					return false;
+			}
 		}
-		return result;
+		return true;
 	}
 
 	/**
@@ -120,16 +129,18 @@ public class DLXSymmetry {
 	 *
 	 * @return result
 	 */
-	private static  int[][] frotateC3(int data[][]) {
+	private static boolean checkfrotateC3(int data[][], int result[][]) {
 		int w = data.length;
 		int l = data[0].length;
-		int result[][] = new int[l][w];
 
 		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < l; j++)
-				result[l - 1 - j][i] = data[i][l - 1 - j];
+			for (int j = 0; j < l; j++){
+				if(result[l - 1 - j][i] != data[i][l - 1 - j])
+					return false;
+			}
+
 		}
-		return result;
+		return true;
 	}
 
 	/**
@@ -137,9 +148,17 @@ public class DLXSymmetry {
 	 *
 	 * @return result
 	 */
-	@SuppressWarnings("unused")
-	private static  int[][] rotateC0(int data[][]) {
-		return data;
+	private static boolean checkrotateC0(int data[][], int result[][]) {
+		int w = data.length;
+		int l = data[0].length;
+
+		for (int i = 0; i < w; i++) {
+			for (int j = 0; j < l; j++){
+				if(result[i][j] != data[i][j])
+					return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -147,16 +166,18 @@ public class DLXSymmetry {
 	 *
 	 * @return result
 	 */
-	private static  int[][] rotateC1(int data[][]) {
+	private static boolean checkrotateC1(int data[][], int result[][]) {
 		int w = data.length;
 		int l = data[0].length;
-		int result[][] = new int[l][w];
 
 		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < l; j++)
-				result[j][w - i - 1] = data[i][j];
+			for (int j = 0; j < l; j++){
+				if(result[j][w - i - 1] != data[i][j])
+					return false;
+			}
+
 		}
-		return result;
+		return true;
 	}
 
 	/**
@@ -164,16 +185,18 @@ public class DLXSymmetry {
 	 *
 	 * @return result
 	 */
-	private static int[][] rotateC2(int data[][]) {
+	private static boolean checkrotateC2(int data[][], int result[][]) {
 		int w = data.length;
 		int l = data[0].length;
-		int result[][] = new int[w][l];
 
 		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < l; j++)
-				result[w - i - 1][l - j - 1] = data[i][j];
+			for (int j = 0; j < l; j++){
+				if(result[w - i - 1][l - j - 1] != data[i][j])
+					return false;
+			}
+
 		}
-		return result;
+		return true;
 	}
 
 	/**
@@ -181,76 +204,17 @@ public class DLXSymmetry {
 	 *
 	 * @return result
 	 */
-	private static  int[][] rotateC3(int data[][]) {
+	private static boolean checkrotateC3(int data[][], int result[][]) {
 		int w = data.length;
 		int l = data[0].length;
-		int result[][] = new int[l][w];
 
 		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < l; j++)
-				result[l - 1 - j][i] = data[i][j];
-		}
-		return result;
-	}
-
-
-	/**
-	 * Determine if two 2D int arrays are equal
-	 * @param a
-	 * @param b
-	 * @return
-	 */
-	private static boolean equalValue(int[][] a, int[][] b) {
-		if (a.length != b.length || a[0].length != b[0].length)
-			return false;
-
-		// For detecting tile duplication
-		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-
-		for (int i = 0; i < a.length; i++) {
-			for (int j = 0; j < a[0].length; j++) {
-
-				/* If there exists duplicated tiles, a map is needed. */
-				if (a[i][j] >= 0 && Config.eliminateDuplica()) {
-
-					if (Config.duplica()[a[i][j]] == a[i][j]) { //unique tile
-						if (a[i][j] != b[i][j]) return false;
-					} else { //duplicated tile
-						if (map.containsKey(a[i][j])) {
-							if (map.get(a[i][j]) != b[i][j]) return false;
-						} else {
-							boolean same = false;
-							if (a[i][j] == b[i][j]) { // map to itself
-								same = true;
-								map.put(a[i][j], b[i][j]);
-							} else for (int k = Config.duplica()[a[i][j]];
-											k != a[i][j];
-											k = Config.duplica()[k]) {
-								if (k == b[i][j]) {
-									same = true;
-									map.put(a[i][j], b[i][j]);
-									break;
-								}
-							}
-							if (!same) return false;
-						}
-					}
-
-				} else { //just compare them
-					if (a[i][j] != b[i][j]) {
-						return false;
-					}
-				}
-
+			for (int j = 0; j < l; j++){
+				if(result[l - 1 - j][i] != data[i][j])
+					return false;
 			}
+
 		}
 		return true;
 	}
-
-	public static void printMatrix(int d[][]) {
-		System.out.println();
-		for (int i = 0; i < d.length; i++)
-			System.out.println(Arrays.toString(d[i]));
-	}
-
 }

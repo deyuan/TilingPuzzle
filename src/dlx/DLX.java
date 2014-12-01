@@ -173,11 +173,7 @@ public class DLX {
 	 */
 	public List<List<List<Integer>>> solveAll() {
 		Config.autoSetEliminateDuplica();
-
 		while (nextSolution() != null);
-
-		//System.out.println("In solve all: ");
-		//System.out.println(Solutions);
 		return Solutions;
 	}
 
