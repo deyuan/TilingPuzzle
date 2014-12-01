@@ -224,7 +224,7 @@ public class DLXSymmetry {
 			for (int j = 0; j < a[0].length; j++) {
 
 				/* If there exists duplicated tiles, a map is needed. */
-				if (Config.eliminateDuplica()) {
+				if (a[i][j] >= 0 && Config.eliminateDuplica()) {
 
 					if (Config.duplica()[a[i][j]] == a[i][j]) { //unique tile
 						if (a[i][j] != b[i][j]) return false;
