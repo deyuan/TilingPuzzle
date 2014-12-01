@@ -8,7 +8,7 @@ import java.util.Map;
 public class DLXSymmetry {
 
 	/** Reference to DLXConfig. Used for dealing with duplicated tiles. */
-	private static DLXConfig Config;
+	public static DLXConfig Config;
 
 	/**
 	 * Determine if two solutions are symmetric
@@ -53,12 +53,10 @@ public class DLXSymmetry {
 	 * @param config
 	 * @return
 	 */
-	public static boolean isAsymmetricList(int cur[][], List<int[][]> pattern,
-			DLXConfig config) {
-		Config = config;
+	public static boolean isAsymmetricList(int cur[][], List<int[][]> pattern) {
 		for (int i = 0; i < pattern.size(); i++) {
 			if (!isAsymmetric(cur, pattern.get(i))) {
-				if (config.verb) System.out.println("Symmetric solution.");
+				if (Config.verb) System.out.println("Symmetric solution.");
 				return false;
 			}
 		}
@@ -277,4 +275,40 @@ public class DLXSymmetry {
 		return true;
 	}
 
+	/**
+	 * Convert a solution (list of list of int) into 2D array.
+	 * @param solution
+	 * @return
+	 */
+	public static int[][] solutionView(List<List<Integer>> solution) {
+		/* Put all the tiles onto a serialized board position. */
+		int[] boardPosition = new int[Config.board.area];
+		for (int i = 0; i < Config.board.area; i++) boardPosition[i] = -1;
+		for (int i = 0; i < solution.size(); i++) {
+			int tileIdx = solution.get(i).get(0);
+			for (int j = 1; j < solution.get(i).size(); j++) {
+				boardPosition[solution.get(i).get(j)] = tileIdx;
+			}
+		}
+
+		/* Convert a serialized board position to a 2D board */
+		int rows = Config.board.data.length;
+		int cols = Config.board.data[0].length;
+		int[][] view = new int[rows][cols];
+		int cnt = 0;
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				if (Config.board.data[i][j] != Config.S) {
+					view[i][j] = boardPosition[cnt];
+					cnt++;
+				} else {
+					view[i][j] = -1;
+				}
+			}
+		}
+
+		return view;
+	}
+
 }
+

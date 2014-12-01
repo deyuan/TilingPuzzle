@@ -117,15 +117,12 @@ public class DLXBasicSearch {
 
 	/**
 	 * Push all the choices for next level search.
-	 * So duplication and symmetry can be eliminated here.
+	 * So duplication can be eliminated here.
 	 * @param trail
 	 * @param c
 	 */
 	private void pushNextLevelSearch(DLXTrail trail, DLXColumnHeader c) {
 		for (DLXCell i = c.U; i != c; i = i.U) {
-			/* TODO: if need to eliminate symmetry, only push non-symmetry
-			 * row of the first tile. */
-
 			trail.push(i);
 			/* Eliminate tile duplication: If duplicated tiles in
 			 * Trail are not used in correct order, then pop them */
@@ -133,6 +130,61 @@ public class DLXBasicSearch {
 				if (!duplicatedTilesUsedInOrder(trail))
 					trail.pop();
 			}
+		}
+	}
+
+	/**
+	 * Determine if a DLXCell is a symmetric choice.
+	 * Note: This function only works for the first level choices.
+	 * @param trail
+	 * @param x
+	 * @return
+	 */
+	private boolean isSymmetricChoice(DLXTrail trail, DLXCell x) {
+		DLXTrail t1 = new DLXTrail();
+		t1.push(x);
+		List<List<Integer>> s1 = solutionToPosition(t1);
+		int[][] v1 = DLXSymmetry.solutionView(s1);
+
+		for (int i = 0; i < trail.size(); i++) {
+			DLXTrail t2 = new DLXTrail();
+			t2.push(trail.get(i));
+			List<List<Integer>> s2 = solutionToPosition(t2);
+			int[][] v2 = DLXSymmetry.solutionView(s2);
+
+			if (!DLXSymmetry.isAsymmetric(v1, v2)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Push all the choices for the first level search for the leader tile.
+	 * So some symmetry can be eliminated here.
+	 * @param trail
+	 * @param c
+	 */
+	private void pushFirstLevelSearch(DLXTrail trail, DLXColumnHeader c) {
+		/* When leader id = -1, just search as usual */
+		if (!Config.eliminateSymmetry() || Config.isEnableExtra() ||
+				Config.getLeaderId() < 0) {
+			pushNextLevelSearch(trail, c);
+			return;
+		}
+
+		/* only push non-symmetric choices to trail */
+		int cnt = 0;
+		for (DLXCell i = c.U; i != c; i = i.U) {
+			if (!isSymmetricChoice(trail, i)) {
+				trail.push(i);
+				cnt++;
+			}
+		}
+		Config.setSymmetryEiminatedByLeader(true);
+		if (Config.verb) {
+			System.out.println("Leader tile eliminates "
+					+ (c.S - cnt) + "/" + c.S + " symmetric possibilities.");
 		}
 	}
 
@@ -188,13 +240,21 @@ public class DLXBasicSearch {
 	 * @return reference to a column object
 	 */
 	private DLXColumnHeader chooseFirstColumnObject() {
-		/* Normal selection */
 		if (!Config.eliminateSymmetry() || Config.isEnableExtra()) {
 			return chooseColumnObject();
 		}
-
-		/* TODO: Symmetry: select the leader tile column */
-
+		/* Symmetry: select the leader tile column */
+		int leader = Config.getLeaderId();
+		if (Config.verb) {
+			if (leader >= 0) System.out.println("Leader tile id = " + leader);
+			else System.out.println("No leader tile.");
+		}
+		if (leader >= 0) {
+			for (DLXColumnHeader h = DLA.H.R; h != DLA.H; h = h.R) {
+				if (h.col == leader) return h;
+				else if (h.col > leader) break;
+			}
+		}
 		return chooseColumnObject();
 	}
 
@@ -251,7 +311,7 @@ public class DLXBasicSearch {
 		/* If start from an empty trail */
 		if (!Config.searchFinished() && trail.isEmpty()) {
 			DLXColumnHeader c = chooseFirstColumnObject();
-			pushNextLevelSearch(trail, c);
+			pushFirstLevelSearch(trail, c);
 		}
 
 		/* Search kernel */

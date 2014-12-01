@@ -19,6 +19,10 @@ public class DLXConfig {
 	/** The debug information switch */
 	public boolean verb = true;
 
+	/** Reference to the board and tile list */
+	public Tile board = null;
+	public List<Tile> tiles = null;
+
 	/******************** Private Member Variables ********************/
 
 	/** Enable spin of tiles or not. */
@@ -55,6 +59,12 @@ public class DLXConfig {
 	private int[] duplicaS = null;
 	private int[] duplicaSF = null;
 
+	/** The ID of the leader tile. -1 for no leader. */
+	private int leaderId = -1;
+
+	/** True if use leader tile to eliminate symmetry */
+	private boolean symmetryEliminatedByLeader = false;
+
 	/******************** Public Member Functions ********************/
 
 	public DLXConfig() {
@@ -69,19 +79,14 @@ public class DLXConfig {
 		searchFinished = false;
 		singleStepSearch = false;
 		singleSolutionSearch = false;
+		symmetryEliminatedByLeader = false;
 	}
 
 	public boolean isEnableSpin() { return enableSpin; }
-	public void setEnableSpin(boolean b) {
-		enableSpin = b;
-//		if (b == false) enableSpinFlip = false;
-	}
+	public void setEnableSpin(boolean b) { enableSpin = b; }
 
 	public boolean isEnableSpinFlip() { return enableSpinFlip; }
-	public void setEnableSpinFlip(boolean b) {
-		enableSpinFlip = b;
-//		if (b == true) enableSpin = true;
-	}
+	public void setEnableSpinFlip(boolean b) { enableSpinFlip = b; }
 
 	public boolean isEnableExtra() { return enableExtra; }
 	public void setEnableExtra(boolean b) { enableExtra = b; }
@@ -100,6 +105,12 @@ public class DLXConfig {
 
 	public boolean eliminateSymmetry() { return eliminateSymmetry; }
 	public void setEliminateSymmetry(boolean b) { eliminateSymmetry = b; }
+
+	public int getLeaderId() { return leaderId; }
+	public void setLeaderId(int id) { leaderId = id; }
+
+	public boolean symmetryEliminatedByLeader() { return symmetryEliminatedByLeader; }
+	public void setSymmetryEiminatedByLeader(boolean b) { symmetryEliminatedByLeader = b; }
 
 	public boolean eliminateDuplica() { return eliminateDuplica; }
 	public void setEliminateDuplica(boolean b) { eliminateDuplica = b; }
@@ -216,7 +227,6 @@ public class DLXConfig {
 			duplicaSF[i] = tiles.get(i).getDuplicaSF();
 		}
 	}
-
 
 	/******************** Private Member Functions ********************/
 

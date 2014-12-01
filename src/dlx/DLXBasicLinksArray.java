@@ -59,6 +59,8 @@ public class DLXBasicLinksArray {
 		H = buildDancingLinks();
 
 		verifyDancingLinks();
+
+		chooseLeaderTile();
 	}
 
 	/**
@@ -254,6 +256,23 @@ public class DLXBasicLinksArray {
 			System.out.println("Verifying Finished.");
 			System.out.println();
 		}
+	}
+
+	/**
+	 * Choose a leader tile from tile list. (for eliminating symmetry)
+	 */
+	private void chooseLeaderTile() {
+		int bestId = -1, bestSize = Integer.MAX_VALUE;
+		if (!Config.isEnableExtra())
+		for (DLXColumnHeader h = H.R; h.col < numTiles; h = h.R) {
+			if (Config.tiles.get(h.col).sfpattern.size() == 8) {
+				if (h.S < bestSize) {
+					bestId = h.col;
+					bestSize = h.S;
+				}
+			}
+		}
+		Config.setLeaderId(bestId);
 	}
 
 }

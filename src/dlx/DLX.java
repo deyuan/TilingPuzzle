@@ -58,8 +58,11 @@ public class DLX {
 		board = b;
 		tiles = t;
 		Config = new DLXConfig();
+		Config.board = b;
+		Config.tiles = t;
 		Config.verb = false;
 		Config.recognizeDuplica(tiles);
+		DLXSymmetry.Config = Config;
 	}
 
 	public DLX(String puzzleFilePath) {
@@ -71,8 +74,11 @@ public class DLX {
 		tiles.remove(0);
 
 		Config = new DLXConfig();
+		Config.board = board;
+		Config.tiles = tiles;
 		Config.verb = false;
 		Config.recognizeDuplica(tiles);
+		DLXSymmetry.Config = Config;
 	}
 
 	/**
@@ -101,16 +107,18 @@ public class DLX {
 		List<List<Integer>> solution = basicSearch.solveSingleSolution();
 		if (solution != null) {
 			/* Check if the solution is a unique solution. */
-			if (Config.eliminateSymmetry() && board.sfpattern.size() != 8) {
-				int view[][] = solutionView(solution);
+			if (Config.eliminateSymmetry() && board.sfpattern.size() != 8
+					&& !Config.symmetryEliminatedByLeader()) {
+				int view[][] = DLXSymmetry.solutionView(solution);
 				if (ViewList.size() == 0) {
 					Solutions.add(solution);
 					ViewList.add(view);
 				} else {
 					/* Remove symmetry. */
-					while (!DLXSymmetry.isAsymmetricList(view, ViewList, Config)) {
+					while (!DLXSymmetry.isAsymmetricList(view, ViewList)) {
 						solution = basicSearch.solveSingleSolution();
-						if (solution != null) view = solutionView(solution);
+						if (solution != null)
+							view = DLXSymmetry.solutionView(solution);
 						else break;
 					}
 					if (solution != null) {
@@ -135,14 +143,15 @@ public class DLX {
 
 		if (isCompleteSolution()) {
 			/* Check if the solution is a unique solution. */
-			if (Config.eliminateSymmetry() && board.sfpattern.size() != 8) {
-				int view[][] = solutionView(step);
+			if (Config.eliminateSymmetry() && board.sfpattern.size() != 8
+					&& !Config.symmetryEliminatedByLeader()) {
+				int view[][] = DLXSymmetry.solutionView(step);
 				if (ViewList.size() == 0) {
 					Solutions.add(step);
 					ViewList.add(view);
 				} else {
 					/* Remove symmetry. */
-					if (DLXSymmetry.isAsymmetricList(view, ViewList, Config)) {
+					if (DLXSymmetry.isAsymmetricList(view, ViewList)) {
 						Solutions.add(step);
 						ViewList.add(view);
 					} else {
@@ -196,41 +205,6 @@ public class DLX {
 	}
 
 	/**
-	 * Convert a solution (list of list of int) into 2D array.
-	 * @param solution
-	 * @return
-	 */
-	public int[][] solutionView(List<List<Integer>> solution) {
-		/* Put all the tiles onto a serialized board position. */
-		int[] boardPosition = new int[board.area];
-		for (int i = 0; i < board.area; i++) boardPosition[i] = -1;
-		for (int i = 0; i < solution.size(); i++) {
-			int tileIdx = solution.get(i).get(0);
-			for (int j = 1; j < solution.get(i).size(); j++) {
-				boardPosition[solution.get(i).get(j)] = tileIdx;
-			}
-		}
-
-		/* Convert a serialized board position to a 2D board */
-		int rows = board.data.length;
-		int cols = board.data[0].length;
-		int[][] view = new int[rows][cols];
-		int cnt = 0;
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				if (board.data[i][j] != Config.S) {
-					view[i][j] = boardPosition[cnt];
-					cnt++;
-				} else {
-					view[i][j] = -1;
-				}
-			}
-		}
-
-		return view;
-	}
-
-	/**
 	 * Print all the solutions.
 	 */
 	public void printAllSolutions() {
@@ -240,7 +214,7 @@ public class DLX {
 		int[][] view = null;
 		for (int i = 0; i < Solutions.size(); i++) {
 			System.out.println("Solution " + (i+1) + ":");
-			view = solutionView(Solutions.get(i));
+			view = DLXSymmetry.solutionView(Solutions.get(i));
 			for (int j = 0; j < view.length; j++) {
 				System.out.println(Arrays.toString(view[j]));
 			}
@@ -251,7 +225,6 @@ public class DLX {
 	public List<List<List<Integer>>> getSolutions(){
 		return Solutions;
 	}
-
 
 	/******************** Private Member Functions ********************/
 
