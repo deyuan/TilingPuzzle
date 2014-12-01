@@ -552,8 +552,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				// TODO Auto-generated method stub
 				if (cbEnableSpin.isSelected())
 					dlx.Config.setEnableSpin(true);
-				else
+				else{
+					cbEnableSpinFlip.setSelected(false);
 					dlx.Config.setEnableSpin(false);
+				}
 			}
 
 		});
@@ -570,8 +572,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				if (cbEnableSpinFlip.isSelected())
+				if (cbEnableSpinFlip.isSelected()){
+					cbEnableSpin.setSelected(true);
 					dlx.Config.setEnableSpinFlip(true);
+				}
 				else
 					dlx.Config.setEnableSpinFlip(false);
 			}
