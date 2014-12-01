@@ -302,7 +302,7 @@ public class DLXSymmetry {
 					view[i][j] = boardPosition[cnt];
 					cnt++;
 				} else {
-					view[i][j] = -1;
+					view[i][j] = -2;
 				}
 			}
 		}
