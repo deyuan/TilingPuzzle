@@ -1,0 +1,11 @@
+What is the minimum (exact) number of multiplications and additions needed to evaluate an
+arbitrary N-degree, one-variable polynomial with integer coefficients?
+38. Give a linear-time algorithm that for a sequence of N integers, finds the contiguous subsequence
+with the largest possible sum.
+39. Give an O(N log K)-time algorithm to merge K given sorted lists into a single sorted list, where
+N is the total number of items in all the lists.
+40. Consider the following code for randomly permuting an array A of size N:
+For i = 1 to N Do Swap(A[i], A[Random(1,N)])
+where Random(i,j) returns a random integer uniformly distributed in the range i through j, inclusive.
+a) Prove that in general, not all permutations are equally probable here.
+b) Give an alternate random permuter without this flaw.

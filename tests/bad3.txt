@@ -1,0 +1,2 @@
+What is the minimum (exact) number of multiplications and additions needed to evaluate an
+arbitrary N-degree, one-variable polynomial with integer coefficients
