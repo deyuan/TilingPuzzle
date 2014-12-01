@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
@@ -224,9 +223,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			dlx.preProcess();
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
 			tResultInfo.setText("Calculating...");
-			List<List<List<Integer>>> s = dlx.solve();
-			dlx.printAllSolutions();
-//			System.out.println(s);
+			List<List<List<Integer>>> s = dlx.solveAll();
+//			dlx.printAllSolutions();
+			System.out.println(s);
 			return s;
 		}
 		@Override
@@ -315,11 +314,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 					System.err.println("Sleep interrupt");
 				}
 				number++;
-
-				if(sol.get(0).get(0)!=-1){
-					solution.add(sol);
-					publish(sol);
-				}
+				solution.add(sol);
+				publish(sol);
 				sol =  dlx.nextSolution();
 			}
 
@@ -343,8 +339,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			System.out.println("Finished!!!!");
 			System.out.println("number of solutions: "+solution.size());
+			System.out.println("numOfSolution: "+numOfSolution);
 
-
+			/*
 			try {
 				numOfSolution = get();
 			} catch (InterruptedException e) {
@@ -354,6 +351,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			} catch (CancellationException e){
 				System.err.println("The background task has been canceled!");
 			}
+			*/
+
+			numOfSolution = solution.size();
+
 
 			/* After geting the numofSolution, set the min and max of the slider. */
 			sNumSolution.setMinimum(1);
@@ -370,6 +371,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		@Override
 		protected void process(List<List<List<Integer>>> r){
+			System.out.println("The size of the list: "+r.size());
 			cleanTiles();
 			displayStep(r.get(r.size()-1));
 			String s = tResultInfo.getText();
@@ -499,7 +501,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	/**
 	 * Setup DLX instance.
 	 *
-	 * @param dls
+	 * @param dlx
 	 */
 	public void setDLX(DLX d) {
 		dlx = d;
@@ -886,8 +888,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		bPlay.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("Is running: " + isRunning);
-				System.out.println("There is a thread? " + isThread);
 
 				if (!isRunning) {
 					isRunning = true;
@@ -1043,7 +1043,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		mBar.add(mHelp);
 
 		fc = new JFileChooser();
-		fc.setCurrentDirectory(new File("./testcases"));
+		fc.setCurrentDirectory(new File("./tests"));
 
 	}
 
@@ -1441,6 +1441,5 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		});
 
 	}
-
 
 }
