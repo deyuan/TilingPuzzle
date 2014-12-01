@@ -498,6 +498,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		setupControlPanel();
 		setupDisplayPanel();
 		setupTileListPanel();
+		setComponents(false);
 	}
 
 	/**
@@ -1355,6 +1356,26 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		return colors;
 	}
 
+	private void setComponents(boolean b){
+		cbEnableSpin.setEnabled(b);
+		cbEnableSpinFlip.setEnabled(b);
+		cbRmSymm.setEnabled(b);
+		bSolveAll.setEnabled(b);
+		bSolveTrail.setEnabled(b);
+		bSolveStep.setEnabled(b);
+		bPause.setEnabled(b);
+		bStop.setEnabled(b);
+		lSpeed.setEnabled(b);
+		sSpeed.setEnabled(b);
+		tIndex.setEnabled(b);
+		bShowResult.setEnabled(b);
+		bPre.setEnabled(b);
+		bNext.setEnabled(b);
+		bPlay.setEnabled(b);
+
+	}
+
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == miExit)
@@ -1405,7 +1426,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			/* Initiate a new DLX Solver and set it. */
 			DLX dlx = new DLX(board, tileList);
 			setDLX(dlx);
-
+			setComponents(true);
 			/* Initialize the board and posMap. */
 			setupBoard(board.data);
 			setPosMap();
