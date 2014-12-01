@@ -10,7 +10,7 @@ public class DLXSymmetry {
 	/** Reference to DLXConfig. Used for dealing with duplicated tiles. */
 	private static DLXConfig Config;
 
-	public static boolean isAsymmetric(int cur[][], int pattern[][], boolean sf){
+	public static boolean isAsymmetric(int cur[][], int pattern[][], boolean sf) {
 
 		/* Enable spin and flip. At most 8 symmetric patterns. */
 		if(sf){
@@ -66,10 +66,10 @@ public class DLXSymmetry {
 	}
 
 
-	public static boolean isAsymmetricList(int cur[][], List<int[][]> pattern, boolean sf, DLXConfig config){
+	public static boolean isAsymmetricList(int cur[][], List<int[][]> pattern, DLXConfig config){
 		Config = config;
 		for(int i = 0; i< pattern.size(); i++){
-			if(!isAsymmetric(cur, pattern.get(i), sf)){
+			if(!isAsymmetric(cur, pattern.get(i), true)){
 				return false;
 			}
 		}

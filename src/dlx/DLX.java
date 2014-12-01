@@ -33,9 +33,6 @@ public class DLX {
 
 	/******************** Public Member Variables ********************/
 
-	/** Select the DLX algorithm version */
-	public int solverSelection = 0;
-
 	/** DLX algorithm configuration. */
 	public DLXConfig Config = null;
 
@@ -49,6 +46,8 @@ public class DLX {
 
 	private List<List<List<Integer>>> Solutions = null;
 	private List<int[][]> ViewList = null;
+
+	private boolean isSolutionSymmetric = false;
 
 	/******************** Public Member Functions ********************/
 
@@ -88,11 +87,10 @@ public class DLX {
 		Config.autoSetEliminateDuplica();
 		Solutions = new ArrayList<List<List<Integer>>>();
 		ViewList = new ArrayList<int[][]>();
-		if (solverSelection == 0) {
-			basicECA = new DLXBasicExactCoverArray(board, tiles, Config);
-			basicDLA = new DLXBasicLinksArray(basicECA, Config);
-			basicSearch = new DLXBasicSearch(basicDLA, Config);
-		}
+
+		basicECA = new DLXBasicExactCoverArray(board, tiles, Config);
+		basicDLA = new DLXBasicLinksArray(basicECA, Config);
+		basicSearch = new DLXBasicSearch(basicDLA, Config);
 	}
 
 	/**
@@ -100,37 +98,28 @@ public class DLX {
 	 * @return a valid solution
 	 */
 	public List<List<Integer>> nextSolution() {
-		List<List<Integer>> solution = null;
-		if (solverSelection == 0)
-			solution = basicSearch.solveSingleSolution();
-
-		if (solution!=null) {
-
-			int view[][] = solutionView(solution);
-			/* Check the solution is a unique solution. */
-			if(ViewList.size()==0){
-				Solutions.add(solution);
-				ViewList.add(view);
-			}
-			else{
-				/* Remove symmetry. */
-				if( (Config.eliminateSymmetry()&&Config.isEnableSpinFlip()&&(board.sfpattern.size()!=8))
-						||(Config.eliminateSymmetry()&&Config.isEnableSpin()&&(board.spattern.size()!=4)) ){
-
-					while(!DLXSymmetry.isAsymmetricList(view, ViewList, true, Config) && solution!=null){
+		List<List<Integer>> solution = basicSearch.solveSingleSolution();
+		if (solution != null) {
+			/* Check if the solution is a unique solution. */
+			if (Config.eliminateSymmetry() && board.sfpattern.size() != 8) {
+				int view[][] = solutionView(solution);
+				if (ViewList.size() == 0) {
+					Solutions.add(solution);
+					ViewList.add(view);
+				} else {
+					/* Remove symmetry. */
+					while (!DLXSymmetry.isAsymmetricList(view, ViewList, Config)) {
 						solution = basicSearch.solveSingleSolution();
-						if(solution!=null)
-							view = solutionView(solution);
+						if (solution != null) view = solutionView(solution);
+						else break;
 					}
-					if(solution!=null){
+					if (solution != null) {
 						Solutions.add(solution);
 						ViewList.add(view);
 					}
 				}
-
-				/* Don't remove symmetry. */
-				else
-					Solutions.add(solution);
+			} else { //don't remove symmetry
+				Solutions.add(solution);
 			}
 		}
 		return solution;
@@ -141,32 +130,27 @@ public class DLX {
 	 * @return a partial solution
 	 */
 	public List<List<Integer>> nextSingleStep() {
-		List<List<Integer>> step = null;
-		if (solverSelection == 0) step = basicSearch.solveSingleStep();
+		isSolutionSymmetric = false;
+		List<List<Integer>> step = basicSearch.solveSingleStep();
 
 		if (isCompleteSolution()) {
-
-			int view[][] = solutionView(step);
-			/* Check the solution is a unique solution. */
-			/* The first solution. */
-			if(ViewList.size()==0){
-				Solutions.add(step);
-				ViewList.add(view);
-			}
-			else{
-				/* Remove symmetry. */
-				if( (Config.eliminateSymmetry()&&Config.isEnableSpinFlip()&&(board.sfpattern.size()!=8))
-						||(Config.eliminateSymmetry()&&Config.isEnableSpin()&&(board.spattern.size()!=4)) ){
-
-					if(DLXSymmetry.isAsymmetricList(view, ViewList, true, Config)){
+			/* Check if the solution is a unique solution. */
+			if (Config.eliminateSymmetry() && board.sfpattern.size() != 8) {
+				int view[][] = solutionView(step);
+				if (ViewList.size() == 0) {
+					Solutions.add(step);
+					ViewList.add(view);
+				} else {
+					/* Remove symmetry. */
+					if (DLXSymmetry.isAsymmetricList(view, ViewList, Config)) {
 						Solutions.add(step);
 						ViewList.add(view);
+					} else {
+						isSolutionSymmetric = true;
 					}
 				}
-
-				/* Don't remove symmetry. */
-				else
-					Solutions.add(step);
+			} else { //don't remove symmetry
+				Solutions.add(step);
 			}
 		}
 		return step;
@@ -179,38 +163,29 @@ public class DLX {
 	public List<List<List<Integer>>> solve() {
 		Config.autoSetEliminateDuplica();
 		//Config.print();
-		if (solverSelection == 0) Solutions.addAll(basicSearch.solve());
+		Solutions.addAll(basicSearch.solve());
 		return Solutions;
 	}
 
 	/**
-	 * Solve and find all solutions using single step function.
+	 * Solve and find all solutions using single solution function.
 	 * @return a list of solution
 	 */
 	public List<List<List<Integer>>> solveAll() {
 		Config.autoSetEliminateDuplica();
 
-		List<List<Integer>> s = nextSolution();
-		while(s!=null){
-			s = new ArrayList<List<Integer>>();
-			s = nextSolution();
-//			s = nextSolution();
-		}
+		while (nextSolution() != null);
 
 		System.out.println("In solve all: ");
 		System.out.println(Solutions);
 		return Solutions;
 	}
 
-
-
-
-
 	/**
 	 * Reset the DLX search.
 	 */
 	public void resetSearch() {
-		if (solverSelection == 0) basicSearch.reset();
+		basicSearch.reset();
 		Solutions.clear();
 		Config.reset();
 		if (Config.verb) System.out.println("DLX search has been reset.");
@@ -221,8 +196,7 @@ public class DLX {
 	 * @return
 	 */
 	public boolean isCompleteSolution() {
-		if (solverSelection == 0) return basicSearch.isCompleteSolution();
-		return false;
+		return basicSearch.isCompleteSolution() && !isSolutionSymmetric;
 	}
 
 	/**
