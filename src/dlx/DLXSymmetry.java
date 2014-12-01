@@ -10,66 +10,53 @@ public class DLXSymmetry {
 	/** Reference to DLXConfig. Used for dealing with duplicated tiles. */
 	private static DLXConfig Config;
 
-	public static boolean isAsymmetric(int cur[][], int pattern[][], boolean sf) {
+	/**
+	 * Determine if two solutions are symmetric
+	 * @param cur
+	 * @param pattern
+	 * @return
+	 */
+	public static boolean isAsymmetric(int cur[][], int pattern[][]) {
 
-		/* Enable spin and flip. At most 8 symmetric patterns. */
-		if(sf){
-			/* Width == height. At most 8 symmetric patterns.*/
-			if(cur.length == cur[0].length){
-				if(equalValue(cur, pattern)
-						||equalValue(cur, rotateC1(pattern))
-						||equalValue(cur, rotateC2(pattern))
-						||equalValue(cur, rotateC3(pattern))
-						||equalValue(cur, frotateC0(pattern))
-						||equalValue(cur, frotateC1(pattern))
-						||equalValue(cur, frotateC2(pattern))
-						||equalValue(cur, frotateC3(pattern)))
-					return false;
-				else
-					return true;
-			}
-
-			/* Width != height. At most 4 symmetric patterns.*/
-			else{
-				if(equalValue(cur, pattern)
-						||equalValue(cur, rotateC2(pattern))
-						||equalValue(cur, frotateC0(pattern))
-						||equalValue(cur, frotateC2(pattern)))
-					return false;
-				else
-					return true;
-			}
+		/* Width == height. At most 8 symmetric patterns.*/
+		if (cur.length == cur[0].length) {
+			if (equalValue(cur, pattern)
+					||equalValue(cur, rotateC1(pattern))
+					||equalValue(cur, rotateC2(pattern))
+					||equalValue(cur, rotateC3(pattern))
+					||equalValue(cur, frotateC0(pattern))
+					||equalValue(cur, frotateC1(pattern))
+					||equalValue(cur, frotateC2(pattern))
+					||equalValue(cur, frotateC3(pattern)))
+				return false;
+			else
+				return true;
 		}
-
-		/* Enable only spin. At most 4 symmetric patterns. */
-		else{
-			/* Width == height. */
-			if(cur.length == cur[0].length){
-				if(equalValue(cur, pattern)
-						||equalValue(cur, rotateC1(pattern))
-						||equalValue(cur, rotateC2(pattern))
-						||equalValue(cur, rotateC3(pattern)))
-					return false;
-				else
-					return true;
-			}
-
-			/* Width != height. At most 2 symmetric patterns. */
-			else{
-				if(equalValue(cur, pattern)||equalValue(cur, rotateC2(pattern)))
-					return false;
-				else
-					return true;
-			}
+		/* Width != height. At most 4 symmetric patterns.*/
+		else {
+			if (equalValue(cur, pattern)
+					||equalValue(cur, rotateC2(pattern))
+					||equalValue(cur, frotateC0(pattern))
+					||equalValue(cur, frotateC2(pattern)))
+				return false;
+			else
+				return true;
 		}
-
 	}
 
-
-	public static boolean isAsymmetricList(int cur[][], List<int[][]> pattern, DLXConfig config){
+	/**
+	 * Determine if a new solution is symmetric to existing solutions.
+	 * @param cur
+	 * @param pattern
+	 * @param config
+	 * @return
+	 */
+	public static boolean isAsymmetricList(int cur[][], List<int[][]> pattern,
+			DLXConfig config) {
 		Config = config;
-		for(int i = 0; i< pattern.size(); i++){
-			if(!isAsymmetric(cur, pattern.get(i), true)){
+		for (int i = 0; i < pattern.size(); i++) {
+			if (!isAsymmetric(cur, pattern.get(i))) {
+				if (config.verb) System.out.println("Symmetric solution.");
 				return false;
 			}
 		}
@@ -233,9 +220,12 @@ public class DLXSymmetry {
 							if (map.get(a[i][j]) != b[i][j]) return false;
 						} else {
 							boolean same = false;
-							for (int k = Config.duplica()[a[i][j]];
-									k != a[i][j];
-									k = Config.duplica()[k]) {
+							if (a[i][j] == b[i][j]) { // map to itself
+								same = true;
+								map.put(a[i][j], b[i][j]);
+							} else for (int k = Config.duplica()[a[i][j]];
+											k != a[i][j];
+											k = Config.duplica()[k]) {
 								if (k == b[i][j]) {
 									same = true;
 									map.put(a[i][j], b[i][j]);
