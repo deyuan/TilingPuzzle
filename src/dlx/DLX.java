@@ -117,7 +117,7 @@ public class DLX {
 				if( (Config.eliminateSymmetry()&&Config.isEnableSpinFlip()&&(board.sfpattern.size()!=8))
 						||(Config.eliminateSymmetry()&&Config.isEnableSpin()&&(board.spattern.size()!=4)) ){
 
-					while(!DLXSymmetry.isAsymmetricList(view, ViewList, true) && solution!=null){
+					while(!DLXSymmetry.isAsymmetricList(view, ViewList, true, Config) && solution!=null){
 						solution = basicSearch.solveSingleSolution();
 						if(solution!=null)
 							view = solutionView(solution);
@@ -158,7 +158,7 @@ public class DLX {
 				if( (Config.eliminateSymmetry()&&Config.isEnableSpinFlip()&&(board.sfpattern.size()!=8))
 						||(Config.eliminateSymmetry()&&Config.isEnableSpin()&&(board.spattern.size()!=4)) ){
 
-					if(DLXSymmetry.isAsymmetricList(view, ViewList, true)){
+					if(DLXSymmetry.isAsymmetricList(view, ViewList, true, Config)){
 						Solutions.add(step);
 						ViewList.add(view);
 					}

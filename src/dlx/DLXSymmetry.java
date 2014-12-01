@@ -1,10 +1,14 @@
 package dlx;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DLXSymmetry {
 
+	/** Reference to DLXConfig. Used for dealing with duplicated tiles. */
+	private static DLXConfig Config;
 
 	public static boolean isAsymmetric(int cur[][], int pattern[][], boolean sf){
 
@@ -62,7 +66,8 @@ public class DLXSymmetry {
 	}
 
 
-	public static boolean isAsymmetricList(int cur[][], List<int[][]> pattern, boolean sf){
+	public static boolean isAsymmetricList(int cur[][], List<int[][]> pattern, boolean sf, DLXConfig config){
+		Config = config;
 		for(int i = 0; i< pattern.size(); i++){
 			if(!isAsymmetric(cur, pattern.get(i), sf)){
 				return false;
@@ -211,10 +216,42 @@ public class DLXSymmetry {
 	private static boolean equalValue(int[][] a, int[][] b) {
 		if (a.length != b.length || a[0].length != b[0].length)
 			return false;
+
+		// For detecting tile duplication
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+
 		for (int i = 0; i < a.length; i++) {
 			for (int j = 0; j < a[0].length; j++) {
-				if (a[i][j] != b[i][j])
-					return false;
+
+				/* If there exists duplicated tiles, a map is needed. */
+				if (Config.eliminateDuplica()) {
+
+					if (Config.duplica()[a[i][j]] == a[i][j]) { //unique tile
+						if (a[i][j] != b[i][j]) return false;
+					} else { //duplicated tile
+						if (map.containsKey(a[i][j])) {
+							if (map.get(a[i][j]) != b[i][j]) return false;
+						} else {
+							boolean same = false;
+							for (int k = Config.duplica()[a[i][j]];
+									k != a[i][j];
+									k = Config.duplica()[k]) {
+								if (k == b[i][j]) {
+									same = true;
+									map.put(a[i][j], b[i][j]);
+									break;
+								}
+							}
+							if (!same) return false;
+						}
+					}
+
+				} else { //just compare them
+					if (a[i][j] != b[i][j]) {
+						return false;
+					}
+				}
+
 			}
 		}
 		return true;

@@ -554,8 +554,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				if (cbEnableSpin.isSelected())
 					dlx.Config.setEnableSpin(true);
 				else{
-					cbEnableSpinFlip.setSelected(false);
 					dlx.Config.setEnableSpin(false);
+					cbEnableSpinFlip.setSelected(false);
+					dlx.Config.setEnableSpinFlip(false);
 				}
 			}
 
@@ -574,8 +575,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				if (cbEnableSpinFlip.isSelected()){
-					cbEnableSpin.setSelected(true);
 					dlx.Config.setEnableSpinFlip(true);
+					cbEnableSpin.setSelected(true);
+					dlx.Config.setEnableSpin(true);
 				}
 				else
 					dlx.Config.setEnableSpinFlip(false);
@@ -599,7 +601,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		cbRmSymm.setBackground(Color.WHITE);
 		cbRmSymm.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		cbRmSymm.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		cbRmSymm.setSelected(false);
+		cbRmSymm.setSelected(true);
 		cbRmSymm.setSize(160, 30);
 		cbRmSymm.setLocation(10, 110);
 		cbRmSymm.setEnabled(true);
@@ -1408,6 +1410,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			/* Reset configuration . */
 			cbEnableSpin.setSelected(false);
 			cbEnableSpinFlip.setSelected(false);
+			cbRmSymm.setSelected(true);
 
 			/* Reset text field */
 			tResultInfo.setText("Press button to solve");

@@ -43,7 +43,7 @@ public class DLXConfig {
 	private boolean singleSolutionSearch = false;
 
 	/** Eliminate symmetry solution */
-	private boolean eliminateSymmetry = false;
+	private boolean eliminateSymmetry = true;
 
 	/** Eliminate same solution due to duplicated tiles
 	 *  Note it is enabled by default.
