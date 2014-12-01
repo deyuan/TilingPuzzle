@@ -33,9 +33,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -102,7 +104,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	/**
 	 * The speed of the single step and single solution. from 1ms to 500ms.
 	 */
-	private int speed = 250;
+	private int speed = 1000;
 
 	/**
 	 * Configure panel
@@ -117,6 +119,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	JButton bSolveTrail;
 	JButton bPause;
 	JButton bStop;
+	JLabel lSpeed;
 	JSlider sSpeed;
 
 	/**
@@ -172,12 +175,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	/**
 	 * Size parameters.
 	 */
-	private static final int frameSize[] = { 820+340, 610 };
+	private static final int frameSize[] = { 820+340-75-130, 610-10 };
 	private static final int framePos[] = { 200, 20 };
-	private static final int displaySize[] = { 600, 535 };
+	private static final int displaySize[] = { 600-65, 535 };
 	private static final int displayPos[] = { 195, 10 };
-	private static final int tileListSize[] = { 340, 535 };
-	private static final int tileListPos[] = { 800, 10 };
+	private static final int tileListSize[] = { 340-130, 535 };
+	private static final int tileListPos[] = { 800-65, 10 };
 
 	private int OffsetX = 5;
 	private int OffsetY = 15;
@@ -657,12 +660,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pConfig.add(bSolveTrail);
 
 
-		JLabel lSpeed = new JLabel("Speed");
-		lSpeed.setSize(40, 20);
+		lSpeed = new JLabel("Speed (1x)");
+		lSpeed.setSize(140, 20);
 		lSpeed.setLocation(10, 265);
 		pConfig.add(lSpeed);
 
-		sSpeed = new JSlider(1, 500, 250);
+		sSpeed = new JSlider(-2, 6, 0); //from 2^-2 to 2^6
 		sSpeed.setBackground(Color.WHITE);
 		sSpeed.setSize(160, 30);
 		sSpeed.setLocation(10, 280);
@@ -672,7 +675,19 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			@Override
 			public void stateChanged(ChangeEvent arg0) {
-				speed = 501-sSpeed.getValue();
+				int s = sSpeed.getValue();
+				if (s < 6) {
+					speed =  (int)(1000 / Math.pow(2, sSpeed.getValue()));
+				} else {
+					speed = 1; //unlimited
+				}
+				if (s >= 0 && s < 6) {
+					lSpeed.setText("Speed (" + (int)Math.pow(2, s) + "x)");
+				} else if (s < 0) {
+					lSpeed.setText("Speed (1/" + (int)Math.pow(2, -s) + "x)");
+				} else {
+					lSpeed.setText("Speed (Unlimited)");
+				}
 			}
 
 		});
@@ -959,43 +974,43 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 	private void setupTileList(List<Tile> t){
 
-
 		List<Color> colorList = genColors(t.size());
-		for(int i = 0; i<t.size(); i++){
+		for (int i = 0; i < t.size(); i++) {
 			t.get(i).printTile();
 		}
 
-
-		final int width = 100;
+		final int width = (tileListSize[0] - 30) / 3;
 		int lMax = Math.max(t.get(0).l, t.get(0).w);
-		for(int i = 1; i<t.size(); i++){
-			if(lMax<  Math.max(t.get(i).l, t.get(i).w))
+		for (int i = 1; i < t.size(); i++) {
+			if (lMax < Math.max(t.get(i).l, t.get(i).w))
 				lMax = Math.max(t.get(i).l, t.get(i).w);
 		}
 		System.out.println("Max:"+lMax);
 
-		int grid = width/lMax;
+		int grid = width / lMax - 1;
+		if (grid == 0) grid = 1; // too small?
+
 		JPanel block[] = new JPanel[t.size()];
-		for(int i = 0; i<t.size(); i++){
+		for (int i = 0; i < t.size(); i++) {
 			JPanel pic = new JPanel(null);
-			pic.setSize(100, 100);
-			pic.setLocation(i%3*105+15, i/3*105+30);
+			pic.setSize(width, width);
+			pic.setLocation(i % 3 * width + 15, i / 3 * width + 25);
 			pic.setBackground(Color.white);
 			pTileList.add(pic);
 
-			for(int j = 0; j<t.get(i).data.length; j++){
-				for(int k = 0; k<t.get(i).data[0].length; k++){
-					if(t.get(i).data[j][k]!=' '){
+			for (int j = 0; j < t.get(i).data.length; j++){
+				for (int k = 0; k < t.get(i).data[0].length; k++){
+					if (t.get(i).data[j][k] != ' ') {
 						block[i] = new JPanel();
 						block[i].setBackground(colorList.get(i));
-						block[i].setSize(grid, grid);
-						block[i].setLocation(k*grid, j*grid);
+						block[i].setBorder(new LineBorder(Color.black));
+						block[i].setSize(grid + 1, grid + 1);
+						block[i].setLocation(k * grid, j * grid);
 						pic.add(block[i]);
 					}
 				}
 			}
 		}
-
 
 	}
 
@@ -1140,10 +1155,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 						}
 					};
 					block.setSize(sizeTile, sizeTile);
-					int x = originTile[0] + (j) * sizeTile+OffsetX;
-					int y = originTile[1] + (i) * sizeTile+OffsetY;
+					int x = originTile[0] + (j) * sizeTile + OffsetX;
+					int y = originTile[1] + (i) * sizeTile + OffsetY;
 					block.setLocation(x, y);
-					/* Set it to transparent to display the chars on a board. */
 					block.setOpaque(true);
 					block.setVisible(true);
 					pDisplay.add(block);
@@ -1152,26 +1166,22 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			}
 		}
 
-		Object o[] = set.toArray();
-		/* Setup board colors(now use chars to represent) if there are more than one colors. */
-		if (set.size() > 1)
-		for (int s = 0; s < set.size(); s++) {
+		/* Setup board colors (now use chars to represent) if there are more than one colors. */
+		if (set.size() > 1) {
 			for (int i = 0; i < w; i++) {
 				for (int j = 0; j < l; j++) {
-					if (board[i][j] == (char) o[s]) {
-						JLabel block = new JLabel(
-								Character.toString((char) o[s]));
-						block.setSize(sizeTile / 2, sizeTile / 2);
-						block.setFont(new Font(block.getFont().getName(),
-								Font.BOLD, 28));
-						int x = originTile[0] + (j) * sizeTile + sizeTile / 3+OffsetX;
-						int y = originTile[1] + (i) * sizeTile + sizeTile / 3+OffsetY;
-						block.setLocation(x, y);
-						block.setOpaque(false);
-						block.setVisible(true);
-						pDisplay.add(block);
-					} else
-						set.add(board[i][j]);
+					if (board[i][j] == ' ') continue;
+					JLabel block = new JLabel(Character.toString(board[i][j]));
+					block.setSize(sizeTile/2, sizeTile/2);
+					block.setFont(new Font("Arial", Font.PLAIN, sizeTile/2));
+					block.setVerticalAlignment(SwingConstants.CENTER);
+					block.setHorizontalAlignment(SwingConstants.CENTER);
+					int x = originTile[0] + (j) * sizeTile + OffsetX + sizeTile/4;
+					int y = originTile[1] + (i) * sizeTile + OffsetY + sizeTile/4;
+					block.setLocation(x, y);
+					block.setOpaque(false);  //set to transparent
+					block.setVisible(true);
+					pDisplay.add(block);
 				}
 			}
 		}
