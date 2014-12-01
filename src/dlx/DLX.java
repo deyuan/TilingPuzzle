@@ -117,14 +117,15 @@ public class DLX {
 				if( (Config.eliminateSymmetry()&&Config.isEnableSpinFlip()&&(board.sfpattern.size()!=8))
 						||(Config.eliminateSymmetry()&&Config.isEnableSpin()&&(board.spattern.size()!=4)) ){
 
-					while(!DLXSymmetry.isAsymmetricList(view, ViewList, true)){
+					while(!DLXSymmetry.isAsymmetricList(view, ViewList, true) && solution!=null){
 						solution = basicSearch.solveSingleSolution();
-						System.out.println("In next Solution: ");
-						System.out.println(solution);
-						view = solutionView(solution);
+						if(solution!=null)
+							view = solutionView(solution);
 					}
-					Solutions.add(solution);
-					ViewList.add(view);
+					if(solution!=null){
+						Solutions.add(solution);
+						ViewList.add(view);
+					}
 				}
 
 				/* Don't remove symmetry. */
