@@ -223,10 +223,11 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			dlx.preProcess();
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
 			tResultInfo.setText("Calculating...");
-			List<List<List<Integer>>> s = dlx.solveAll();
+			solution.addAll(dlx.solveAll());
 //			dlx.printAllSolutions();
-			System.out.println(s);
-			return s;
+			System.out.println("In background:");
+			System.out.println(solution);
+			return solution;
 		}
 		@Override
 		protected void done(){
@@ -340,7 +341,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			System.out.println("Finished!!!!");
 			System.out.println("number of solutions: "+solution.size());
 			System.out.println("numOfSolution: "+numOfSolution);
-
+			System.out.println(dlx.Config.isEnableSpin());
+			System.out.println(dlx.Config.isEnableSpinFlip());
 			/*
 			try {
 				numOfSolution = get();

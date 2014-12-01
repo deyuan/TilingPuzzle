@@ -108,7 +108,6 @@ public class DLX {
 
 			int view[][] = solutionView(solution);
 			/* Check the solution is a unique solution. */
-			/* The first solution. */
 			if(ViewList.size()==0){
 				Solutions.add(solution);
 				ViewList.add(view);
@@ -120,6 +119,8 @@ public class DLX {
 
 					while(!DLXSymmetry.isAsymmetricList(view, ViewList, true)){
 						solution = basicSearch.solveSingleSolution();
+						System.out.println("In next Solution: ");
+						System.out.println(solution);
 						view = solutionView(solution);
 					}
 					Solutions.add(solution);
@@ -189,8 +190,11 @@ public class DLX {
 		Config.autoSetEliminateDuplica();
 
 		List<List<Integer>> s = nextSolution();
-		while(s!=null)
+		while(s!=null){
+			s = new ArrayList<List<Integer>>();
 			s = nextSolution();
+//			s = nextSolution();
+		}
 
 		System.out.println("In solve all: ");
 		System.out.println(Solutions);

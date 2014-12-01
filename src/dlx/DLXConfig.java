@@ -69,20 +69,18 @@ public class DLXConfig {
 		searchFinished = false;
 		singleStepSearch = false;
 		singleSolutionSearch = false;
-//		eliminateSymmetry = false;
-		//eliminateDuplica = false;
 	}
 
 	public boolean isEnableSpin() { return enableSpin; }
 	public void setEnableSpin(boolean b) {
 		enableSpin = b;
-		if (b == false) enableSpinFlip = false;
+//		if (b == false) enableSpinFlip = false;
 	}
 
 	public boolean isEnableSpinFlip() { return enableSpinFlip; }
 	public void setEnableSpinFlip(boolean b) {
 		enableSpinFlip = b;
-		if (b == true) enableSpin = true;
+//		if (b == true) enableSpin = true;
 	}
 
 	public boolean isEnableExtra() { return enableExtra; }
