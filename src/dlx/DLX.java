@@ -248,6 +248,11 @@ public class DLX {
 		}
 	}
 
+	public List<List<List<Integer>>> getSolutions(){
+		return Solutions;
+	}
+
+
 	/******************** Private Member Functions ********************/
 
 }

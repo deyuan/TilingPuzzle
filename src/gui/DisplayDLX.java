@@ -423,12 +423,11 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				} catch (InterruptedException e) {
 					System.err.println("Sleep Interrupt!");
 				}
-				solution.add(sol);
+
 				publish(sol);
 				sol =  dlx.nextSingleStep();
 			}
-
-			List<List<List<Integer>>> s = dlx.solve();
+			List<List<List<Integer>>> s = dlx.getSolutions();
 			return s;
 		}
 
@@ -476,6 +475,19 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		protected void process(List<List<List<Integer>>> r){
 			cleanTiles();
 			displayStep(r.get(r.size()-1));
+
+			String s = tResultInfo.getText();
+			String t =s.replaceAll("Calculating...", "");
+
+			if(t.length()==0)
+				t="0 solutions";
+			String y =t.replaceAll(" solutions", "");
+
+			int i = Integer.parseInt(y);
+			int j = dlx.getSolutions().size();
+			if(j > i);
+			tResultInfo.setText("Calculating..." + j +" solutions");
+
 		}
 
 	}
