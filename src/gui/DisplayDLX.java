@@ -220,6 +220,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			/* Disable all useless buttons to prevent incorrect operations. */
 			setControlPanelComponents(false);
+			bStop.setEnabled(true);
 			tIndex.setText("0");
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -239,11 +240,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			try {
 				solution = get();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.err.println("The background task has been interrupt!");
 			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.err.println("The background task has been excuted incorrectly!");
+			} catch (CancellationException e){
 				System.err.println("The background task has been canceled!");
 			}
 			numOfSolution = solution.size();
@@ -278,7 +278,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			lSpeed.setEnabled(true);
 			bPause.setEnabled(true);
 			bStop.setEnabled(true);
-			tResultInfo.setEnabled(true);
 			sSpeed.setEnabled(true);
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -320,7 +319,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			lSpeed.setEnabled(false);
 			bPause.setEnabled(false);
 			bStop.setEnabled(false);
-			tResultInfo.setEnabled(false);
 			sSpeed.setEnabled(false);
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -351,7 +349,13 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			if(t.length()==0)
 				t="0 solutions!";
 			String y =t.replaceAll(" solutions!", "");
-			int i = Integer.parseInt(y);
+			int i = 0;
+			try{
+				i = Integer.parseInt(y);
+			} catch (NumberFormatException e){
+				System.out.println("The thread has been canceld and we don't need to display numbers here.");
+				return;
+			}
 			tResultInfo.setText("Searching..." + (i+1) +" solutions!");
 		}
 
@@ -366,7 +370,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			lSpeed.setEnabled(true);
 			bPause.setEnabled(true);
 			bStop.setEnabled(true);
-			tResultInfo.setEnabled(true);
 			sSpeed.setEnabled(true);
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -407,7 +410,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			lSpeed.setEnabled(false);
 			bPause.setEnabled(false);
 			bStop.setEnabled(false);
-			tResultInfo.setEnabled(false);
 			sSpeed.setEnabled(false);
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -447,7 +449,13 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				t="0 solutions";
 			String y =t.replaceAll(" solutions", "");
 
-			int i = Integer.parseInt(y);
+			int i = 0;
+			try{
+				i = Integer.parseInt(y);
+			} catch (NumberFormatException e){
+				System.out.println("The thread has been canceld and we don't need to display numbers here.");
+				return;
+			}
 			int j = dlx.getSolutions().size();
 			if(j > i);
 			tResultInfo.setText("Searching..." + j +" solutions");
@@ -679,12 +687,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				isPaused = !isPaused;
-				if(isPaused){
-					bPause.setText("Resume");
-				}
-				else{
-					bPause.setText("Pause");
+				/* Only if there is at least on thread running, does this button work. */
+				if( (calculateSSol!=null && calculateSSol.getState() == SwingWorker.StateValue.STARTED)
+						||(calculateSStep!=null && calculateSStep.getState() == SwingWorker.StateValue.STARTED)
+						||(calculateAll!=null && calculateAll.getState() == SwingWorker.StateValue.STARTED) ){
+					isPaused = !isPaused;
+					if(isPaused)
+						bPause.setText("Resume");
+					else
+						bPause.setText("Pause");
 				}
 			}
 
@@ -702,13 +713,21 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
+				/* Reset the resume button to "Pause" again. */
+				bPause.setText("Pause");
+				isPaused = false;
 				if(calculateSSol!=null && calculateSSol.getState() == SwingWorker.StateValue.STARTED){
 					calculateSSol.cancel(true);
+					tResultInfo.setText("Searching is canceled!");
 				}
 				else if(calculateSStep!=null && calculateSStep.getState() == SwingWorker.StateValue.STARTED){
 					calculateSStep.cancel(true);
+					tResultInfo.setText("Searching is canceled!");
 				}
-
+				else if(calculateAll!=null && calculateAll.getState() == SwingWorker.StateValue.STARTED){
+					calculateAll.cancel(true);
+					tResultInfo.setText("Searching is canceled!");
+				}
 			}
 
 		});
@@ -733,7 +752,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 		pResult.setLayout(null);
 
-		tResultInfo = new JLabel("Press button to solve");
+		tResultInfo = new JLabel("Please select a puzzle file");
 		tResultInfo.setBackground(Color.WHITE);
 		tResultInfo.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		// tResultInfo.setPreferredSize(new Dimension(60, 30));
@@ -1361,7 +1380,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		sSpeed.setEnabled(b);
 		bPause.setEnabled(b);
 		bStop.setEnabled(b);
-		tResultInfo.setEnabled(b);
 	}
 
 	private void setResultPanelComponents(boolean b){
@@ -1386,12 +1404,20 @@ public class DisplayDLX extends JPanel implements ActionListener {
 					"About", JOptionPane.INFORMATION_MESSAGE);
 		}
 		if (e.getSource() == miRead) {
+			/* If there is a thread running, cannot select new files. */
+			if( (calculateSSol!=null && calculateSSol.getState() == SwingWorker.StateValue.STARTED)
+					||(calculateSStep!=null && calculateSStep.getState() == SwingWorker.StateValue.STARTED)
+					||(calculateAll!=null && calculateAll.getState() == SwingWorker.StateValue.STARTED) ){
+				JOptionPane.showConfirmDialog(null, "Stop before selecting a new file!",
+						"Warning", JOptionPane.CLOSED_OPTION,
+						JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+
 			/* Read a ASCII file and solve it. */
 			File file = null;
 			if (fc.showOpenDialog(DisplayDLX.this) == JFileChooser.APPROVE_OPTION) {
 				file = fc.getSelectedFile();
-			//	System.out.println(file.getAbsolutePath());
-				System.out.println(file.getName());
 			}
 			// not select any files
 			else {
@@ -1411,7 +1437,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			cbRmSymm.setSelected(true);
 
 			/* Reset text field */
-			tResultInfo.setText("Press button to solve");
+			tResultInfo.setText("Press buttons to solve");
 			tIndex.setText("0");
 
 			pDisplay.setBorder(BorderFactory.createCompoundBorder(
