@@ -884,6 +884,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				if (!isRunning) {
 					isRunning = true;
 					bPlay.setText("Stop");
+					setControlPanelComponents(false);
 					if (!isThread) {
 						isThread = true;
 						new Thread(new Runnable() {
@@ -922,6 +923,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				/* If now it is running, stop it! */
 				else {
 					isRunning = false;
+					setControlPanelComponents(true);
 					bPlay.setText("Autoplay all solutions");
 
 				}
