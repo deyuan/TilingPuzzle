@@ -220,6 +220,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			/* Disable all useless buttons to prevent incorrect operations. */
 			setControlPanelComponents(false);
+			setResultPanelComponents(false);
 			bStop.setEnabled(true);
 			tIndex.setText("0");
 
@@ -255,15 +256,17 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			sNumSolution.setMaximum(numOfSolution);
 			sNumSolution.setMinimum(0);
 			sNumSolution.setValue(0);
-			sNumSolution.setValue(1);
-			sNumSolution.setMinimum(1);
 
 			if(numOfSolution == 0)
 				tResultInfo.setText("No solutions!");
-			else if(numOfSolution == 1)
-				tResultInfo.setText("Only 1 solution!");
-			else
-				tResultInfo.setText(numOfSolution+" solutions!");
+			else{
+				if(numOfSolution == 1)
+					tResultInfo.setText("Only 1 solution!");
+				else
+					tResultInfo.setText(numOfSolution+" solutions!");
+				sNumSolution.setValue(1);
+				sNumSolution.setMinimum(1);
+			}
 		}
 
 	}
@@ -276,6 +279,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			/* Disable all useless buttons to prevent incorrect operations. */
 			setControlPanelComponents(false);
+			setResultPanelComponents(false);
 			lSpeed.setEnabled(true);
 			bPause.setEnabled(true);
 			bStop.setEnabled(true);
@@ -326,18 +330,23 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 			numOfSolution = solution.size();
-
 			/* After geting the numofSolution, set the min and max of the slider. */
+			/* Note: only when there is state change the solution could be displayed! */
 			sNumSolution.setMinimum(1);
 			sNumSolution.setMaximum(numOfSolution);
-			sNumSolution.setValue(1);
+			sNumSolution.setMinimum(0);
+			sNumSolution.setValue(0);
 
 			if(numOfSolution == 0)
 				tResultInfo.setText("No solutions!");
-			else if(numOfSolution == 1)
-				tResultInfo.setText("Only 1 solution!");
-			else
-				tResultInfo.setText(numOfSolution+" solutions!");
+			else{
+				if(numOfSolution == 1)
+					tResultInfo.setText("Only 1 solution!");
+				else
+					tResultInfo.setText(numOfSolution+" solutions!");
+				sNumSolution.setValue(1);
+				sNumSolution.setMinimum(1);
+			}
 		}
 
 		@Override
@@ -369,6 +378,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		protected List<List<List<Integer>>> doInBackground() {
 			solution = new ArrayList<List<List<Integer>>>();
 			setControlPanelComponents(false);
+			setResultPanelComponents(false);
 			lSpeed.setEnabled(true);
 			bPause.setEnabled(true);
 			bStop.setEnabled(true);
@@ -426,18 +436,23 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				System.err.println("The background task has been canceled!");
 			}
 			numOfSolution = solution.size();
-
 			/* After geting the numofSolution, set the min and max of the slider. */
+			/* Note: only when there is state change the solution could be displayed! */
 			sNumSolution.setMinimum(1);
 			sNumSolution.setMaximum(numOfSolution);
-			sNumSolution.setValue(1);
+			sNumSolution.setMinimum(0);
+			sNumSolution.setValue(0);
 
 			if(numOfSolution == 0)
 				tResultInfo.setText("No solutions!");
-			else if(numOfSolution == 1)
-				tResultInfo.setText("Only 1 solution!");
-			else
-				tResultInfo.setText(numOfSolution+" solutions!");
+			else{
+				if(numOfSolution == 1)
+					tResultInfo.setText("Only 1 solution!");
+				else
+					tResultInfo.setText(numOfSolution+" solutions!");
+				sNumSolution.setValue(1);
+				sNumSolution.setMinimum(1);
+			}
 		}
 
 		@Override
