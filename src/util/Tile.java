@@ -281,6 +281,31 @@ public class Tile implements Comparable<Tile> {
 			p.get(i).remove(0);
 			p.get(i).remove(p.get(i).size() - 1);
 		}
+		for (int i = p.size() - 1; i >= 0; i--) {
+			boolean empty = true;
+			for (int j = 0; j < p.get(0).size(); j++) {
+				if (p.get(i).get(j) != 0 && p.get(i).get(j) != -2) {
+					empty = false;
+					break;
+				}
+			}
+			if (empty) p.remove(i);
+			else break;
+		}
+		for (int i = p.get(0).size() - 1; i >= 0; i--) {
+			boolean empty = true;
+			for (int j = 0; j < p.size(); j++) {
+				if (p.get(j).get(i) != 0 && p.get(j).get(i) != -2) {
+					empty = false;
+					break;
+				}
+			}
+			if (empty) {
+				for (int j = 0; j < p.size(); j++)
+					p.get(j).remove(p.get(0).size() - 1);
+			}
+			else break;
+		}
 		// adjust tile id
 		for (int i = 0; i < p.size(); i++) {
 			for (int j = 0; j < p.get(i).size(); j++) {
