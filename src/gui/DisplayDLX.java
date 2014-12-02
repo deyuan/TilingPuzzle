@@ -1008,7 +1008,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		int grid = Math.min((tileListAreaWidth - 1)/pack[0].length,
 						(tileListAreaHeight - 1)/pack.length);
-		System.out.println(show_char + " ---- " + grid);
 		int[][] tbase = new int[tiles.size()][2];
 		for (int i = 0; i < tiles.size(); i++)
 			tbase[i][0] = -1;
@@ -1407,7 +1406,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		if (e.getSource() == miAbout) {
 			JOptionPane.showMessageDialog(null, "Tiling Puzzle v1.0\n"
-					+ "Date: 11/24/2014\n" + "Designed by Dawei Fan and Deyuan Guo",
+					+ "Date: Dec 1, 2014\n" + "Designed by Dawei Fan and Deyuan Guo",
 					"About", JOptionPane.INFORMATION_MESSAGE);
 		}
 		if (e.getSource() == miRead) {
