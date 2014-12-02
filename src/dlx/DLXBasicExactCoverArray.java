@@ -62,6 +62,17 @@ public class DLXBasicExactCoverArray {
 		ECA = buildExactCoverArray(board, tiles);
 
 		numRows = ECA.length;
+
+		/* check tile area */
+		int total_area = 0;
+		for (Tile i: tiles) {
+			total_area += i.area;
+		}
+		if (total_area < board.area) {
+			Config.setDirectlyFail(true);
+			if (Config.verb)
+				System.out.println("Directly fail (no enough tiles).");
+		}
 	}
 
 	/******************** Private Member Functions ********************/

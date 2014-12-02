@@ -133,7 +133,8 @@ public class DLXBasicLinksArray {
 			/* If a cell cannot be covered by any tile, then directly fail. */
 			if (n == 0 && j >= numTiles) {
 				Config.setDirectlyFail(true);
-				if (Config.verb) System.out.println("Directly fail!");
+				if (Config.verb)
+					System.out.println("Directly fail (unreachable positions).");
 				return null;
 			}
 		}
