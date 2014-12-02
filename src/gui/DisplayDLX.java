@@ -234,7 +234,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			dlx.preProcess();
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
 			tResultInfo.setText("Searching...");
-			solution.addAll(dlx.solve());
+			solution.addAll(dlx.solveAll());
 
 			return solution;
 		}

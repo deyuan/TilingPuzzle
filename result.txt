@@ -1,0 +1,190 @@
+checkerboard.txt
+Enable rotation.
+Time for solve all: 148.4194634 ms
+Solutions: 11
+Time for the first: 8.695842800000001 ms
+Enable rotation and reflection.
+Solutions: 779
+Time for solve all: 1976.5208228 ms
+Time for the first: 19.847395199999998 ms
+
+IQ_creator.txt
+Enable rotation.
+Time for solve all: 8.2381964 ms
+Solutions: 2
+Time for the first: 8.1860404 ms
+Enable rotation and reflection.
+Solutions: 6
+Time for solve all: 26.7066804 ms
+Time for the first: 16.8132132 ms
+
+lucky13.txt
+Enable rotation.
+Time for solve all: 5568.741859 ms
+Solutions: 904
+Time for the first: 8.910344199999999 ms
+Enable rotation and reflection.
+Solutions: 69415
+Time for solve all: 132171.110611 ms
+Time for the first: 17.1688806 ms
+
+partial_cross.txt
+Enable rotation.
+Time for solve all: 9.328524 ms
+Solutions: 0
+Time for the first: 9.215255599999999 ms
+Enable rotation and reflection.
+Solutions: 20
+Time for solve all: 106.01247640000001 ms
+Time for the first: 9.6897896 ms
+
+pentominoes3x20.txt
+Enable rotation.
+Time for solve all: 24.6463852 ms
+Solutions: 0
+Time for the first: 26.1740192 ms
+Enable rotation and reflection.
+Solutions: 2
+Time for solve all: 124.3077926 ms
+Time for the first: 38.490074 ms
+
+pentominoes4x15.txt
+Enable rotation.
+Time for solve all: 170.2916994 ms
+Solutions: 8
+Time for the first: 25.720571600000003 ms
+Enable rotation and reflection.
+Solutions: 368
+Time for solve all: 1538.1720074 ms
+Time for the first: 32.078079 ms
+
+pentominoes5x12.txt
+Enable rotation.
+Time for solve all: 505.7767022 ms
+Solutions: 23
+Time for the first: 62.499113799999996 ms
+Enable rotation and reflection.
+Solutions: 1010
+Time for solve all: 4518.8248052 ms
+Time for the first: 71.24104759999999 ms
+
+pentominoes6x10.txt
+Enable rotation.
+Time for solve all: 798.7376236 ms
+Solutions: 53
+Time for the first: 14.7238074 ms
+Enable rotation and reflection.
+Solutions: 2339
+Time for solve all: 7604.6263816 ms
+Time for the first: 34.8779798 ms
+
+pentominoes8x8_corner_missing.txt
+Enable rotation.
+Time for solve all: 1755.8754154 ms
+Solutions: 130
+Time for the first: 14.137683800000001 ms
+Enable rotation and reflection.
+Solutions: 5027
+Time for solve all: 16173.8412816 ms
+Time for the first: 52.7191944 ms
+
+pentominoes8x8_four_missing_corners.txt
+Enable rotation.
+Time for solve all: 436.44704 ms
+Solutions: 48
+Time for the first: 12.668829800000001 ms
+Enable rotation and reflection.
+Solutions: 2170
+Time for solve all: 5686.0181306 ms
+Time for the first: 20.8806216 ms
+
+pentominoes8x8_four_missing_diagonal.txt
+Enable rotation.
+Time for solve all: 57.948307 ms
+Solutions: 0
+Time for the first: 57.720836799999994 ms
+Enable rotation and reflection.
+Solutions: 74
+Time for solve all: 312.10593919999997 ms
+Time for the first: 62.786950600000004 ms
+
+pentominoes8x8_four_missing_near_corners.txt
+Enable rotation.
+Time for solve all: 110.9443284 ms
+Solutions: 5
+Time for the first: 63.0691888 ms
+Enable rotation and reflection.
+Solutions: 188
+Time for solve all: 1118.517841 ms
+Time for the first: 80.96909059999999 ms
+
+pentominoes8x8_four_missing_near_middle.txt
+Enable rotation.
+Time for solve all: 15.144226199999999 ms
+Solutions: 0
+Time for the first: 15.3563948 ms
+Enable rotation and reflection.
+Solutions: 21
+Time for solve all: 156.1080178 ms
+Time for the first: 19.246716399999997 ms
+
+pentominoes8x8_four_missing_offset_near_corners.txt
+Enable rotation.
+Time for solve all: 42.798949 ms
+Solutions: 0
+Time for the first: 41.2672096 ms
+Enable rotation and reflection.
+Solutions: 54
+Time for solve all: 811.484081 ms
+Time for the first: 132.4114472 ms
+
+pentominoes8x8_four_missing_offset_near_middle.txt
+Enable rotation.
+Time for solve all: 36.0861478 ms
+Solutions: 1
+Time for the first: 22.7298682 ms
+Enable rotation and reflection.
+Solutions: 126
+Time for solve all: 430.6057734 ms
+Time for the first: 30.2166098 ms
+
+pentominoes8x8_middle_missing.txt
+Enable rotation.
+Time for solve all: 61.0895066 ms
+Solutions: 1
+Time for the first: 40.2219466 ms
+Enable rotation and reflection.
+Solutions: 65
+Time for solve all: 527.1674062 ms
+Time for the first: 49.856781399999996 ms
+
+pentominoes8x8_side_missing.txt
+Enable rotation.
+Time for solve all: 563.9814032 ms
+Solutions: 27
+Time for the first: 43.2891574 ms
+Enable rotation and reflection.
+Solutions: 1288
+Time for solve all: 5692.9515916 ms
+Time for the first: 135.3808768 ms
+
+thirteen_holes.txt
+Enable rotation.
+Time for solve all: 0.44290440000000003 ms
+Solutions: 0
+Time for the first: 0.434694 ms
+Enable rotation and reflection.
+Solutions: 2
+Time for solve all: 3.2961737999999996 ms
+Time for the first: 2.0412616 ms
+
+trivial.txt
+Enable rotation.
+Time for solve all: 0.004385600000000001 ms
+Solutions: 1
+Time for the first: 0.0028928 ms
+Enable rotation and reflection.
+Solutions: 1
+Time for solve all: 0.008677200000000001 ms
+Time for the first: 0.0058786 ms
+

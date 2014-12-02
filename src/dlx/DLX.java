@@ -1,5 +1,8 @@
 package dlx;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -168,13 +171,14 @@ public class DLX {
 	/**
 	 * Solve and find all solutions.
 	 * @return a list of solution
+	 *
+	 * @deprecated This function cannot deal with symmetric situations, use solveAll()
+	 * instead.
 	 */
+	@Deprecated
 	public List<List<List<Integer>>> solve() {
 		Config.autoSetEliminateDuplica();
-		long start=System.currentTimeMillis();
 		Solutions.addAll(basicSearch.solve());
-		long end=System.currentTimeMillis();
-		System.out.println("Time used for solve: "+(end-start)+"ms");
 		return Solutions;
 	}
 
@@ -184,11 +188,7 @@ public class DLX {
 	 */
 	public List<List<List<Integer>>> solveAll() {
 		Config.autoSetEliminateDuplica();
-
-		long start=System.currentTimeMillis();
 		while (nextSolution() != null);
-		long end=System.currentTimeMillis();
-		System.out.println("Time used for solve all: "+(end-start)+"ms");
 		return Solutions;
 	}
 
@@ -234,4 +234,99 @@ public class DLX {
 
 	/******************** Private Member Functions ********************/
 
+	public static void main(String args[]){
+
+		File dir = new File("./testcases/");
+		File tests[] = dir.listFiles();
+		System.out.println(tests.length);
+		PrintWriter result = null;
+		try {
+			result = new PrintWriter("result.txt");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		long first = 0;
+		long total = 0;
+		int times = 5;
+		long start = 0;
+		long end = 0;
+		List<List<List<Integer>>> solutions = null;
+		List<List<Integer>> single = null;
+
+
+		for(int i = 0; i<tests.length; i++){
+			String name = tests[i].getAbsolutePath();
+			start = 0;
+			end = 0;
+			first = 0;
+			total = 0;
+			result.write(tests[i].getName()+"\r\n");
+			result.write("Enable rotation.\r\n");
+			/* Measure solve all time. */
+			for(int j = 0; j<times; j++){
+				DLX dlx = new DLX(name);
+				dlx.Config.setEnableSpin(true);
+				dlx.Config.setEliminateSymmetry(true);
+				dlx.preProcess();
+
+				start=System.nanoTime();
+				solutions = dlx.solveAll();
+				end=System.nanoTime();
+				total += (end-start);
+			}
+			result.write("Time for solve all: "+ String.valueOf((double)total/(double)(times)/1000000.0)+" ms"+"\r\n");
+			result.write("Solutions: "+solutions.size()+"\r\n");
+
+			/* Measure solve the first */
+			for(int j = 0; j<times; j++){
+				DLX dlx = new DLX(name);
+				dlx.Config.setEnableSpin(true);
+				dlx.Config.setEliminateSymmetry(true);
+				dlx.preProcess();
+
+				start=System.nanoTime();
+				single = dlx.nextSolution();
+				end=System.nanoTime();
+				first += (end-start);
+
+			}
+			result.write("Time for the first: "+ String.valueOf((double)first/(double)(times)/1000000.0)+" ms"+"\r\n");
+
+
+			result.write("Enable rotation and reflection.\r\n");
+			/* Measure solve all time. */
+			for(int j = 0; j<times; j++){
+				DLX dlx = new DLX(name);
+				dlx.Config.setEnableSpinFlip(true);
+				dlx.Config.setEliminateSymmetry(true);
+				dlx.preProcess();
+
+				start=System.nanoTime();
+				solutions = dlx.solveAll();
+				end=System.nanoTime();
+				total += (end-start);
+
+			}
+			result.write("Solutions: "+solutions.size()+"\r\n");
+			result.write("Time for solve all: "+ String.valueOf((double)total/(double)(times)/1000000.0)+" ms"+"\r\n");
+
+			/* Measure solve the first */
+			for(int j = 0; j<times; j++){
+				DLX dlx = new DLX(name);
+				dlx.Config.setEnableSpinFlip(true);
+				dlx.Config.setEliminateSymmetry(true);
+				dlx.preProcess();
+
+				start=System.nanoTime();
+				single = dlx.nextSolution();
+				end=System.nanoTime();
+				first += (end-start);
+			}
+			result.write("Time for the first: "+ String.valueOf((double)first/(double)(times)/1000000.0)+" ms"+"\r\n");
+			result.write("\r\n");
+		}
+		result.close();
+	}
 }
