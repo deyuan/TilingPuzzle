@@ -236,6 +236,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		@Override
 		protected void done(){
 			setControlPanelComponents(true);
+			setResultPanelComponents(true);
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			try {
 				solution = get();
@@ -316,6 +317,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		protected void done(){
 
 			setControlPanelComponents(true);
+			setResultPanelComponents(true);
 			lSpeed.setEnabled(false);
 			bPause.setEnabled(false);
 			bStop.setEnabled(false);
@@ -407,6 +409,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		protected void done(){
 
 			setControlPanelComponents(true);
+			setResultPanelComponents(true);
 			lSpeed.setEnabled(false);
 			bPause.setEnabled(false);
 			bStop.setEnabled(false);
@@ -735,9 +738,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		bStop.setLocation(95, 310);
 		pConfig.add(bStop);
 
-
 		pControl.add(pConfig);
-
 
 		/* Initialize result sub-panel. */
 		pResult = new JPanel();
@@ -1499,5 +1500,4 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		});
 
 	}
-
 }
