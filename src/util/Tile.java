@@ -254,4 +254,115 @@ public class Tile implements Comparable<Tile> {
 		}
 		return false;
 	}
+
+
+	/**
+	 * Pack all tiles into a rectangular 2d array, and roughly keep the
+	 * height-width ratio.
+	 * @param tiles
+	 * @param hwRatio
+	 * @return
+	 */
+	public static int[][] packAllTiles(List<Tile> tiles, double hwRatio) {
+		List<List<Integer>> p = new ArrayList<List<Integer>>();
+		p.add(new ArrayList<Integer>());
+
+		// pack all tiles
+		for (int i = 0; i < tiles.size(); i++) {
+			while (!packTile(p, tiles.get(i), i))
+				packEnlarge(p, hwRatio);
+			//DLXSymmetry.printMatrix(packToArray(p));
+		}
+
+		// remove outer margin
+		p.remove(0);
+		p.remove(p.size() - 1);
+		for (int i = 0; i < p.size(); i++) {
+			p.get(i).remove(0);
+			p.get(i).remove(p.get(i).size() - 1);
+		}
+		// adjust tile id
+		for (int i = 0; i < p.size(); i++) {
+			for (int j = 0; j < p.get(i).size(); j++) {
+				int k = p.get(i).get(j);
+				if (k <= 0) p.get(i).set(j, -1);
+				else p.get(i).set(j, k - 1);
+			}
+		}
+		return packToArray(p);
+	}
+
+	private static boolean packable(List<List<Integer>> p, Tile t, int r, int c) {
+		int th = t.data.length + 1;
+		int tw = t.data[0].length + 1;
+		for (int i = 0; i < th; i++) {
+			if (p.get(r + i).get(c) != 0) return false;
+			if (p.get(r + i).get(c + tw - 1) != 0) return false;
+		}
+		for (int i = 0; i < tw; i++) {
+			if (p.get(r).get(c + i) != 0) return false;
+			if (p.get(r + th - 1).get(c + i) != 0) return false;
+		}
+		return true;
+	}
+
+	private static boolean packTile(List<List<Integer>> p, Tile t, int id) {
+		int h = p.size();
+		int w = p.get(0).size();
+		int th = t.data.length;
+		int tw = t.data[0].length;
+
+		for (int i = 0; i < h - th; i++) {
+			for (int j = 0; j < w - tw; j++) {
+				if (packable(p, t, i, j)) {
+					// pack tile
+					//System.out.println("Pack tile "+id+" to "+i+","+j);
+					for (int m = 0; m < th; m++) {
+						for (int n = 0; n < tw; n++) {
+							p.get(i + m).set(j + n, id + 1);
+						}
+					}
+					// margin
+					for (int m = i - 1; m <= i + th; m++) {
+						p.get(m).set(j - 1, -2);
+						p.get(m).set(j + tw, -2);
+					}
+					for (int m = j - 1; m <= j + tw; m++) {
+						p.get(i - 1).set(m, -2);
+						p.get(i + th).set(m, -2);
+					}
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private static void packEnlarge(List<List<Integer>> p, double hwRatio) {
+		int h = p.size();
+		int w = p.get(0).size();
+		//System.out.print("Enlarge " + h + "x" + w + " -> ");
+		if ((double)h / w <= hwRatio) { // enlarge height
+			p.add(new ArrayList<Integer>());
+			p.get(h).add(-2);
+			for (int i = 1; i < w; i++) p.get(h).add(0);
+		} else { // enlarge width
+			p.get(0).add(-2);
+			for (int i = 1; i < h; i++) p.get(i).add(0);
+		}
+		//System.out.println(p.size() + "x" + p.get(0).size());
+	}
+
+	private static int[][] packToArray(List<List<Integer>> p) {
+		int h = p.size();
+		int w = p.get(0).size();
+		int[][] a = new int[h][w];
+		for (int i = 0; i < h; i++) {
+			for (int j = 0; j < w; j++) {
+				a[i][j] = p.get(i).get(j);
+			}
+		}
+		return a;
+	}
+
 }

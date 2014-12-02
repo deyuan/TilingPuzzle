@@ -987,45 +987,78 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		this.add(pTileList);
 	}
 
-	private void setupTileList(List<Tile> t){
+	private void setupTileList(List<Tile> tiles, Tile board) {
 
-		List<Color> colorList = genColors(t.size());
-		for (int i = 0; i < t.size(); i++) {
-			t.get(i).printTile();
-		}
+		List<Color> colorList = genColors(tiles.size());
+		//for (int i = 0; i < tiles.size(); i++) {
+		//	tiles.get(i).printTile();
+		//}
 
-		final int width = (tileListSize[0] - 30) / 3;
-		int lMax = Math.max(t.get(0).l, t.get(0).w);
-		for (int i = 1; i < t.size(); i++) {
-			if (lMax < Math.max(t.get(i).l, t.get(i).w))
-				lMax = Math.max(t.get(i).l, t.get(i).w);
-		}
-
-		int grid = width / lMax - 1;
-		if (grid == 0) grid = 1; // too small?
-
-		JPanel block[] = new JPanel[t.size()];
-		for (int i = 0; i < t.size(); i++) {
-			JPanel pic = new JPanel(null);
-			pic.setSize(width, width);
-			pic.setLocation(i % 3 * width + 15, i / 3 * width + 25);
-			pic.setBackground(Color.white);
-			pTileList.add(pic);
-
-			for (int j = 0; j < t.get(i).data.length; j++){
-				for (int k = 0; k < t.get(i).data[0].length; k++){
-					if (t.get(i).data[j][k] != ' ') {
-						block[i] = new JPanel();
-						block[i].setBackground(colorList.get(i));
-						block[i].setBorder(new LineBorder(Color.black));
-						block[i].setSize(grid + 1, grid + 1);
-						block[i].setLocation(k * grid, j * grid);
-						pic.add(block[i]);
+		boolean show_char = false;
+		char c = ' ';
+		for (int i = 0; i < board.data.length && !show_char; i++) {
+			for (int j = 0; j < board.data[0].length && !show_char; j++) {
+				if (board.data[i][j] != ' ') {
+					if (c == ' ') {
+						c = board.data[i][j];
+					} else {
+						if (board.data[i][j] != c) show_char = true;
 					}
 				}
 			}
 		}
 
+		final int tileListAreaWidth = tileListSize[0] - 30;
+		final int tileListAreaHeight = tileListSize[1] - 45;
+
+		JPanel pic = new JPanel(null);
+		pic.setSize(tileListAreaWidth, tileListAreaHeight);
+		pic.setLocation(15, 30);
+		pic.setBackground(Color.white);
+		pTileList.add(pic);
+
+		int[][] pack = Tile.packAllTiles(tiles,
+						(double)tileListAreaHeight/tileListAreaWidth);
+
+		int grid = Math.min((tileListAreaWidth - 1)/pack[0].length,
+						(tileListAreaHeight - 1)/pack.length);
+		System.out.println(show_char + " ---- " + grid);
+		int[][] tbase = new int[tiles.size()][2];
+		for (int i = 0; i < tiles.size(); i++)
+			tbase[i][0] = -1;
+		for (int i = 0; i < pack.length; i++) {
+			for (int j = 0; j < pack[0].length; j++) {
+				int id = pack[i][j];
+				if (id >= 0) {
+					if (tbase[id][0] < 0) {
+						tbase[id][0] = i;
+						tbase[id][1] = j;
+					}
+					int ofsty = i - tbase[id][0];
+					int ofstx = j - tbase[id][1];
+					char t = tiles.get(id).data[ofsty][ofstx];
+					if (t != ' ') {
+						JPanel block = new JPanel();
+						block.setBackground(colorList.get(pack[i][j]));
+						block.setBorder(new LineBorder(Color.black));
+						block.setSize(grid + 1, grid + 1);
+						block.setLocation(j * grid, i * grid);
+						if (show_char && grid > 5) {
+							JLabel l = new JLabel(Character.toString(t));
+							l.setSize(grid - 2, grid - 2);
+							l.setFont(new Font("Arial", Font.PLAIN, grid - 2));
+							l.setVerticalAlignment(SwingConstants.CENTER);
+							l.setHorizontalAlignment(SwingConstants.CENTER);
+							l.setLocation(j * grid + 1, i * grid + 1);
+							l.setOpaque(false);  //false = transparent
+							l.setVisible(true);
+							pic.add(l);
+						}
+						pic.add(block);
+					}
+				}
+			}
+		}
 	}
 
 	private void setupMenu() {
@@ -1441,7 +1474,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			setupBoard(board.data);
 			setPosMap();
 			/* Initialize and display the tile. */
-			setupTileList(tileList);
+			setupTileList(tileList, board);
 			repaint();
 
 		}
