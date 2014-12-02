@@ -29,7 +29,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -62,13 +61,13 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * DLX instance.
+	 * DLX instance. It is initialized after reading a new file.
 	 *
 	 */
 	private DLX dlx;
 
 	/**
-	 * The solution got from DLX.solve. For every tile, the first element is the number of
+	 * The solution will receive from DLX.solve. For every tile, the first element is the index of
 	 * the tile, others are positions.
 	 *
 	 */
@@ -79,10 +78,24 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	 */
 	private int numOfSolution;
 
+	/**
+	 * The board.
+	 */
 	private char board[][];
 
-	/** The color of each tiles */
+	/** The color of each tile. */
 	private List<Color> colors = null;
+
+	/**
+	 * Use to map solution from DancingLinks class to actual position. In order
+	 * to reduce the time complexity to O(1), an array is used.
+	 */
+	private int posMap[];
+
+	/**
+	 * The speed of the single step and single solution. from 1ms to 500ms.
+	 */
+	private int speed = 1000;
 
 	/**
 	 * Control panel.
@@ -95,15 +108,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	private JPanel pDisplay;
 
 	/**
-	 * Use to map solution from DancingLinks class to actual position. In order
-	 * to reduce the time complexity to O(1), an array is used.
+	 * TileList Panel
 	 */
-	private int posMap[];
-
-	/**
-	 * The speed of the single step and single solution. from 1ms to 500ms.
-	 */
-	private int speed = 1000;
+	private JPanel pTileList;
 
 	/**
 	 * Configure panel
@@ -134,16 +141,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	JSlider sNumSolution;
 
 	/**
-	 * TileListPanel
-	 */
-	JPanel pTileList;
-	JScrollPane scroll;
-
-
-	/* Menu related */
-	/**
-	 * Declare of menu variables. b- for button, t- for text field, l- for
-	 * label; m- for menu, mi- for menu item;
+	 * Menu related components.
 	 *
 	 */
 	private static JMenuBar mBar;
@@ -153,23 +151,25 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	private JMenuItem miRead;
 	private JMenuItem miAbout;
 
+	/**
+	 * File chooser to get input ASCII files.
+	 */
 	private JFileChooser fc;
 
 	/**
-	 * For autoplaying all solutions.
+	 * For auto-playing all solutions.
 	 */
 	private boolean isRunning = false;
 
+	/**
+	 * For auto-playing all solutions. If there is no thread currently, create a new one.
+	 */
+	private boolean isThread = false;
 
 	/**
 	 * For single step and single solution.
 	 */
 	private boolean isPaused = false;
-
-	/**
-	 * For playing all solutions.
-	 */
-	private boolean isThread = false;
 
 	/**
 	 * Size parameters.
@@ -181,6 +181,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	private static final int tileListSize[] = { 340-130, 535 };
 	private static final int tileListPos[] = { 800-65, 10 };
 
+	/**
+	 * The origin point from the left-top of the board to pDisplay panel.
+	 */
+	private int origin[] = { 20, 20 };
+	private int originTile[] = { 20 + gridWidth / 2, 20 + gridWidth / 2 };
+
 	private int OffsetX = 5;
 	private int OffsetY = 15;
 
@@ -188,14 +194,20 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 	private int sizeBlock;
 	private int sizeTile;
-	/**
-	 * The origin point from the left-top of the board to pDisplay panel.
-	 */
-	private int origin[] = { 20, 20 };
-	private int originTile[] = { 20 + gridWidth / 2, 20 + gridWidth / 2 };
 
+	/**
+	 * SwingWorker task for calculating all solutions.
+	 */
 	private CalculateAll calculateAll = null;
+
+	/**
+	 * SwingWorker task for calculating next single solution.
+	 */
 	private CalculateSingleSolution calculateSSol = null;
+
+	/**
+	 * SwingWorker task for calculating next single step.
+	 */
 	private CalculateSingleStep calculateSStep = null;
 
 	private class CalculateAll extends SwingWorker<List<List<List<Integer>>>, Void>{
@@ -216,18 +228,14 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bPlay.setEnabled(false);
 			tIndex.setText("0");
 
-
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
 			dlx.Config.reset();
 			dlx.preProcess();
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
 			tResultInfo.setText("Searching...");
-			solution.addAll(dlx.solveAll());
+			solution.addAll(dlx.solve());
 
-//			dlx.printAllSolutions();
-//			System.out.println("In background:");
-//			System.out.println(solution);
 			return solution;
 		}
 		@Override
@@ -262,7 +270,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			sNumSolution.setValue(0);
 			sNumSolution.setValue(1);
 			sNumSolution.setMinimum(1);
-
 
 			if(numOfSolution == 0)
 				tResultInfo.setText("No solutions!");
@@ -299,8 +306,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			tIndex.setText("0");
 
 			int number = 0;
-
+			long start=System.currentTimeMillis();
 			List<List<Integer>> sol = dlx.nextSolution();
+			long end=System.currentTimeMillis();
+			System.out.println("Time used to find the first solution: "+(end-start)+"ms");
 			while(sol!=null && !isCancelled()){
 				while(isPaused){
 					try {
@@ -312,7 +321,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				try {
 					Thread.sleep(speed);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					System.err.println("Sleep interrupt");
 				}
 				number++;
@@ -339,20 +347,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
-			/*
-			try {
-				numOfSolution = get();
-			} catch (InterruptedException e) {
-				System.err.println("The background task has been interrupt!");
-			} catch (ExecutionException e) {
-				System.err.println("The background task has been excuted incorrectly!");
-			} catch (CancellationException e){
-				System.err.println("The background task has been canceled!");
-			}
-			*/
-
 			numOfSolution = solution.size();
-
 
 			/* After geting the numofSolution, set the min and max of the slider. */
 			sNumSolution.setMinimum(1);
@@ -369,17 +364,17 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		@Override
 		protected void process(List<List<List<Integer>>> r){
-//			System.out.println("The size of the list: "+r.size());
+
 			cleanTiles();
 			displayStep(r.get(r.size()-1));
 			String s = tResultInfo.getText();
 			String t =s.replaceAll("Searching...", "");
 
 			if(t.length()==0)
-				t="0 solutions";
-			String y =t.replaceAll(" solutions", "");
+				t="0 solutions!";
+			String y =t.replaceAll(" solutions!", "");
 			int i = Integer.parseInt(y);
-			tResultInfo.setText("Searching..." + (i+1) +" solutions");
+			tResultInfo.setText("Searching..." + (i+1) +" solutions!");
 		}
 
 	}
@@ -507,15 +502,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		setupDisplayPanel();
 		setupTileListPanel();
 		setComponents(false);
-	}
-
-	/**
-	 * Setup DLX instance.
-	 *
-	 * @param dlx
-	 */
-	private void setDLX(DLX d) {
-		dlx = d;
 	}
 
 	private void setupControlPanel() {
@@ -1435,7 +1421,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			/* Initiate a new DLX Solver and set it. */
 			DLX dlx = new DLX(board, tileList);
-			setDLX(dlx);
+			this.dlx = dlx;
 			setComponents(true);
 			/* Initialize the board and posMap. */
 			setupBoard(board.data);

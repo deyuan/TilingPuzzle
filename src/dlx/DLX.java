@@ -171,8 +171,10 @@ public class DLX {
 	 */
 	public List<List<List<Integer>>> solve() {
 		Config.autoSetEliminateDuplica();
-		//Config.print();
+		long start=System.currentTimeMillis();
 		Solutions.addAll(basicSearch.solve());
+		long end=System.currentTimeMillis();
+		System.out.println("Time used for solve: "+(end-start)+"ms");
 		return Solutions;
 	}
 
@@ -182,7 +184,11 @@ public class DLX {
 	 */
 	public List<List<List<Integer>>> solveAll() {
 		Config.autoSetEliminateDuplica();
+
+		long start=System.currentTimeMillis();
 		while (nextSolution() != null);
+		long end=System.currentTimeMillis();
+		System.out.println("Time used for solve all: "+(end-start)+"ms");
 		return Solutions;
 	}
 
