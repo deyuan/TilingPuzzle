@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
@@ -218,14 +219,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			solution = new ArrayList<List<List<Integer>>>();
 
 			/* Disable all useless buttons to prevent incorrect operations. */
-			bSolveAll.setEnabled(false);
-			bSolveStep.setEnabled(false);
-			bSolveTrail.setEnabled(false);
-
-			bShowResult.setEnabled(false);
-			bPre.setEnabled(false);
-			bNext.setEnabled(false);
-			bPlay.setEnabled(false);
+			setControlPanelComponents(false);
 			tIndex.setText("0");
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -240,15 +234,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		}
 		@Override
 		protected void done(){
-			bSolveAll.setEnabled(true);
-			bSolveStep.setEnabled(true);
-			bSolveTrail.setEnabled(true);
-
-			bShowResult.setEnabled(true);
-			bPre.setEnabled(true);
-			bNext.setEnabled(true);
-			bPlay.setEnabled(true);
-
+			setControlPanelComponents(true);
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			try {
 				solution = get();
@@ -286,16 +272,14 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		@Override
 		protected Integer doInBackground() {
 			solution = new ArrayList<List<List<Integer>>>();
-			bSolveAll.setEnabled(false);
-			bSolveStep.setEnabled(false);
-			bSolveTrail.setEnabled(false);
+
+			/* Disable all useless buttons to prevent incorrect operations. */
+			setControlPanelComponents(false);
+			lSpeed.setEnabled(true);
 			bPause.setEnabled(true);
 			bStop.setEnabled(true);
-
-			bShowResult.setEnabled(false);
-			bPre.setEnabled(false);
-			bNext.setEnabled(false);
-			bPlay.setEnabled(false);
+			tResultInfo.setEnabled(true);
+			sSpeed.setEnabled(true);
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
@@ -306,10 +290,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			tIndex.setText("0");
 
 			int number = 0;
-			long start=System.currentTimeMillis();
 			List<List<Integer>> sol = dlx.nextSolution();
-			long end=System.currentTimeMillis();
-			System.out.println("Time used to find the first solution: "+(end-start)+"ms");
 			while(sol!=null && !isCancelled()){
 				while(isPaused){
 					try {
@@ -334,16 +315,13 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		@Override
 		protected void done(){
-			bSolveAll.setEnabled(true);
-			bSolveStep.setEnabled(true);
-			bSolveTrail.setEnabled(true);
+
+			setControlPanelComponents(true);
+			lSpeed.setEnabled(false);
 			bPause.setEnabled(false);
 			bStop.setEnabled(false);
-
-			bShowResult.setEnabled(true);
-			bPre.setEnabled(true);
-			bNext.setEnabled(true);
-			bPlay.setEnabled(true);
+			tResultInfo.setEnabled(false);
+			sSpeed.setEnabled(false);
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
@@ -384,16 +362,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		@Override
 		protected List<List<List<Integer>>> doInBackground() {
 			solution = new ArrayList<List<List<Integer>>>();
-			bSolveAll.setEnabled(false);
-			bSolveStep.setEnabled(false);
-			bSolveTrail.setEnabled(false);
+			setControlPanelComponents(false);
+			lSpeed.setEnabled(true);
 			bPause.setEnabled(true);
 			bStop.setEnabled(true);
-
-			bShowResult.setEnabled(false);
-			bPre.setEnabled(false);
-			bNext.setEnabled(false);
-			bPlay.setEnabled(false);
+			tResultInfo.setEnabled(true);
+			sSpeed.setEnabled(true);
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
@@ -428,27 +402,22 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		@Override
 		protected void done(){
-			bSolveAll.setEnabled(true);
-			bSolveStep.setEnabled(true);
-			bSolveTrail.setEnabled(true);
+
+			setControlPanelComponents(true);
+			lSpeed.setEnabled(false);
 			bPause.setEnabled(false);
 			bStop.setEnabled(false);
-
-			bShowResult.setEnabled(true);
-			bPre.setEnabled(true);
-			bNext.setEnabled(true);
-			bPlay.setEnabled(true);
-
+			tResultInfo.setEnabled(false);
+			sSpeed.setEnabled(false);
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			try {
 				solution = get();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.err.println("The background task has been interrupted!");
 			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.err.println("The background task has been exccuted incorrectly!");
+			} catch (CancellationException e){
 				System.err.println("The background task has been canceled!");
 			}
 			numOfSolution = solution.size();
@@ -501,7 +470,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		setupControlPanel();
 		setupDisplayPanel();
 		setupTileListPanel();
-		setComponents(false);
+
+		setControlPanelComponents(false);
+		setResultPanelComponents(false);
 	}
 
 	private void setupControlPanel() {
@@ -1379,23 +1350,28 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		return colors;
 	}
 
-	private void setComponents(boolean b){
+	private void setControlPanelComponents(boolean b){
 		cbEnableSpin.setEnabled(b);
 		cbEnableSpinFlip.setEnabled(b);
 		cbRmSymm.setEnabled(b);
 		bSolveAll.setEnabled(b);
 		bSolveTrail.setEnabled(b);
 		bSolveStep.setEnabled(b);
-		bPause.setEnabled(b);
-		bStop.setEnabled(b);
 		lSpeed.setEnabled(b);
 		sSpeed.setEnabled(b);
+		bPause.setEnabled(b);
+		bStop.setEnabled(b);
+		tResultInfo.setEnabled(b);
+	}
+
+	private void setResultPanelComponents(boolean b){
+		sNumSolution.setEnabled(b);
 		tIndex.setEnabled(b);
+
 		bShowResult.setEnabled(b);
 		bPre.setEnabled(b);
 		bNext.setEnabled(b);
 		bPlay.setEnabled(b);
-
 	}
 
 
@@ -1454,7 +1430,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			/* Initiate a new DLX Solver and set it. */
 			DLX dlx = new DLX(board, tileList);
 			this.dlx = dlx;
-			setComponents(true);
+			/* Only enable control panel components. */
+			setControlPanelComponents(true);
 			/* Initialize the board and posMap. */
 			setupBoard(board.data);
 			setPosMap();
