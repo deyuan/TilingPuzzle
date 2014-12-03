@@ -224,6 +224,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			setResultPanelComponents(false);
 			bStop.setEnabled(true);
 			tIndex.setText("0");
+			cleanTiles();
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/*
@@ -306,6 +307,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bPause.setEnabled(true);
 			bStop.setEnabled(true);
 			sSpeed.setEnabled(true);
+			cleanTiles();
 
 			/*
 			 * Before every new process must reset DLX (DLX.config is also
@@ -394,6 +396,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bPause.setEnabled(true);
 			bStop.setEnabled(true);
 			sSpeed.setEnabled(true);
+			cleanTiles();
 
 			/*
 			 * Before every new process must reset DLX (DLX.config is also
