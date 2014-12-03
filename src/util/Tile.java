@@ -302,7 +302,7 @@ public class Tile implements Comparable<Tile> {
 			}
 			if (empty) {
 				for (int j = 0; j < p.size(); j++)
-					p.get(j).remove(p.get(0).size() - 1);
+					p.get(j).remove(p.get(j).size() - 1);
 			}
 			else break;
 		}
@@ -314,6 +314,7 @@ public class Tile implements Comparable<Tile> {
 				else p.get(i).set(j, k - 1);
 			}
 		}
+
 		return packToArray(p);
 	}
 
