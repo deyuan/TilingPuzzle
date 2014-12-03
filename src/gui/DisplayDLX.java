@@ -235,8 +235,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			dlx.resetSearch();
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
 			tResultInfo.setText("Searching...");
-			solution.addAll(dlx.solveAll());
 
+			/* Warning: use this will incur a bug. */
+//			solution.addAll(dlx.solveAll());
+
+			List<List<Integer>> sol = dlx.nextSolution();
+			while (sol != null && !isCancelled()) {
+				solution.add(sol);
+				sol = dlx.nextSolution();
+			}
 			return solution;
 		}
 
@@ -245,6 +252,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			setControlPanelComponents(true);
 			setResultPanelComponents(true);
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			/*
 			try {
 				solution = get();
 			} catch (InterruptedException e) {
@@ -252,9 +260,11 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			} catch (ExecutionException e) {
 				System.err
 						.println("The background task has been excuted incorrectly!");
+				e.printStackTrace();
 			} catch (CancellationException e) {
 				System.err.println("The background task has been canceled!");
 			}
+			*/
 			numOfSolution = solution.size();
 
 			/*
@@ -635,7 +645,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
 				calculateAll = new CalculateAll();
 				calculateAll.execute();
 			}
@@ -652,7 +661,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
 				calculateSSol = new CalculateSingleSolution();
 				calculateSSol.execute();
 			}
@@ -765,6 +773,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 						&& calculateAll.getState() == SwingWorker.StateValue.STARTED) {
 					calculateAll.cancel(true);
 					tResultInfo.setText("Searching is canceled!");
+			//		solution = null;
 				}
 			}
 
