@@ -378,6 +378,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		protected void process(List<List<List<Integer>>> r) {
 
 			cleanTiles();
+			System.out.println(r.size());
 			displayStep(r.get(r.size() - 1));
 			String s = tResultInfo.getText();
 			String t = s.replaceAll("Searching...", "");
@@ -393,7 +394,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 						.println("The thread has been canceld and we don't need to display numbers here.");
 				return;
 			}
-			tResultInfo.setText("Searching..." + (i + 1) + " solutions!");
+			tResultInfo.setText("Searching..." + (i + r.size()) + " solutions!");
+
 		}
 
 	}
