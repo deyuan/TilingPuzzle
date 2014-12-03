@@ -970,7 +970,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 									if (numOfSolution > 0) {
 										if (id < 1) id = 1;
 										else if (id > numOfSolution) id = numOfSolution;
-										else if (id < numOfSolution) id++;
 									} else {
 										id = 0;
 									}
@@ -981,8 +980,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 										id = 0;
 									}
 								}
+								if (id == numOfSolution) id = 1;
 								// Loop show
-								while (id > 0 && id < numOfSolution) {
+								while (id > 0 && id <= numOfSolution && isRunning) {
 									cleanTiles();
 									displayResults(id - 1);
 									tIndex.setText(Integer.toString(id));
@@ -992,31 +992,26 @@ public class DisplayDLX extends JPanel implements ActionListener {
 									} catch (InterruptedException e) {
 										System.err.println("Sleep interrupt");
 									}
+									id++;
 								}
 								// Finished
 								isThread = false;
 								isRunning = false;
 								bPlay.setText("Autoplay All Solutions");
-								sNumSolution.setValue(1);
+								setControlPanelComponents(true);
+								tIndex.setEnabled(true);
+								bShowResult.setEnabled(true);
+								bPre.setEnabled(true);
+								bNext.setEnabled(true);
 							}
 						}).start();
 
 					}
-					setControlPanelComponents(true);
-					tIndex.setEnabled(true);
-					bShowResult.setEnabled(true);
-					bPre.setEnabled(true);
-					bNext.setEnabled(true);
 				}
 
 				/* If now it is running, stop it! */
 				else {
 					isRunning = false;
-					setControlPanelComponents(true);
-					tIndex.setEnabled(true);
-					bShowResult.setEnabled(true);
-					bPre.setEnabled(true);
-					bNext.setEnabled(true);
 					bPlay.setText("Autoplay All Solutions");
 				}
 			}
