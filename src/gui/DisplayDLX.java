@@ -53,9 +53,8 @@ import dlx.DLX;
  * @author Dawei Fan, Deyuan Guo
  * @version 1.0 11/16/2014
  *
- * 			1.1 11/27/2014
- * 			1, Used new class DLX to replace DancingLinks.
- *			2, Initialized board outside DLX.
+ *          1.1 11/27/2014 1, Used new class DLX to replace DancingLinks. 2,
+ *          Initialized board outside DLX.
  */
 public class DisplayDLX extends JPanel implements ActionListener {
 
@@ -68,8 +67,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	private DLX dlx;
 
 	/**
-	 * The solution will receive from DLX.solve. For every tile, the first element is the index of
-	 * the tile, others are positions.
+	 * The solution will receive from DLX.solve. For every tile, the first
+	 * element is the index of the tile, others are positions.
 	 *
 	 */
 	private List<List<List<Integer>>> solution;
@@ -163,7 +162,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	private boolean isRunning = false;
 
 	/**
-	 * For auto-playing all solutions. If there is no thread currently, create a new one.
+	 * For auto-playing all solutions. If there is no thread currently, create a
+	 * new one.
 	 */
 	private boolean isThread = false;
 
@@ -175,12 +175,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	/**
 	 * Size parameters.
 	 */
-	private static final int frameSize[] = { 820+340-75-130, 610-10 };
+	private static final int frameSize[] = { 955, 600 };
 	private static final int framePos[] = { 200, 20 };
-	private static final int displaySize[] = { 600-65, 535 };
+	private static final int displaySize[] = { 535, 535 };
 	private static final int displayPos[] = { 195, 10 };
-	private static final int tileListSize[] = { 340-130, 535 };
-	private static final int tileListPos[] = { 800-65, 10 };
+	private static final int tileListSize[] = { 210, 535 };
+	private static final int tileListPos[] = { 735, 10 };
 
 	/**
 	 * The origin point from the left-top of the board to pDisplay panel.
@@ -211,7 +211,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	 */
 	private CalculateSingleStep calculateSStep = null;
 
-	private class CalculateAll extends SwingWorker<List<List<List<Integer>>>, Void>{
+	private class CalculateAll extends
+			SwingWorker<List<List<List<Integer>>>, Void> {
 
 		@Override
 		protected List<List<List<Integer>>> doInBackground() {
@@ -225,7 +226,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			tIndex.setText("0");
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
+			/*
+			 * Before every new process must reset DLX (DLX.config is also
+			 * reset, DON'T reset enable options)
+			 */
 			dlx.Config.reset();
 			dlx.preProcess();
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
@@ -234,8 +238,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			return solution;
 		}
+
 		@Override
-		protected void done(){
+		protected void done() {
 			setControlPanelComponents(true);
 			setResultPanelComponents(true);
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -244,26 +249,33 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			} catch (InterruptedException e) {
 				System.err.println("The background task has been interrupt!");
 			} catch (ExecutionException e) {
-				System.err.println("The background task has been excuted incorrectly!");
-			} catch (CancellationException e){
+				System.err
+						.println("The background task has been excuted incorrectly!");
+			} catch (CancellationException e) {
 				System.err.println("The background task has been canceled!");
 			}
 			numOfSolution = solution.size();
 
-			/* After geting the numofSolution, set the min and max of the slider. */
-			/* Note: only when there is state change the solution could be displayed! */
+			/*
+			 * After geting the numofSolution, set the min and max of the
+			 * slider.
+			 */
+			/*
+			 * Note: only when there is state change the solution could be
+			 * displayed!
+			 */
 			sNumSolution.setMinimum(1);
 			sNumSolution.setMaximum(numOfSolution);
 			sNumSolution.setMinimum(0);
 			sNumSolution.setValue(0);
 
-			if(numOfSolution == 0)
+			if (numOfSolution == 0)
 				tResultInfo.setText("No solutions!");
-			else{
-				if(numOfSolution == 1)
+			else {
+				if (numOfSolution == 1)
 					tResultInfo.setText("Only 1 solution!");
 				else
-					tResultInfo.setText(numOfSolution+" solutions!");
+					tResultInfo.setText(numOfSolution + " solutions!");
 				sNumSolution.setValue(1);
 				sNumSolution.setMinimum(1);
 			}
@@ -271,7 +283,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 	}
 
-	private class CalculateSingleSolution extends SwingWorker<Integer, List<List<Integer>>>{
+	private class CalculateSingleSolution extends
+			SwingWorker<Integer, List<List<Integer>>> {
 
 		@Override
 		protected Integer doInBackground() {
@@ -286,7 +299,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			sSpeed.setEnabled(true);
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
+			/*
+			 * Before every new process must reset DLX (DLX.config is also
+			 * reset, DON'T reset enable options)
+			 */
 			dlx.Config.reset();
 			dlx.preProcess();
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
@@ -295,14 +311,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			int number = 0;
 			List<List<Integer>> sol = dlx.nextSolution();
-			while(sol!=null && !isCancelled()){
-				while(isPaused){
+			while (sol != null && !isCancelled()) {
+				while (isPaused) {
 					try {
 						Thread.sleep(1);
 					} catch (InterruptedException e) {
 						System.err.println("Sleep Interrupt!");
 					}
-				};
+				}
+				;
 				try {
 					Thread.sleep(speed);
 				} catch (InterruptedException e) {
@@ -311,14 +328,14 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				number++;
 				solution.add(sol);
 				publish(sol);
-				sol =  dlx.nextSolution();
+				sol = dlx.nextSolution();
 			}
 
 			return number;
 		}
 
 		@Override
-		protected void done(){
+		protected void done() {
 
 			setControlPanelComponents(true);
 			setResultPanelComponents(true);
@@ -330,49 +347,57 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 			numOfSolution = solution.size();
-			/* After geting the numofSolution, set the min and max of the slider. */
-			/* Note: only when there is state change the solution could be displayed! */
+			/*
+			 * After geting the numofSolution, set the min and max of the
+			 * slider.
+			 */
+			/*
+			 * Note: only when there is state change the solution could be
+			 * displayed!
+			 */
 			sNumSolution.setMinimum(1);
 			sNumSolution.setMaximum(numOfSolution);
 			sNumSolution.setMinimum(0);
 			sNumSolution.setValue(0);
 
-			if(numOfSolution == 0)
+			if (numOfSolution == 0)
 				tResultInfo.setText("No solutions!");
-			else{
-				if(numOfSolution == 1)
+			else {
+				if (numOfSolution == 1)
 					tResultInfo.setText("Only 1 solution!");
 				else
-					tResultInfo.setText(numOfSolution+" solutions!");
+					tResultInfo.setText(numOfSolution + " solutions!");
 				sNumSolution.setValue(1);
 				sNumSolution.setMinimum(1);
 			}
 		}
 
 		@Override
-		protected void process(List<List<List<Integer>>> r){
+		protected void process(List<List<List<Integer>>> r) {
 
 			cleanTiles();
-			displayStep(r.get(r.size()-1));
+			displayStep(r.get(r.size() - 1));
 			String s = tResultInfo.getText();
-			String t =s.replaceAll("Searching...", "");
+			String t = s.replaceAll("Searching...", "");
 
-			if(t.length()==0)
-				t="0 solutions!";
-			String y =t.replaceAll(" solutions!", "");
+			if (t.length() == 0)
+				t = "0 solutions!";
+			String y = t.replaceAll(" solutions!", "");
 			int i = 0;
-			try{
+			try {
 				i = Integer.parseInt(y);
-			} catch (NumberFormatException e){
-				System.out.println("The thread has been canceld and we don't need to display numbers here.");
+			} catch (NumberFormatException e) {
+				System.out
+						.println("The thread has been canceld and we don't need to display numbers here.");
 				return;
 			}
-			tResultInfo.setText("Searching..." + (i+1) +" solutions!");
+			tResultInfo.setText("Searching..." + (i + 1) + " solutions!");
 		}
 
 	}
 
-	private class CalculateSingleStep extends SwingWorker<List<List<List<Integer>>>, List<List<Integer>>>{
+	private class CalculateSingleStep extends
+			SwingWorker<List<List<List<Integer>>>, List<List<Integer>>> {
 
 		@Override
 		protected List<List<List<Integer>>> doInBackground() {
@@ -385,7 +410,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			sSpeed.setEnabled(true);
 
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			/* Before every new process must reset DLX (DLX.config is also reset, DON'T reset enable options)*/
+			/*
+			 * Before every new process must reset DLX (DLX.config is also
+			 * reset, DON'T reset enable options)
+			 */
 			dlx.Config.reset();
 			dlx.preProcess();
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
@@ -394,14 +422,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			tIndex.setText("0");
 
 			List<List<Integer>> sol = dlx.nextSingleStep();
-			while(sol!=null && !isCancelled()){
-				while(isPaused){
+			while (sol != null && !isCancelled()) {
+				while (isPaused) {
 					try {
 						Thread.sleep(1);
 					} catch (InterruptedException e) {
 						System.err.println("Sleep Interrupt!");
 					}
-				};
+				}
+				;
 				try {
 					Thread.sleep(speed);
 				} catch (InterruptedException e) {
@@ -409,14 +438,14 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				}
 
 				publish(sol);
-				sol =  dlx.nextSingleStep();
+				sol = dlx.nextSingleStep();
 			}
 			List<List<List<Integer>>> s = dlx.getSolutions();
 			return s;
 		}
 
 		@Override
-		protected void done(){
+		protected void done() {
 
 			setControlPanelComponents(true);
 			setResultPanelComponents(true);
@@ -431,52 +460,61 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			} catch (InterruptedException e) {
 				System.err.println("The background task has been interrupted!");
 			} catch (ExecutionException e) {
-				System.err.println("The background task has been exccuted incorrectly!");
-			} catch (CancellationException e){
+				System.err
+						.println("The background task has been exccuted incorrectly!");
+			} catch (CancellationException e) {
 				System.err.println("The background task has been canceled!");
 			}
 			numOfSolution = solution.size();
-			/* After geting the numofSolution, set the min and max of the slider. */
-			/* Note: only when there is state change the solution could be displayed! */
+			/*
+			 * After geting the numofSolution, set the min and max of the
+			 * slider.
+			 */
+			/*
+			 * Note: only when there is state change the solution could be
+			 * displayed!
+			 */
 			sNumSolution.setMinimum(1);
 			sNumSolution.setMaximum(numOfSolution);
 			sNumSolution.setMinimum(0);
 			sNumSolution.setValue(0);
 
-			if(numOfSolution == 0)
+			if (numOfSolution == 0)
 				tResultInfo.setText("No solutions!");
-			else{
-				if(numOfSolution == 1)
+			else {
+				if (numOfSolution == 1)
 					tResultInfo.setText("Only 1 solution!");
 				else
-					tResultInfo.setText(numOfSolution+" solutions!");
+					tResultInfo.setText(numOfSolution + " solutions!");
 				sNumSolution.setValue(1);
 				sNumSolution.setMinimum(1);
 			}
 		}
 
 		@Override
-		protected void process(List<List<List<Integer>>> r){
+		protected void process(List<List<List<Integer>>> r) {
 			cleanTiles();
-			displayStep(r.get(r.size()-1));
+			displayStep(r.get(r.size() - 1));
 
 			String s = tResultInfo.getText();
-			String t =s.replaceAll("Searching...", "");
+			String t = s.replaceAll("Searching...", "");
 
-			if(t.length()==0)
-				t="0 solutions";
-			String y =t.replaceAll(" solutions", "");
+			if (t.length() == 0)
+				t = "0 solutions";
+			String y = t.replaceAll(" solutions", "");
 
 			int i = 0;
-			try{
+			try {
 				i = Integer.parseInt(y);
-			} catch (NumberFormatException e){
-				System.out.println("The thread has been canceld and we don't need to display numbers here.");
+			} catch (NumberFormatException e) {
+				System.out
+						.println("The thread has been canceld and we don't need to display numbers here.");
 				return;
 			}
 			int j = dlx.getSolutions().size();
-			if(j > i);
-			tResultInfo.setText("Searching..." + j +" solutions");
+			if (j > i)
+				;
+			tResultInfo.setText("Searching..." + j + " solutions");
 
 		}
 
@@ -544,7 +582,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				// TODO Auto-generated method stub
 				if (cbEnableSpin.isSelected())
 					dlx.Config.setEnableSpin(true);
-				else{
+				else {
 					dlx.Config.setEnableSpin(false);
 					cbEnableSpinFlip.setSelected(false);
 					dlx.Config.setEnableSpinFlip(false);
@@ -565,12 +603,11 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				if (cbEnableSpinFlip.isSelected()){
+				if (cbEnableSpinFlip.isSelected()) {
 					dlx.Config.setEnableSpinFlip(true);
 					cbEnableSpin.setSelected(true);
 					dlx.Config.setEnableSpin(true);
-				}
-				else
+				} else
 					dlx.Config.setEnableSpinFlip(false);
 			}
 
@@ -586,7 +623,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		cbExtra.setLocation(10, 80);
 		cbExtra.setEnabled(false);
 		pConfig.add(cbExtra);
-
 
 		cbRmSymm = new JCheckBox("Remove Symmetry");
 		cbRmSymm.setBackground(Color.WHITE);
@@ -608,7 +644,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		});
 		pConfig.add(cbRmSymm);
 
-
 		bSolveAll = new JButton("Get All Solutions");
 		bSolveAll.setBackground(Color.WHITE);
 		bSolveAll.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
@@ -625,7 +660,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		bSolveAll.setSize(160, 30);
 		bSolveAll.setLocation(10, 150);
 		pConfig.add(bSolveAll);
-
 
 		bSolveStep = new JButton("Display Solutions!");
 		bSolveStep.setBackground(Color.WHITE);
@@ -661,13 +695,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		bSolveTrail.setLocation(10, 230);
 		pConfig.add(bSolveTrail);
 
-
 		lSpeed = new JLabel("Speed (1x)");
 		lSpeed.setSize(140, 20);
 		lSpeed.setLocation(10, 265);
 		pConfig.add(lSpeed);
 
-		sSpeed = new JSlider(-2, 6, 0); //from 2^-2 to 2^6
+		sSpeed = new JSlider(-2, 6, 0); // from 2^-2 to 2^6
 		sSpeed.setBackground(Color.WHITE);
 		sSpeed.setSize(160, 30);
 		sSpeed.setLocation(10, 280);
@@ -679,14 +712,14 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			public void stateChanged(ChangeEvent arg0) {
 				int s = sSpeed.getValue();
 				if (s < 6) {
-					speed =  (int)(1000 / Math.pow(2, sSpeed.getValue()));
+					speed = (int) (1000 / Math.pow(2, sSpeed.getValue()));
 				} else {
-					speed = 1; //unlimited
+					speed = 1; // unlimited
 				}
 				if (s >= 0 && s < 6) {
-					lSpeed.setText("Speed (" + (int)Math.pow(2, s) + "x)");
+					lSpeed.setText("Speed (" + (int) Math.pow(2, s) + "x)");
 				} else if (s < 0) {
-					lSpeed.setText("Speed (1/" + (int)Math.pow(2, -s) + "x)");
+					lSpeed.setText("Speed (1/" + (int) Math.pow(2, -s) + "x)");
 				} else {
 					lSpeed.setText("Speed (Unlimited)");
 				}
@@ -694,7 +727,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		});
 		pConfig.add(sSpeed);
-
 
 		bPause = new JButton("Pause");
 
@@ -705,12 +737,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				/* Only if there is at least on thread running, does this button work. */
-				if( (calculateSSol!=null && calculateSSol.getState() == SwingWorker.StateValue.STARTED)
-						||(calculateSStep!=null && calculateSStep.getState() == SwingWorker.StateValue.STARTED)
-						||(calculateAll!=null && calculateAll.getState() == SwingWorker.StateValue.STARTED) ){
+				/*
+				 * Only if there is at least on thread running, does this button
+				 * work.
+				 */
+				if ((calculateSSol != null && calculateSSol.getState() == SwingWorker.StateValue.STARTED)
+						|| (calculateSStep != null && calculateSStep.getState() == SwingWorker.StateValue.STARTED)
+						|| (calculateAll != null && calculateAll.getState() == SwingWorker.StateValue.STARTED)) {
 					isPaused = !isPaused;
-					if(isPaused)
+					if (isPaused)
 						bPause.setText("Resume");
 					else
 						bPause.setText("Pause");
@@ -734,15 +769,16 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				/* Reset the resume button to "Pause" again. */
 				bPause.setText("Pause");
 				isPaused = false;
-				if(calculateSSol!=null && calculateSSol.getState() == SwingWorker.StateValue.STARTED){
+				if (calculateSSol != null
+						&& calculateSSol.getState() == SwingWorker.StateValue.STARTED) {
 					calculateSSol.cancel(true);
 					tResultInfo.setText("Searching is canceled!");
-				}
-				else if(calculateSStep!=null && calculateSStep.getState() == SwingWorker.StateValue.STARTED){
+				} else if (calculateSStep != null
+						&& calculateSStep.getState() == SwingWorker.StateValue.STARTED) {
 					calculateSStep.cancel(true);
 					tResultInfo.setText("Searching is canceled!");
-				}
-				else if(calculateAll!=null && calculateAll.getState() == SwingWorker.StateValue.STARTED){
+				} else if (calculateAll != null
+						&& calculateAll.getState() == SwingWorker.StateValue.STARTED) {
 					calculateAll.cancel(true);
 					tResultInfo.setText("Searching is canceled!");
 				}
@@ -809,7 +845,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 				else {
 					System.err.println("Out of Range!");
-					JOptionPane.showMessageDialog(null, "Index out of range!",
+					JOptionPane.showMessageDialog(null, "No such solution!",
 							"Warning", JOptionPane.WARNING_MESSAGE);
 				}
 			}
@@ -879,7 +915,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			public void stateChanged(ChangeEvent arg0) {
 				tIndex.setText(Integer.toString(sNumSolution.getValue()));
 				cleanTiles();
-				if(sNumSolution.getValue()>=1 && sNumSolution.getValue()<=numOfSolution)
+				if (sNumSolution.getValue() >= 1
+						&& sNumSolution.getValue() <= numOfSolution)
 					displayResults(sNumSolution.getValue() - 1);
 			}
 
@@ -965,7 +1002,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		this.add(pDisplay);
 	}
 
-	private void setupTileListPanel(){
+	private void setupTileListPanel() {
 		pTileList = new JPanel();
 		pTileList.setBackground(Color.WHITE);
 		pTileList.setLayout(null);
@@ -984,9 +1021,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	private void setupTileList(List<Tile> tiles, Tile board) {
 
 		List<Color> colorList = genColors(tiles.size());
-		//for (int i = 0; i < tiles.size(); i++) {
-		//	tiles.get(i).printTile();
-		//}
+		// for (int i = 0; i < tiles.size(); i++) {
+		// tiles.get(i).printTile();
+		// }
 
 		boolean show_char = false;
 		char c = ' ';
@@ -996,7 +1033,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 					if (c == ' ') {
 						c = board.data[i][j];
 					} else {
-						if (board.data[i][j] != c) show_char = true;
+						if (board.data[i][j] != c)
+							show_char = true;
 					}
 				}
 			}
@@ -1011,11 +1049,11 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pic.setBackground(Color.white);
 		pTileList.add(pic);
 
-		int[][] pack = Tile.packAllTiles(tiles,
-						(double)tileListAreaHeight/tileListAreaWidth);
+		int[][] pack = Tile.packAllTiles(tiles, (double) tileListAreaHeight
+				/ tileListAreaWidth);
 
-		int grid = Math.min((tileListAreaWidth - 1)/pack[0].length,
-						(tileListAreaHeight - 1)/pack.length);
+		int grid = Math.min((tileListAreaWidth - 1) / pack[0].length,
+				(tileListAreaHeight - 1) / pack.length);
 		int[][] tbase = new int[tiles.size()][2];
 		for (int i = 0; i < tiles.size(); i++)
 			tbase[i][0] = -1;
@@ -1043,7 +1081,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 							l.setVerticalAlignment(SwingConstants.CENTER);
 							l.setHorizontalAlignment(SwingConstants.CENTER);
 							l.setLocation(j * grid + 1, i * grid + 1);
-							l.setOpaque(false);  //false = transparent
+							l.setOpaque(false); // false = transparent
 							l.setVisible(true);
 							pic.add(l);
 						}
@@ -1101,13 +1139,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		}
 
 		/*
-		 * Initialize board related size.
-		 * There should be some redundancy for the sizeblock, or the edges cannot
-		 * be drawn.
+		 * Initialize board related size. There should be some redundancy for
+		 * the sizeblock, or the edges cannot be drawn.
 		 */
-		sizeBlock = Math.min(
-				(displaySize[0] - origin[0] - 20) / board[0].length,
-				(displaySize[1] - origin[1] - 20) / board.length)
+		sizeBlock = Math.min((displaySize[0] - origin[0] - 20)
+				/ board[0].length, (displaySize[1] - origin[1] - 20)
+				/ board.length)
 				- gridWidth;
 		sizeTile = sizeBlock + gridWidth;
 
@@ -1118,9 +1155,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		int l = board[0].length;
 
 		/* Set offset, to make the board display in the middle. */
-		OffsetX = displaySize[0]/2 - (l * (sizeBlock + gridWidth) + gridWidth)/2-18;
-		OffsetY = displaySize[1]/2 - (w * (sizeBlock + gridWidth) + gridWidth)/2-10;
-
+		OffsetX = displaySize[0] / 2
+				- (l * (sizeBlock + gridWidth) + gridWidth) / 2 - 18;
+		OffsetY = displaySize[1] / 2
+				- (w * (sizeBlock + gridWidth) + gridWidth) / 2 - 10;
 
 		/* First is x, second is y. */
 		int sizeGridH[] = { l * (sizeBlock + gridWidth) + gridWidth, gridWidth };
@@ -1135,8 +1173,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			gridH_w[i] = new JPanel();
 			gridH_w[i].setBackground(Color.white);
 			gridH_w[i].setSize(sizeGridH[0] - 2, sizeGridH[1] - 2);
-			gridH_w[i].setLocation(origin[0] + OffsetX, origin[1] + (sizeBlock + gridWidth)
-					* i + OffsetY);
+			gridH_w[i].setLocation(origin[0] + OffsetX, origin[1]
+					+ (sizeBlock + gridWidth) * i + OffsetY);
 			gridH_w[i].setOpaque(true);
 			gridH_w[i].setVisible(true);
 			pDisplay.add(gridH_w[i]);
@@ -1146,8 +1184,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			gridV_w[j] = new JPanel();
 			gridV_w[j].setBackground(Color.white);
 			gridV_w[j].setSize(sizeGridV[0] - 2, sizeGridV[1] - 2);
-			gridV_w[j].setLocation(origin[0] + (sizeBlock + gridWidth) * j + OffsetX,
-					origin[1] + OffsetY);
+			gridV_w[j].setLocation(origin[0] + (sizeBlock + gridWidth) * j
+					+ OffsetX, origin[1] + OffsetY);
 			gridV_w[j].setOpaque(true);
 			gridV_w[j].setVisible(true);
 			pDisplay.add(gridV_w[j]);
@@ -1158,8 +1196,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			gridH[i] = new JPanel();
 			gridH[i].setBackground(Color.black);
 			gridH[i].setSize(sizeGridH[0], sizeGridH[1]);
-			gridH[i].setLocation(origin[0]+OffsetX-1, origin[1] + (sizeBlock + gridWidth)
-					* i+OffsetY-1);
+			gridH[i].setLocation(origin[0] + OffsetX - 1, origin[1]
+					+ (sizeBlock + gridWidth) * i + OffsetY - 1);
 			gridH[i].setOpaque(true);
 			gridH[i].setVisible(true);
 			pDisplay.add(gridH[i]);
@@ -1169,8 +1207,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			gridV[j] = new JPanel();
 			gridV[j].setBackground(Color.black);
 			gridV[j].setSize(sizeGridV[0], sizeGridV[1]);
-			gridV[j].setLocation(origin[0] + (sizeBlock + gridWidth) * j+OffsetX-1,
-					origin[1]+OffsetY-1);
+			gridV[j].setLocation(origin[0] + (sizeBlock + gridWidth) * j
+					+ OffsetX - 1, origin[1] + OffsetY - 1);
 			gridV[j].setOpaque(true);
 			gridV[j].setVisible(true);
 			pDisplay.add(gridV[j]);
@@ -1204,20 +1242,26 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			}
 		}
 
-		/* Setup board colors (now use chars to represent) if there are more than one colors. */
+		/*
+		 * Setup board colors (now use chars to represent) if there are more
+		 * than one colors.
+		 */
 		if (set.size() > 1) {
 			for (int i = 0; i < w; i++) {
 				for (int j = 0; j < l; j++) {
-					if (board[i][j] == ' ') continue;
+					if (board[i][j] == ' ')
+						continue;
 					JLabel block = new JLabel(Character.toString(board[i][j]));
-					block.setSize(sizeTile/2, sizeTile/2);
-					block.setFont(new Font("Arial", Font.PLAIN, sizeTile/2));
+					block.setSize(sizeTile / 2, sizeTile / 2);
+					block.setFont(new Font("Arial", Font.PLAIN, sizeTile / 2));
 					block.setVerticalAlignment(SwingConstants.CENTER);
 					block.setHorizontalAlignment(SwingConstants.CENTER);
-					int x = originTile[0] + (j) * sizeTile + OffsetX + sizeTile/4;
-					int y = originTile[1] + (i) * sizeTile + OffsetY + sizeTile/4;
+					int x = originTile[0] + (j) * sizeTile + OffsetX + sizeTile
+							/ 4;
+					int y = originTile[1] + (i) * sizeTile + OffsetY + sizeTile
+							/ 4;
 					block.setLocation(x, y);
-					block.setOpaque(false);  //set to transparent
+					block.setOpaque(false); // set to transparent
 					block.setVisible(true);
 					pDisplay.add(block);
 				}
@@ -1245,10 +1289,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				block.setSize(sizeTile, sizeTile);
 				int x = originTile[0]
 						+ (posMap[tilePos.get(j)] % (board[0].length))
-						* sizeTile+OffsetX;
+						* sizeTile + OffsetX;
 				int y = originTile[0]
 						+ (posMap[tilePos.get(j)] / (board[0].length))
-						* sizeTile+OffsetY;
+						* sizeTile + OffsetY;
 				block.setLocation(x, y);
 				block.setOpaque(true);
 				block.setVisible(true);
@@ -1274,10 +1318,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				block.setSize(sizeTile, sizeTile);
 				int x = originTile[0]
 						+ (posMap[tilePos.get(j)] % (board[0].length))
-						* sizeTile+OffsetX ;
+						* sizeTile + OffsetX;
 				int y = originTile[0]
 						+ (posMap[tilePos.get(j)] / (board[0].length))
-						* sizeTile+OffsetY;
+						* sizeTile + OffsetY;
 				block.setLocation(x, y);
 				block.setOpaque(true);
 				block.setVisible(true);
@@ -1293,8 +1337,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board[0].length; j++) {
 				/* Avoid deleting the grids. */
-				int x = originTile[0] + j * sizeTile + gridWidth + 2+OffsetX;
-				int y = originTile[0] + i * sizeTile + gridWidth + 2+OffsetY;
+				int x = originTile[0] + j * sizeTile + gridWidth + 2 + OffsetX;
+				int y = originTile[0] + i * sizeTile + gridWidth + 2 + OffsetY;
 
 				if (board[i][j] != ' ') {
 					Component t = pDisplay.getComponentAt(x, y);
@@ -1306,9 +1350,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	}
 
 	/**
-	 * This is a map between the assigned number of the board in DLX and the real position
-	 * for drawing when there are holes in the board.
-	 * If there are no holes this function does nothing
+	 * This is a map between the assigned number of the board in DLX and the
+	 * real position for drawing when there are holes in the board. If there are
+	 * no holes this function does nothing
 	 */
 	private void setPosMap() {
 		posMap = new int[board.length * board[0].length];
@@ -1332,31 +1376,23 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 	/**
 	 * Generate n colors for n different tiles.
-	 * @param n - the number of tiles
+	 *
+	 * @param n
+	 *            - the number of tiles
 	 * @return a list of Color
 	 */
 	private List<Color> genColors(int n) {
 		List<Color> colors = new ArrayList<Color>();
 
 		/* Default color list. */
-		colors.addAll(Arrays.asList(
-				Color.cyan,
-				Color.blue,
-				Color.green,
-				Color.red,
-				Color.yellow,
-				new Color(46, 139, 87),
-				new Color(148, 0, 211),
-				new Color(135, 51, 36),
-				Color.magenta,
-				Color.gray,
-				Color.pink,
-				new Color(175, 255, 225),
-				new Color(130, 175, 190)
-				));
+		colors.addAll(Arrays.asList(Color.cyan, Color.blue, Color.green,
+				Color.red, Color.yellow, new Color(46, 139, 87), new Color(148,
+						0, 211), new Color(135, 51, 36), Color.magenta,
+				Color.gray, Color.pink, new Color(175, 255, 225), new Color(
+						130, 175, 190)));
 
 		double goldenRatio = 0.618033988749895;
-		double hue = 0.0; //or use random start value between 0 and 1
+		double hue = 0.0; // or use random start value between 0 and 1
 		double saturation = 0.5;
 		double value = 0.95;
 
@@ -1365,7 +1401,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			hue = (hue + goldenRatio) % 1.0;
 
 			/* HSV to RGB */
-			int h = (int)(hue * 6);
+			int h = (int) (hue * 6);
 			double f = hue * 6 - h;
 			double p = value * (1 - saturation);
 			double q = value * (1 - f * saturation);
@@ -1373,21 +1409,47 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			double r, g, b;
 			switch (h) {
-			case 0: r = value; g = t; b = p; break;
-			case 1: r = q; g = value; b = p; break;
-			case 2: r = p; g = value; b = t; break;
-			case 3: r = p; g = q; b = value; break;
-			case 4: r = t; g = p; b = value; break;
-			case 5: r = value; g = p; b = q; break;
-			default: throw new RuntimeException("Error in genColor.");
+			case 0:
+				r = value;
+				g = t;
+				b = p;
+				break;
+			case 1:
+				r = q;
+				g = value;
+				b = p;
+				break;
+			case 2:
+				r = p;
+				g = value;
+				b = t;
+				break;
+			case 3:
+				r = p;
+				g = q;
+				b = value;
+				break;
+			case 4:
+				r = t;
+				g = p;
+				b = value;
+				break;
+			case 5:
+				r = value;
+				g = p;
+				b = q;
+				break;
+			default:
+				throw new RuntimeException("Error in genColor.");
 			}
 
-			colors.add(new Color((int)(r*256), (int)(g*256), (int)(b*256)));
+			colors.add(new Color((int) (r * 256), (int) (g * 256),
+					(int) (b * 256)));
 		}
 		return colors;
 	}
 
-	private void setControlPanelComponents(boolean b){
+	private void setControlPanelComponents(boolean b) {
 		cbEnableSpin.setEnabled(b);
 		cbEnableSpinFlip.setEnabled(b);
 		cbRmSymm.setEnabled(b);
@@ -1400,7 +1462,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		bStop.setEnabled(b);
 	}
 
-	private void setResultPanelComponents(boolean b){
+	private void setResultPanelComponents(boolean b) {
 		sNumSolution.setEnabled(b);
 		tIndex.setEnabled(b);
 
@@ -1410,7 +1472,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		bPlay.setEnabled(b);
 	}
 
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == miExit)
@@ -1418,17 +1479,18 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		if (e.getSource() == miAbout) {
 			JOptionPane.showMessageDialog(null, "Tiling Puzzle v1.0\n"
-					+ "Date: Dec 1, 2014\n" + "Designed by Dawei Fan and Deyuan Guo",
-					"About", JOptionPane.INFORMATION_MESSAGE);
+					+ "Date: Dec 1, 2014\n"
+					+ "Designed by Dawei Fan and Deyuan Guo", "About",
+					JOptionPane.INFORMATION_MESSAGE);
 		}
 		if (e.getSource() == miRead) {
 			/* If there is a thread running, cannot select new files. */
-			if( (calculateSSol!=null && calculateSSol.getState() == SwingWorker.StateValue.STARTED)
-					||(calculateSStep!=null && calculateSStep.getState() == SwingWorker.StateValue.STARTED)
-					||(calculateAll!=null && calculateAll.getState() == SwingWorker.StateValue.STARTED) ){
-				JOptionPane.showConfirmDialog(null, "Stop before selecting a new file!",
-						"Warning", JOptionPane.CLOSED_OPTION,
-						JOptionPane.WARNING_MESSAGE);
+			if ((calculateSSol != null && calculateSSol.getState() == SwingWorker.StateValue.STARTED)
+					|| (calculateSStep != null && calculateSStep.getState() == SwingWorker.StateValue.STARTED)
+					|| (calculateAll != null && calculateAll.getState() == SwingWorker.StateValue.STARTED)) {
+				JOptionPane.showConfirmDialog(null,
+						"Stop before selecting a new file!", "Warning",
+						JOptionPane.CLOSED_OPTION, JOptionPane.WARNING_MESSAGE);
 				return;
 			}
 
@@ -1459,7 +1521,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			tIndex.setText("0");
 
 			pDisplay.setBorder(BorderFactory.createCompoundBorder(
-					BorderFactory.createTitledBorder("Solution ("+file.getName()+")"),
+					BorderFactory.createTitledBorder("Solution ("
+							+ file.getName() + ")"),
 					BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 			DataFileParser dfp = new DataFileParser(file.getAbsolutePath());
 			/* Extract puzzle pieces, board are included in this list. */
@@ -1502,12 +1565,13 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	public static void main(String[] args) {
 
 		try {
-			UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+			UIManager
+					.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		SwingUtilities.invokeLater(new Runnable(){
+		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
 			public void run() {
