@@ -298,7 +298,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bStop.setEnabled(true);
 			sSpeed.setEnabled(true);
 
-			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			//setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/*
 			 * Before every new process must reset DLX (DLX.config is also
 			 * reset, DON'T reset enable options)
@@ -344,11 +344,11 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bStop.setEnabled(false);
 			sSpeed.setEnabled(false);
 
-			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			//setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 			numOfSolution = solution.size();
 			/*
-			 * After geting the numofSolution, set the min and max of the
+			 * After getting the numofSolution, set the min and max of the
 			 * slider.
 			 */
 			/*
@@ -409,7 +409,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bStop.setEnabled(true);
 			sSpeed.setEnabled(true);
 
-			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			//setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/*
 			 * Before every new process must reset DLX (DLX.config is also
 			 * reset, DON'T reset enable options)
@@ -454,7 +454,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bStop.setEnabled(false);
 			sSpeed.setEnabled(false);
 
-			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			//setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			try {
 				solution = get();
 			} catch (InterruptedException e) {
@@ -467,7 +467,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			}
 			numOfSolution = solution.size();
 			/*
-			 * After geting the numofSolution, set the min and max of the
+			 * After getting the numofSolution, set the min and max of the
 			 * slider.
 			 */
 			/*
@@ -1478,7 +1478,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			System.exit(0);
 
 		if (e.getSource() == miAbout) {
-			JOptionPane.showMessageDialog(null, "Tiling Puzzle v1.0\n"
+			JOptionPane.showMessageDialog(null, "Tiling Puzzle Solver v1.0\n"
 					+ "Date: Dec 1, 2014\n"
 					+ "Designed by Dawei Fan and Deyuan Guo", "About",
 					JOptionPane.INFORMATION_MESSAGE);
@@ -1489,7 +1489,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 					|| (calculateSStep != null && calculateSStep.getState() == SwingWorker.StateValue.STARTED)
 					|| (calculateAll != null && calculateAll.getState() == SwingWorker.StateValue.STARTED)) {
 				JOptionPane.showConfirmDialog(null,
-						"Stop before selecting a new file!", "Warning",
+						"Please stop searching before selecting a new file.",
+						"Warning",
 						JOptionPane.CLOSED_OPTION, JOptionPane.WARNING_MESSAGE);
 				return;
 			}
@@ -1501,7 +1502,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			}
 			// not select any files
 			else {
-				JOptionPane.showConfirmDialog(null, "No file is selected!",
+				JOptionPane.showConfirmDialog(null, "No file is selected.",
 						"Warning", JOptionPane.CLOSED_OPTION,
 						JOptionPane.WARNING_MESSAGE);
 				return;
