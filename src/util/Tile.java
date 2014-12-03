@@ -318,16 +318,24 @@ public class Tile implements Comparable<Tile> {
 	}
 
 	private static boolean packable(List<List<Integer>> p, Tile t, int r, int c) {
-		int th = t.data.length + 1;
-		int tw = t.data[0].length + 1;
+		int th = t.data.length;
+		int tw = t.data[0].length;
+		// tile area
 		for (int i = 0; i < th; i++) {
-			if (p.get(r + i).get(c) != 0) return false;
-			if (p.get(r + i).get(c + tw - 1) != 0) return false;
+			List<Integer> l = p.get(r + i);
+			if ((l.get(c) != 0) || (l.get(c + tw - 1) != 0)
+					|| (l.get(c + tw) != 0 && l.get(c + tw) != -2))
+				return false;
 		}
 		for (int i = 0; i < tw; i++) {
-			if (p.get(r).get(c + i) != 0) return false;
-			if (p.get(r + th - 1).get(c + i) != 0) return false;
+			if ((p.get(r).get(c + i) != 0)
+					|| (p.get(r + th - 1).get(c + i) != 0)
+					|| (p.get(r + th).get(c + i) != 0
+						&& p.get(r + th).get(c + i) != -2))
+				return false;
 		}
+		if (p.get(r + th).get(c + tw) != 0 && p.get(r + th).get(c + tw) != -1)
+			return false;
 		return true;
 	}
 
