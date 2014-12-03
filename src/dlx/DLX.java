@@ -197,7 +197,7 @@ public class DLX {
 	 */
 	public void resetSearch() {
 		basicSearch.reset();
-		Solutions.clear();
+		if (Solutions != null) Solutions.clear();
 		Config.reset();
 		if (Config.verb) System.out.println("DLX search has been reset.");
 	}

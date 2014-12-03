@@ -232,6 +232,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			 */
 			dlx.Config.reset();
 			dlx.preProcess();
+			dlx.resetSearch();
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
 			tResultInfo.setText("Searching...");
 			solution.addAll(dlx.solveAll());
@@ -257,16 +258,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			numOfSolution = solution.size();
 
 			/*
-			 * After geting the numofSolution, set the min and max of the
+			 * After getting the numofSolution, set the min and max of the
 			 * slider.
 			 */
 			/*
 			 * Note: only when there is state change the solution could be
 			 * displayed!
 			 */
-			sNumSolution.setMinimum(1);
-			sNumSolution.setMaximum(numOfSolution);
 			sNumSolution.setMinimum(0);
+			sNumSolution.setMaximum(numOfSolution);
 			sNumSolution.setValue(0);
 
 			if (numOfSolution == 0)
@@ -298,13 +298,13 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bStop.setEnabled(true);
 			sSpeed.setEnabled(true);
 
-			//setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/*
 			 * Before every new process must reset DLX (DLX.config is also
 			 * reset, DON'T reset enable options)
 			 */
 			dlx.Config.reset();
 			dlx.preProcess();
+			dlx.resetSearch();
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
 			tResultInfo.setText("Searching...");
 			tIndex.setText("0");
@@ -312,18 +312,17 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			int number = 0;
 			List<List<Integer>> sol = dlx.nextSolution();
 			while (sol != null && !isCancelled()) {
-				while (isPaused) {
-					try {
-						Thread.sleep(1);
-					} catch (InterruptedException e) {
-						System.err.println("Sleep Interrupt!");
-					}
-				}
-				;
 				try {
 					Thread.sleep(speed);
 				} catch (InterruptedException e) {
 					System.err.println("Sleep interrupt");
+				}
+				while (isPaused) {
+					try {
+						Thread.sleep(50);
+					} catch (InterruptedException e) {
+						System.err.println("Sleep Interrupt!");
+					}
 				}
 				number++;
 				solution.add(sol);
@@ -339,12 +338,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			setControlPanelComponents(true);
 			setResultPanelComponents(true);
-			lSpeed.setEnabled(false);
-			bPause.setEnabled(false);
-			bStop.setEnabled(false);
-			sSpeed.setEnabled(false);
-
-			//setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 			numOfSolution = solution.size();
 			/*
@@ -355,9 +348,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			 * Note: only when there is state change the solution could be
 			 * displayed!
 			 */
-			sNumSolution.setMinimum(1);
-			sNumSolution.setMaximum(numOfSolution);
 			sNumSolution.setMinimum(0);
+			sNumSolution.setMaximum(numOfSolution);
 			sNumSolution.setValue(0);
 
 			if (numOfSolution == 0)
@@ -409,13 +401,13 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			bStop.setEnabled(true);
 			sSpeed.setEnabled(true);
 
-			//setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			/*
 			 * Before every new process must reset DLX (DLX.config is also
 			 * reset, DON'T reset enable options)
 			 */
 			dlx.Config.reset();
 			dlx.preProcess();
+			dlx.resetSearch();
 			cbExtra.setSelected(dlx.Config.isEnableExtra());
 
 			tResultInfo.setText("Searching...");
@@ -423,20 +415,18 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			List<List<Integer>> sol = dlx.nextSingleStep();
 			while (sol != null && !isCancelled()) {
-				while (isPaused) {
-					try {
-						Thread.sleep(1);
-					} catch (InterruptedException e) {
-						System.err.println("Sleep Interrupt!");
-					}
-				}
-				;
 				try {
 					Thread.sleep(speed);
 				} catch (InterruptedException e) {
 					System.err.println("Sleep Interrupt!");
 				}
-
+				while (isPaused) {
+					try {
+						Thread.sleep(50);
+					} catch (InterruptedException e) {
+						System.err.println("Sleep Interrupt!");
+					}
+				}
 				publish(sol);
 				sol = dlx.nextSingleStep();
 			}
@@ -449,12 +439,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			setControlPanelComponents(true);
 			setResultPanelComponents(true);
-			lSpeed.setEnabled(false);
-			bPause.setEnabled(false);
-			bStop.setEnabled(false);
-			sSpeed.setEnabled(false);
 
-			//setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			try {
 				solution = get();
 			} catch (InterruptedException e) {
@@ -474,9 +459,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			 * Note: only when there is state change the solution could be
 			 * displayed!
 			 */
-			sNumSolution.setMinimum(1);
-			sNumSolution.setMaximum(numOfSolution);
 			sNumSolution.setMinimum(0);
+			sNumSolution.setMaximum(numOfSolution);
 			sNumSolution.setValue(0);
 
 			if (numOfSolution == 0)
@@ -813,7 +797,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		tResultInfo.setVisible(true);
 		pResult.add(tResultInfo);
 
-		tIndex = new JTextField(" index", 10);
+		tIndex = new JTextField("index", 10);
 		tIndex.setBackground(Color.WHITE);
 		tIndex.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		// tIndex.setPreferredSize(new Dimension(80, 25));
@@ -824,7 +808,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		tIndex.setHorizontalAlignment(SwingConstants.CENTER);
 		pResult.add(tIndex);
 
-		bShowResult = new JButton("Show!");
+		bShowResult = new JButton("Show");
 		bShowResult.setBackground(Color.WHITE);
 		bShowResult.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bShowResult.setSize(80, 30);
@@ -833,21 +817,26 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				int id = Integer.parseInt(tIndex.getText());
-				if (id >= 1 && id <= numOfSolution) {
-					cleanTiles();
-					displayResults(id - 1);
-
-					/* Set slider. */
-					sNumSolution.setValue(id);
+				int id = 0;
+				try {
+					id = Integer.parseInt(tIndex.getText());
+					if (numOfSolution > 0) {
+						if (id < 1) id = 1;
+						else if (id > numOfSolution) id = numOfSolution;
+					} else {
+						id = 0;
+					}
+				} catch (NumberFormatException e) {
+					if (numOfSolution > 0) {
+						id = 1;
+					} else {
+						id = 0;
+					}
 				}
-
-				else {
-					System.err.println("Out of Range!");
-					JOptionPane.showMessageDialog(null, "No such solution!",
-							"Warning", JOptionPane.WARNING_MESSAGE);
-				}
+				cleanTiles();
+				if (id > 0) displayResults(id - 1);
+				tIndex.setText(Integer.toString(id));
+				sNumSolution.setValue(id);
 			}
 
 		});
@@ -862,15 +851,27 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				int cur = Integer.parseInt(tIndex.getText());
-				if (cur > 1) {
-					cur--;
-					tIndex.setText(Integer.toString(cur));
-					cleanTiles();
-					displayResults(cur - 1);
-					/* Set slider. */
-					sNumSolution.setValue(cur);
+				int id = 0;
+				try {
+					id = Integer.parseInt(tIndex.getText());
+					if (numOfSolution > 0) {
+						if (id < 1) id = 1;
+						else if (id > numOfSolution) id = numOfSolution;
+						else if (id > 1) id--;
+					} else {
+						id = 0;
+					}
+				} catch (NumberFormatException e) {
+					if (numOfSolution > 0) {
+						id = 1;
+					} else {
+						id = 0;
+					}
 				}
+				cleanTiles();
+				if (id > 0) displayResults(id - 1);
+				tIndex.setText(Integer.toString(id));
+				sNumSolution.setValue(id);
 			}
 
 		});
@@ -885,16 +886,27 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				int cur = Integer.parseInt(tIndex.getText());
-				if (cur < numOfSolution) {
-					cur++;
-					tIndex.setText(Integer.toString(cur));
-					cleanTiles();
-					displayResults(cur - 1);
-					/* Set slider. */
-					sNumSolution.setValue(cur);
+				int id = 0;
+				try {
+					id = Integer.parseInt(tIndex.getText());
+					if (numOfSolution > 0) {
+						if (id < 1) id = 1;
+						else if (id > numOfSolution) id = numOfSolution;
+						else if (id < numOfSolution) id++;
+					} else {
+						id = 0;
+					}
+				} catch (NumberFormatException e) {
+					if (numOfSolution > 0) {
+						id = 1;
+					} else {
+						id = 0;
+					}
 				}
-
+				cleanTiles();
+				if (id > 0) displayResults(id - 1);
+				tIndex.setText(Integer.toString(id));
+				sNumSolution.setValue(id);
 			}
 
 		});
@@ -905,19 +917,20 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		sNumSolution.setSize(160, 30);
 		sNumSolution.setLocation(10, 110);
 		sNumSolution.setExtent(0);
-		sNumSolution.setMinimum(1);
-		sNumSolution.setMaximum(100);
+		sNumSolution.setMinimum(0);
+		sNumSolution.setMaximum(0);
+		sNumSolution.setValue(0);
 		sNumSolution.setSnapToTicks(false);
 		sNumSolution.setPaintTicks(false);
 		sNumSolution.addChangeListener(new ChangeListener() {
 
 			@Override
 			public void stateChanged(ChangeEvent arg0) {
-				tIndex.setText(Integer.toString(sNumSolution.getValue()));
+				int id = sNumSolution.getValue();
+				tIndex.setText(Integer.toString(id));
 				cleanTiles();
-				if (sNumSolution.getValue() >= 1
-						&& sNumSolution.getValue() <= numOfSolution)
-					displayResults(sNumSolution.getValue() - 1);
+				if (id >= 1 && id <= numOfSolution)
+					displayResults(id - 1);
 			}
 
 		});
@@ -930,54 +943,81 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		bPlay.setSize(160, 30);
 		bPlay.setLocation(10, 140);
 		bPlay.addActionListener(new ActionListener() {
+
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-
-				if (!isRunning) {
+				if (!isRunning && numOfSolution > 0) {
 					isRunning = true;
 					bPlay.setText("Stop");
 					setControlPanelComponents(false);
+					tIndex.setEnabled(false);
+					bShowResult.setEnabled(false);
+					bPre.setEnabled(false);
+					bNext.setEnabled(false);
+					lSpeed.setEnabled(true);
+					sSpeed.setEnabled(true);
+
 					if (!isThread) {
 						isThread = true;
 						new Thread(new Runnable() {
 
 							@Override
 							public void run() {
-								// TODO Auto-generated method stub
-
-								while (tIndex.getText() != ""
-										&& Integer.parseInt(tIndex.getText()) < numOfSolution) {
-									if (isRunning) {
-										int i = Integer.parseInt(tIndex
-												.getText());
-										cleanTiles();
-										displayResults(i);
-										sNumSolution.setValue(i + 1);
-										try {
-											Thread.sleep(500);
-										} catch (InterruptedException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										}
-
+								// Get current value in tIndex
+								int id = 0;
+								try {
+									id = Integer.parseInt(tIndex.getText());
+									if (numOfSolution > 0) {
+										if (id < 1) id = 1;
+										else if (id > numOfSolution) id = numOfSolution;
+										else if (id < numOfSolution) id++;
+									} else {
+										id = 0;
+									}
+								} catch (NumberFormatException e) {
+									if (numOfSolution > 0) {
+										id = 1;
+									} else {
+										id = 0;
 									}
 								}
+								// Loop show
+								while (id > 0 && id < numOfSolution) {
+									cleanTiles();
+									displayResults(id - 1);
+									tIndex.setText(Integer.toString(id));
+									sNumSolution.setValue(id);
+									try {
+										Thread.sleep(speed);
+									} catch (InterruptedException e) {
+										System.err.println("Sleep interrupt");
+									}
+								}
+								// Finished
 								isThread = false;
 								isRunning = false;
-								bPlay.setText("Autoplay all solutions");
+								bPlay.setText("Autoplay All Solutions");
 								sNumSolution.setValue(1);
 							}
 						}).start();
 
 					}
+					setControlPanelComponents(true);
+					tIndex.setEnabled(true);
+					bShowResult.setEnabled(true);
+					bPre.setEnabled(true);
+					bNext.setEnabled(true);
 				}
 
 				/* If now it is running, stop it! */
 				else {
 					isRunning = false;
 					setControlPanelComponents(true);
-					bPlay.setText("Autoplay all solutions");
-
+					tIndex.setEnabled(true);
+					bShowResult.setEnabled(true);
+					bPre.setEnabled(true);
+					bNext.setEnabled(true);
+					bPlay.setText("Autoplay All Solutions");
 				}
 			}
 		});
@@ -1520,6 +1560,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			/* Reset text field */
 			tResultInfo.setText("Press buttons to solve");
 			tIndex.setText("0");
+			numOfSolution = 0;
+			sNumSolution.setMinimum(0);
+			sNumSolution.setMaximum(0);
+			sNumSolution.setValue(0);
 
 			pDisplay.setBorder(BorderFactory.createCompoundBorder(
 					BorderFactory.createTitledBorder("Solution ("
@@ -1538,15 +1582,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			/* Initiate a new DLX Solver and set it. */
 			DLX dlx = new DLX(board, tileList);
 			this.dlx = dlx;
-			/* Only enable control panel components. */
+			/* enable control panel components. */
 			setControlPanelComponents(true);
+			setResultPanelComponents(true);
 			/* Initialize the board and posMap. */
 			setupBoard(board.data);
 			setPosMap();
 			/* Initialize and display the tile. */
 			setupTileList(tileList, board);
 			repaint();
-
 		}
 	}
 
