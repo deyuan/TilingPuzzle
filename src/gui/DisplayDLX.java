@@ -1528,6 +1528,12 @@ public class DisplayDLX extends JPanel implements ActionListener {
 						"Warning",
 						JOptionPane.CLOSED_OPTION, JOptionPane.WARNING_MESSAGE);
 				return;
+			} else if (isRunning) { // Autoplay..
+				JOptionPane.showConfirmDialog(null,
+						"Please stop autoplay before selecting a new file.",
+						"Warning",
+						JOptionPane.CLOSED_OPTION, JOptionPane.WARNING_MESSAGE);
+				return;
 			}
 
 			/* Read a ASCII file and solve it. */
