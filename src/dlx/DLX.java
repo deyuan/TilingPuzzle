@@ -253,6 +253,7 @@ public class DLX {
 		long start = 0;
 		long end = 0;
 		List<List<List<Integer>>> solutions = null;
+		@SuppressWarnings("unused")
 		List<List<Integer>> single = null;
 
 

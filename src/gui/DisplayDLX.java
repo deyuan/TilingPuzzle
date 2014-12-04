@@ -238,9 +238,16 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			tResultInfo.setText("Searching...");
 
 			List<List<Integer>> sol = dlx.nextSolution();
+			if (sol != null && !isCancelled()) {
+				cleanTiles();
+				displayStep(sol);
+				publish();
+				tIndex.setText("1");
+			}
 			while (sol != null && !isCancelled()) {
 				solution.add(sol);
 				sol = dlx.nextSolution();
+				publish();
 			}
 			return null;
 		}
@@ -278,10 +285,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			sNumSolution.setValue(0);
 
 			if (numOfSolution == 0)
-				tResultInfo.setText("No Solution!");
+				if (dlx.Config.hasUnreachablePosition())
+					tResultInfo.setText("Has Unreachable Positions");
+				else if (dlx.Config.tileAreaNotEnough())
+					tResultInfo.setText("Insufficient Tiles");
+				else
+					tResultInfo.setText("No Solution");
 			else {
 				if (numOfSolution == 1)
-					tResultInfo.setText("Only 1 Solution!");
+					tResultInfo.setText("Only 1 Solution");
 				else
 					tResultInfo.setText(numOfSolution + " Solutions");
 				sNumSolution.setValue(1);
@@ -289,6 +301,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			}
 
 			bSolveAll.requestFocus();
+		}
+
+		@Override
+		protected void process(List<Void> p) {
+			if (!isCancelled())
+				if (solution.size() <= 1)
+					tResultInfo.setText("Searching..." + solution.size() + " Solution");
+				else
+					tResultInfo.setText("Searching..." + solution.size() + " Solutions");
 		}
 
 	}
@@ -360,10 +381,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			sNumSolution.setValue(0);
 
 			if (numOfSolution == 0)
-				tResultInfo.setText("No Solution!");
+				if (dlx.Config.hasUnreachablePosition())
+					tResultInfo.setText("Has Unreachable Positions");
+				else if (dlx.Config.tileAreaNotEnough())
+					tResultInfo.setText("Insufficient Tiles");
+				else
+					tResultInfo.setText("No Solution");
 			else {
 				if (numOfSolution == 1)
-					tResultInfo.setText("Only 1 Solution!");
+					tResultInfo.setText("Only 1 Solution");
 				else
 					tResultInfo.setText(numOfSolution + " Solutions");
 				sNumSolution.setValue(1);
@@ -378,7 +404,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			cleanTiles();
 			displayStep(solution.get(solution.size() - 1));
 			if (!isCancelled())
-				tResultInfo.setText("Searching..." + solution.size() + " Solutions");
+				if (solution.size() <= 1)
+					tResultInfo.setText("Searching..." + solution.size() + " Solution");
+				else
+					tResultInfo.setText("Searching..." + solution.size() + " Solutions");
 		}
 
 	}
@@ -460,15 +489,22 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			sNumSolution.setMaximum(numOfSolution);
 			sNumSolution.setValue(0);
 
+			cleanTiles();
 			if (numOfSolution == 0)
-				tResultInfo.setText("No Solution!");
+				if (dlx.Config.hasUnreachablePosition())
+					tResultInfo.setText("Has Unreachable Positions");
+				else if (dlx.Config.tileAreaNotEnough())
+					tResultInfo.setText("Insufficient Tiles");
+				else
+					tResultInfo.setText("No Solution");
 			else {
 				if (numOfSolution == 1)
-					tResultInfo.setText("Only 1 Solution!");
+					tResultInfo.setText("Only 1 Solution");
 				else
 					tResultInfo.setText(numOfSolution + " Solutions");
 				sNumSolution.setValue(1);
 				sNumSolution.setMinimum(1);
+				displayStep(solution.get(solution.size() - 1));
 			}
 
 			bSolveTrail.requestFocus();
@@ -479,7 +515,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			cleanTiles();
 			displayStep(r.get(r.size() - 1));
 			if (!isCancelled())
-				tResultInfo.setText("Searching..." + solution.size() + " Solutions");
+				if (solution.size() <= 1)
+					tResultInfo.setText("Searching..." + solution.size() + " Solution");
+				else
+					tResultInfo.setText("Searching..." + solution.size() + " Solutions");
 		}
 
 	}
@@ -624,7 +663,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		bSolveAll.setLocation(10, 150);
 		pConfig.add(bSolveAll);
 
-		bSolveStep = new JButton("Display Solutions!");
+		bSolveStep = new JButton("Display Solutions");
 		bSolveStep.setBackground(Color.WHITE);
 		bSolveStep.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bSolveStep.addActionListener(new ActionListener() {
@@ -640,7 +679,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		bSolveStep.setLocation(10, 190);
 		pConfig.add(bSolveStep);
 
-		bSolveTrail = new JButton("Display Single Steps!");
+		bSolveTrail = new JButton("Display Search Steps");
 		bSolveTrail.setBackground(Color.WHITE);
 		bSolveTrail.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bSolveTrail.addActionListener(new ActionListener() {
@@ -734,15 +773,24 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				if (calculateSSol != null
 						&& calculateSSol.getState() == SwingWorker.StateValue.STARTED) {
 					calculateSSol.cancel(true);
-					tResultInfo.setText(solution.size()+" Solutions (Cancelled)");
+					if (solution.size() <= 1)
+						tResultInfo.setText(solution.size()+" Solution (Cancelled)");
+					else
+						tResultInfo.setText(solution.size()+" Solutions (Cancelled)");
 				} else if (calculateSStep != null
 						&& calculateSStep.getState() == SwingWorker.StateValue.STARTED) {
 					calculateSStep.cancel(true);
-					tResultInfo.setText(solution.size()+" Solutions (Cancelled)");
+					if (solution.size() <= 1)
+						tResultInfo.setText(solution.size()+" Solution (Cancelled)");
+					else
+						tResultInfo.setText(solution.size()+" Solutions (Cancelled)");
 				} else if (calculateAll != null
 						&& calculateAll.getState() == SwingWorker.StateValue.STARTED) {
 					calculateAll.cancel(true);
-					tResultInfo.setText(solution.size()+" Solutions (Cancelled)");
+					if (solution.size() <= 1)
+						tResultInfo.setText(solution.size()+" Solution (Cancelled)");
+					else
+						tResultInfo.setText(solution.size()+" Solutions (Cancelled)");
 				}
 			}
 
@@ -762,7 +810,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pResult.setVisible(true);
 		pResult.setFocusable(true);
 		pResult.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Result"),
+				BorderFactory.createTitledBorder("Results"),
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 		pResult.setLayout(null);
 
@@ -1018,7 +1066,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pDisplay.setVisible(true);
 		pDisplay.setFocusable(true);
 		pDisplay.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Solution"),
+				BorderFactory.createTitledBorder("Puzzle"),
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
 		this.add(pDisplay);
@@ -1553,7 +1601,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			sNumSolution.setValue(0);
 
 			pDisplay.setBorder(BorderFactory.createCompoundBorder(
-					BorderFactory.createTitledBorder("Solution ("
+					BorderFactory.createTitledBorder("Puzzle ("
 							+ file.getName() + ")"),
 					BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 			DataFileParser dfp = new DataFileParser(file.getAbsolutePath());

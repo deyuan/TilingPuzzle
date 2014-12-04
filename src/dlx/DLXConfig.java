@@ -35,7 +35,8 @@ public class DLXConfig {
 	private boolean enableExtra = false;
 
 	/** Directly Fail */
-	private boolean directlyFail = false;
+	private boolean tileAreaNotEnough = false;
+	private boolean hasUnreachablePosition = false;
 
 	/** Search Finished */
 	private boolean searchFinished = false;
@@ -75,7 +76,6 @@ public class DLXConfig {
 	 */
 	public void reset(){
 		/* Reset all search related configuration. */
-		directlyFail = false;
 		searchFinished = false;
 		singleStepSearch = false;
 		singleSolutionSearch = false;
@@ -91,8 +91,13 @@ public class DLXConfig {
 	public boolean isEnableExtra() { return enableExtra; }
 	public void setEnableExtra(boolean b) { enableExtra = b; }
 
-	public boolean isDirectlyFail() { return directlyFail; }
-	public void setDirectlyFail(boolean b) { directlyFail = b; }
+	public boolean isDirectlyFail() {
+		return tileAreaNotEnough || hasUnreachablePosition;
+	}
+	public void setTileAreaNotEnough(boolean b) { tileAreaNotEnough = b; }
+	public void setHasUnreachablePosition(boolean b) { hasUnreachablePosition = b; }
+	public boolean tileAreaNotEnough() { return tileAreaNotEnough; }
+	public boolean hasUnreachablePosition() { return hasUnreachablePosition; }
 
 	public boolean searchFinished() { return searchFinished; }
 	public void setSearchFinished(boolean b) { searchFinished = b; }
@@ -143,7 +148,8 @@ public class DLXConfig {
 		System.out.println("Extra = " + enableExtra);
 		System.out.println("Eliminate symmetry = " + eliminateSymmetry);
 		System.out.println("Eliminate duplica = " + eliminateDuplica);
-		System.out.println("Directly fail = " + directlyFail);
+		System.out.println("Tile area not enough = " + tileAreaNotEnough);
+		System.out.println("Has unreachable position = " + hasUnreachablePosition);
 		System.out.println("Search finished = " + searchFinished);
 		System.out.println("Single step search = " + singleStepSearch);
 		System.out.println("Single solution search = " + singleSolutionSearch);

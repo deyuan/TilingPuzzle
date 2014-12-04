@@ -69,9 +69,11 @@ public class DLXBasicExactCoverArray {
 			total_area += i.area;
 		}
 		if (total_area < board.area) {
-			Config.setDirectlyFail(true);
+			Config.setTileAreaNotEnough(true);
 			if (Config.verb)
 				System.out.println("Directly fail (no enough tiles).");
+		} else {
+			Config.setTileAreaNotEnough(false);
 		}
 	}
 

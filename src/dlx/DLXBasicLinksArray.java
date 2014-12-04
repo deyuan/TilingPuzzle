@@ -117,6 +117,7 @@ public class DLXBasicLinksArray {
 		}
 
 		/* Allocate cell objects DLA */
+		Config.setHasUnreachablePosition(false);
 		for (int j = 0; j < numColumns; j++) {
 			int n = 0;
 			for (int i = 0; i < numRows; i++) {
@@ -132,7 +133,7 @@ public class DLXBasicLinksArray {
 			}
 			/* If a cell cannot be covered by any tile, then directly fail. */
 			if (n == 0 && j >= numTiles) {
-				Config.setDirectlyFail(true);
+				Config.setHasUnreachablePosition(true);
 				if (Config.verb)
 					System.out.println("Directly fail (unreachable positions).");
 				return null;
