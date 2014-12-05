@@ -1,8 +1,6 @@
 package gui;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -16,8 +14,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -74,11 +70,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	private List<List<List<Integer>>> solution;
 
 	/**
-	 * The number of possible solutions.
-	 */
-	private int numOfSolution;
-
-	/**
 	 * The board.
 	 */
 	private char board[][];
@@ -96,11 +87,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	 * The speed of the single step and single solution. from 1ms to 500ms.
 	 */
 	private int speed = 1000;
-
-	/**
-	 * Control panel.
-	 */
-	private JPanel pControl;
 
 	/**
 	 * Display panel to show tiles.
@@ -140,6 +126,8 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	JButton bPlay;
 	JSlider sNumSolution;
 
+	private final Color bgColor = Color.WHITE;
+
 	/**
 	 * Menu related components.
 	 *
@@ -175,8 +163,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	/**
 	 * Size parameters.
 	 */
-	private static final int frameSize[] = { 955, 600 };
-	private static final int framePos[] = { 200, 20 };
+	private static final int dlxPanelSize[] = { 955, 555 };
 	private static final int displaySize[] = { 535, 535 };
 	private static final int displayPos[] = { 195, 10 };
 	private static final int tileListSize[] = { 210, 535 };
@@ -211,8 +198,13 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	 */
 	private CalculateSingleStep calculateSStep = null;
 
-	private class CalculateAll extends
-			SwingWorker<Void, Void> {
+	/** A List for drawing and cleaning tiles on board. */
+	private List<JPanel> blockList = null;
+
+	/**
+	 * A SwingWorder class for calculating all solutions.
+	 */
+	private class CalculateAll extends SwingWorker<Void, Void> {
 
 		@Override
 		protected Void doInBackground() {
@@ -220,7 +212,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			solution = new ArrayList<List<List<Integer>>>();
 
 			/* Disable all useless buttons to prevent incorrect operations. */
-			setControlPanelComponents(false);
+			setConfigPanelComponents(false);
 			setResultPanelComponents(false);
 			bStop.setEnabled(true);
 			tIndex.setText("0");
@@ -242,7 +234,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				cleanTiles();
 				displayStep(sol);
 				publish();
-				tIndex.setText("1");
 			}
 			while (sol != null && !isCancelled()) {
 				solution.add(sol);
@@ -254,52 +245,11 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		@Override
 		protected void done() {
-			setControlPanelComponents(true);
+			setConfigPanelComponents(true);
 			setResultPanelComponents(true);
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			/*
-			try {
-				get();
-			} catch (InterruptedException e) {
-				System.err.println("The background task has been interrupt!");
-			} catch (ExecutionException e) {
-				System.err
-						.println("The background task has been excuted incorrectly!");
-				e.printStackTrace();
-			} catch (CancellationException e) {
-				System.err.println("The background task has been canceled!");
-			}
-			*/
-			numOfSolution = solution.size();
 
-			/*
-			 * After getting the numofSolution, set the min and max of the
-			 * slider.
-			 */
-			/*
-			 * Note: only when there is state change the solution could be
-			 * displayed!
-			 */
-			sNumSolution.setMinimum(0);
-			sNumSolution.setMaximum(numOfSolution);
-			sNumSolution.setValue(0);
-
-			if (numOfSolution == 0)
-				if (dlx.Config.hasUnreachablePosition())
-					tResultInfo.setText("Has Unreachable Positions");
-				else if (dlx.Config.tileAreaNotEnough())
-					tResultInfo.setText("Insufficient Tiles");
-				else
-					tResultInfo.setText("No Solution");
-			else {
-				if (numOfSolution == 1)
-					tResultInfo.setText("Only 1 Solution");
-				else
-					tResultInfo.setText(numOfSolution + " Solutions");
-				sNumSolution.setValue(1);
-				sNumSolution.setMinimum(1);
-			}
-
+			updateResultPanel();
 			bSolveAll.requestFocus();
 		}
 
@@ -314,15 +264,17 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 	}
 
-	private class CalculateSingleSolution extends
-			SwingWorker<Void, Void> {
+	/**
+	 * A SwingWorder class for calculating all solutions and showing them.
+	 */
+	private class CalculateSingleSolution extends SwingWorker<Void, Void> {
 
 		@Override
 		protected Void doInBackground() {
 			solution = new ArrayList<List<List<Integer>>>();
 
 			/* Disable all useless buttons to prevent incorrect operations. */
-			setControlPanelComponents(false);
+			setConfigPanelComponents(false);
 			setResultPanelComponents(false);
 			lSpeed.setEnabled(true);
 			bPause.setEnabled(true);
@@ -364,38 +316,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		@Override
 		protected void done() {
-			setControlPanelComponents(true);
+			setConfigPanelComponents(true);
 			setResultPanelComponents(true);
 
-			numOfSolution = solution.size();
-			/*
-			 * After getting the numofSolution, set the min and max of the
-			 * slider.
-			 */
-			/*
-			 * Note: only when there is state change the solution could be
-			 * displayed!
-			 */
-			sNumSolution.setMinimum(0);
-			sNumSolution.setMaximum(numOfSolution);
-			sNumSolution.setValue(0);
-
-			if (numOfSolution == 0)
-				if (dlx.Config.hasUnreachablePosition())
-					tResultInfo.setText("Has Unreachable Positions");
-				else if (dlx.Config.tileAreaNotEnough())
-					tResultInfo.setText("Insufficient Tiles");
-				else
-					tResultInfo.setText("No Solution");
-			else {
-				if (numOfSolution == 1)
-					tResultInfo.setText("Only 1 Solution");
-				else
-					tResultInfo.setText(numOfSolution + " Solutions");
-				sNumSolution.setValue(1);
-				sNumSolution.setMinimum(1);
-			}
-
+			updateResultPanel();
 			bSolveStep.requestFocus();
 		}
 
@@ -412,6 +336,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 	}
 
+	/**
+	 * A SwingWorder class for showing the search steps.
+	 */
 	private class CalculateSingleStep extends
 			SwingWorker<Void, List<List<Integer>>> {
 
@@ -419,7 +346,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		protected Void doInBackground() {
 			solution = new ArrayList<List<List<Integer>>>();
 
-			setControlPanelComponents(false);
+			setConfigPanelComponents(false);
 			setResultPanelComponents(false);
 			lSpeed.setEnabled(true);
 			bPause.setEnabled(true);
@@ -463,50 +390,13 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		@Override
 		protected void done() {
 
-			setControlPanelComponents(true);
+			setConfigPanelComponents(true);
 			setResultPanelComponents(true);
 
-			try {
-				get();
-			} catch (InterruptedException e) {
-				System.err.println("The background task has been interrupted!");
-			} catch (ExecutionException e) {
-				System.err
-						.println("The background task has been exccuted incorrectly!");
-			} catch (CancellationException e) {
-				System.err.println("The background task has been canceled!");
-			}
-			numOfSolution = solution.size();
-			/*
-			 * After getting the numofSolution, set the min and max of the
-			 * slider.
-			 */
-			/*
-			 * Note: only when there is state change the solution could be
-			 * displayed!
-			 */
-			sNumSolution.setMinimum(0);
-			sNumSolution.setMaximum(numOfSolution);
-			sNumSolution.setValue(0);
-
+			updateResultPanel();
 			cleanTiles();
-			if (numOfSolution == 0)
-				if (dlx.Config.hasUnreachablePosition())
-					tResultInfo.setText("Has Unreachable Positions");
-				else if (dlx.Config.tileAreaNotEnough())
-					tResultInfo.setText("Insufficient Tiles");
-				else
-					tResultInfo.setText("No Solution");
-			else {
-				if (numOfSolution == 1)
-					tResultInfo.setText("Only 1 Solution");
-				else
-					tResultInfo.setText(numOfSolution + " Solutions");
-				sNumSolution.setValue(1);
-				sNumSolution.setMinimum(1);
+			if (solution.size() > 0)
 				displayStep(solution.get(solution.size() - 1));
-			}
-
 			bSolveTrail.requestFocus();
 		}
 
@@ -523,57 +413,68 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 	}
 
-	public DisplayDLX() {
-		super(null);
-		setBackground(Color.WHITE);
+	private void updateResultPanel() {
+		if (solution.size() == 0) {
+			if (dlx.Config.hasUnreachablePosition())
+				tResultInfo.setText("Has Unreachable Positions");
+			else if (dlx.Config.tileAreaNotEnough())
+				tResultInfo.setText("Insufficient Tiles");
+			else
+				tResultInfo.setText("No Solution");
+			sNumSolution.setMinimum(0);
+			sNumSolution.setMaximum(0);
+			sNumSolution.setValue(0);
+		} else {
+			if (solution.size() == 1)
+				tResultInfo.setText("Only 1 Solution");
+			else
+				tResultInfo.setText(solution.size() + " Solutions");
+			sNumSolution.setValue(1);
+			sNumSolution.setMaximum(solution.size());
+			sNumSolution.setMinimum(1);
+			tIndex.setText("1");
+		}
+	}
 
-		this.setLocation(0, 0);
-		this.setSize(810, 520);
-		this.setOpaque(true);
-		this.setVisible(true);
-		this.setFocusable(true);
+	public DisplayDLX() {
+		this.setLayout(null);
+		this.setBackground(bgColor);
 
 		setupMenu();
-		setupControlPanel();
+		setupConfigPanel();
+		setupResultPanel();
 		setupDisplayPanel();
 		setupTileListPanel();
 
-		setControlPanelComponents(false);
+		this.add(pConfig);
+		this.add(pResult);
+		this.add(pDisplay);
+		this.add(pTileList);
+
+		setConfigPanelComponents(false);
 		setResultPanelComponents(false);
+
+		/* set preferred size for frame.pack() */
+		this.setPreferredSize(new Dimension(dlxPanelSize[0], dlxPanelSize[1]));
+		this.setVisible(true);
 	}
 
-	private void setupControlPanel() {
-
-		pControl = new JPanel();
-		pControl.setBackground(Color.WHITE);
-		pControl.setLocation(5, 5);
-		pControl.setSize(190, 540);
-		pControl.setOpaque(true);
-		pControl.setVisible(true);
-		pControl.setFocusable(true);
-		pControl.setLayout(null);
-		/*
-		 * this.setBorder(BorderFactory.createCompoundBorder(
-		 * BorderFactory.createTitledBorder(""),
-		 * BorderFactory.createEmptyBorder(5,5,5,5)));
-		 */
+	private void setupConfigPanel() {
 
 		/* Initialize control sub-panel. */
 		pConfig = new JPanel();
-		pConfig.setBackground(Color.WHITE);
-		pConfig.setLocation(5, 5);
+		pConfig.setBackground(bgColor);
+		pConfig.setLocation(10, 10);
 		pConfig.setSize(180, 350);
 		pConfig.setOpaque(true);
 		pConfig.setVisible(true);
 		pConfig.setFocusable(true);
-		pConfig.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Control"),
-				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+		pConfig.setBorder(BorderFactory.createTitledBorder("Control"));
 
 		pConfig.setLayout(null);
 
 		cbEnableSpin = new JCheckBox("Enable Rotation");
-		cbEnableSpin.setBackground(Color.WHITE);
+		cbEnableSpin.setBackground(bgColor);
 		cbEnableSpin.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		cbEnableSpin.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		cbEnableSpin.setSelected(false);
@@ -582,7 +483,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		cbEnableSpin.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				if (cbEnableSpin.isSelected())
 					dlx.Config.setEnableSpin(true);
 				else {
@@ -596,7 +496,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pConfig.add(cbEnableSpin);
 
 		cbEnableSpinFlip = new JCheckBox("Rotation + Reflection");
-		cbEnableSpinFlip.setBackground(Color.WHITE);
+		cbEnableSpinFlip.setBackground(bgColor);
 		cbEnableSpinFlip.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		cbEnableSpinFlip.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		cbEnableSpinFlip.setSelected(false);
@@ -605,7 +505,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		cbEnableSpinFlip.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				if (cbEnableSpinFlip.isSelected()) {
 					dlx.Config.setEnableSpinFlip(true);
 					cbEnableSpin.setSelected(true);
@@ -618,7 +517,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pConfig.add(cbEnableSpinFlip);
 
 		cbExtra = new JCheckBox("Extra Blocks");
-		cbExtra.setBackground(Color.WHITE);
+		cbExtra.setBackground(bgColor);
 		cbExtra.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		cbExtra.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		cbExtra.setSelected(false);
@@ -628,7 +527,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pConfig.add(cbExtra);
 
 		cbRmSymm = new JCheckBox("Remove Symmetry");
-		cbRmSymm.setBackground(Color.WHITE);
+		cbRmSymm.setBackground(bgColor);
 		cbRmSymm.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		cbRmSymm.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		cbRmSymm.setSelected(true);
@@ -648,7 +547,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pConfig.add(cbRmSymm);
 
 		bSolveAll = new JButton("Get All Solutions");
-		bSolveAll.setBackground(Color.WHITE);
+		bSolveAll.setBackground(bgColor);
 		bSolveAll.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bSolveAll.addActionListener(new ActionListener() {
 
@@ -664,7 +563,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pConfig.add(bSolveAll);
 
 		bSolveStep = new JButton("Display Solutions");
-		bSolveStep.setBackground(Color.WHITE);
+		bSolveStep.setBackground(bgColor);
 		bSolveStep.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bSolveStep.addActionListener(new ActionListener() {
 
@@ -680,7 +579,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pConfig.add(bSolveStep);
 
 		bSolveTrail = new JButton("Display Search Steps");
-		bSolveTrail.setBackground(Color.WHITE);
+		bSolveTrail.setBackground(bgColor);
 		bSolveTrail.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bSolveTrail.addActionListener(new ActionListener() {
 
@@ -702,7 +601,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pConfig.add(lSpeed);
 
 		sSpeed = new JSlider(-2, 6, 0); // from 2^-2 to 2^6
-		sSpeed.setBackground(Color.WHITE);
+		sSpeed.setBackground(bgColor);
 		sSpeed.setSize(160, 30);
 		sSpeed.setLocation(10, 280);
 		sSpeed.setSnapToTicks(false);
@@ -731,7 +630,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		bPause = new JButton("Pause");
 
-		bPause.setBackground(Color.WHITE);
+		bPause.setBackground(bgColor);
 		bPause.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bPause.setEnabled(false);
 		bPause.addActionListener(new ActionListener() {
@@ -759,7 +658,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pConfig.add(bPause);
 
 		bStop = new JButton("Stop");
-		bStop.setBackground(Color.WHITE);
+		bStop.setBackground(bgColor);
 		bStop.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bStop.setEnabled(false);
 		bStop.addActionListener(new ActionListener() {
@@ -798,44 +697,40 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		bStop.setSize(75, 30);
 		bStop.setLocation(95, 310);
 		pConfig.add(bStop);
+	}
 
-		pControl.add(pConfig);
+	private void setupResultPanel() {
 
 		/* Initialize result sub-panel. */
 		pResult = new JPanel();
-		pResult.setBackground(Color.WHITE);
+		pResult.setBackground(bgColor);
 		pResult.setSize(180, 180);
-		pResult.setLocation(5, 360);
+		pResult.setLocation(10, 365);
 		pResult.setOpaque(true);
 		pResult.setVisible(true);
 		pResult.setFocusable(true);
-		pResult.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Results"),
-				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+		pResult.setBorder(BorderFactory.createTitledBorder("Results"));
 		pResult.setLayout(null);
 
 		tResultInfo = new JLabel("Please Select a Puzzle File");
-		tResultInfo.setBackground(Color.WHITE);
+		tResultInfo.setBackground(bgColor);
 		tResultInfo.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
-		// tResultInfo.setPreferredSize(new Dimension(60, 30));
 		tResultInfo.setSize(new Dimension(160, 30));
 		tResultInfo.setLocation(10, 20);
 		tResultInfo.setVisible(true);
 		pResult.add(tResultInfo);
 
 		tIndex = new JTextField("Index", 10);
-		tIndex.setBackground(Color.WHITE);
+		tIndex.setBackground(bgColor);
 		tIndex.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
-		// tIndex.setPreferredSize(new Dimension(80, 25));
 		tIndex.setSize(new Dimension(80, 30));
-		// tIndex.setMaximumSize(new Dimension(80, 25));
 		tIndex.setVisible(true);
 		tIndex.setLocation(10, 50);
 		tIndex.setHorizontalAlignment(SwingConstants.CENTER);
 		pResult.add(tIndex);
 
 		bShowResult = new JButton("Show");
-		bShowResult.setBackground(Color.WHITE);
+		bShowResult.setBackground(bgColor);
 		bShowResult.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bShowResult.setSize(80, 30);
 		bShowResult.setLocation(90, 50);
@@ -846,14 +741,14 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				int id = 0;
 				try {
 					id = Integer.parseInt(tIndex.getText());
-					if (numOfSolution > 0) {
+					if (solution.size() > 0) {
 						if (id < 1) id = 1;
-						else if (id > numOfSolution) id = numOfSolution;
+						else if (id > solution.size()) id = solution.size();
 					} else {
 						id = 0;
 					}
 				} catch (NumberFormatException e) {
-					if (numOfSolution > 0) {
+					if (solution.size() > 0) {
 						id = 1;
 					} else {
 						id = 0;
@@ -869,7 +764,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pResult.add(bShowResult);
 
 		bPre = new JButton("Prev");
-		bPre.setBackground(Color.WHITE);
+		bPre.setBackground(bgColor);
 		bPre.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bPre.setSize(80, 30);
 		bPre.setLocation(10, 80);
@@ -880,15 +775,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				int id = 0;
 				try {
 					id = Integer.parseInt(tIndex.getText());
-					if (numOfSolution > 0) {
+					if (solution.size() > 0) {
 						if (id < 1) id = 1;
-						else if (id > numOfSolution) id = numOfSolution;
+						else if (id > solution.size()) id = solution.size();
 						else if (id > 1) id--;
 					} else {
 						id = 0;
 					}
 				} catch (NumberFormatException e) {
-					if (numOfSolution > 0) {
+					if (solution.size() > 0) {
 						id = 1;
 					} else {
 						id = 0;
@@ -904,7 +799,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pResult.add(bPre);
 
 		bNext = new JButton("Next");
-		bNext.setBackground(Color.WHITE);
+		bNext.setBackground(bgColor);
 		bNext.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bNext.setSize(80, 30);
 		bNext.setLocation(90, 80);
@@ -915,15 +810,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				int id = 0;
 				try {
 					id = Integer.parseInt(tIndex.getText());
-					if (numOfSolution > 0) {
+					if (solution.size() > 0) {
 						if (id < 1) id = 1;
-						else if (id > numOfSolution) id = numOfSolution;
-						else if (id < numOfSolution) id++;
+						else if (id > solution.size()) id = solution.size();
+						else if (id < solution.size()) id++;
 					} else {
 						id = 0;
 					}
 				} catch (NumberFormatException e) {
-					if (numOfSolution > 0) {
+					if (solution.size() > 0) {
 						id = 1;
 					} else {
 						id = 0;
@@ -939,7 +834,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pResult.add(bNext);
 
 		sNumSolution = new JSlider();
-		sNumSolution.setBackground(Color.WHITE);
+		sNumSolution.setBackground(bgColor);
 		sNumSolution.setSize(160, 30);
 		sNumSolution.setLocation(10, 110);
 		sNumSolution.setExtent(0);
@@ -955,7 +850,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				int id = sNumSolution.getValue();
 				tIndex.setText(Integer.toString(id));
 				cleanTiles();
-				if (id >= 1 && id <= numOfSolution)
+				if (id >= 1 && id <= solution.size())
 					displayResults(id - 1);
 			}
 
@@ -964,7 +859,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		pResult.add(sNumSolution);
 
 		bPlay = new JButton("Autoplay All Solutions");
-		bPlay.setBackground(Color.WHITE);
+		bPlay.setBackground(bgColor);
 		bPlay.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		bPlay.setSize(160, 30);
 		bPlay.setLocation(10, 140);
@@ -972,10 +867,10 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (!isRunning && numOfSolution > 0) {
+				if (!isRunning && solution.size() > 0) {
 					isRunning = true;
 					bPlay.setText("Stop");
-					setControlPanelComponents(false);
+					setConfigPanelComponents(false);
 					tIndex.setEnabled(false);
 					bShowResult.setEnabled(false);
 					bPre.setEnabled(false);
@@ -993,22 +888,22 @@ public class DisplayDLX extends JPanel implements ActionListener {
 								int id = 0;
 								try {
 									id = Integer.parseInt(tIndex.getText());
-									if (numOfSolution > 0) {
+									if (solution.size() > 0) {
 										if (id < 1) id = 1;
-										else if (id > numOfSolution) id = numOfSolution;
+										else if (id > solution.size()) id = solution.size();
 									} else {
 										id = 0;
 									}
 								} catch (NumberFormatException e) {
-									if (numOfSolution > 0) {
+									if (solution.size() > 0) {
 										id = 1;
 									} else {
 										id = 0;
 									}
 								}
-								if (id == numOfSolution) id = 1;
+								if (id == solution.size()) id = 1;
 								// Loop show
-								while (id > 0 && id <= numOfSolution && isRunning) {
+								while (id > 0 && id <= solution.size() && isRunning) {
 									cleanTiles();
 									displayResults(id - 1);
 									tIndex.setText(Integer.toString(id));
@@ -1033,7 +928,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 								isThread = false;
 								isRunning = false;
 								bPlay.setText("Autoplay All Solutions");
-								setControlPanelComponents(true);
+								setConfigPanelComponents(true);
 								tIndex.setEnabled(true);
 								bShowResult.setEnabled(true);
 								bPre.setEnabled(true);
@@ -1052,40 +947,30 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			}
 		});
 		pResult.add(bPlay);
-		pControl.add(pResult);
-		this.add(pControl);
 	}
 
 	private void setupDisplayPanel() {
 		pDisplay = new JPanel();
-		pDisplay.setBackground(Color.WHITE);
+		pDisplay.setBackground(bgColor);
 		pDisplay.setLayout(null);
 		pDisplay.setLocation(displayPos[0], displayPos[1]);
 		pDisplay.setSize(displaySize[0], displaySize[1]);
 		pDisplay.setOpaque(true);
 		pDisplay.setVisible(true);
 		pDisplay.setFocusable(true);
-		pDisplay.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Puzzle"),
-				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-
-		this.add(pDisplay);
+		pDisplay.setBorder(BorderFactory.createTitledBorder("Puzzle"));
 	}
 
 	private void setupTileListPanel() {
 		pTileList = new JPanel();
-		pTileList.setBackground(Color.WHITE);
+		pTileList.setBackground(bgColor);
 		pTileList.setLayout(null);
-		pTileList.setSize(tileListSize[0], tileListSize[1]);
 		pTileList.setLocation(tileListPos[0], tileListPos[1]);
+		pTileList.setSize(tileListSize[0], tileListSize[1]);
 		pTileList.setOpaque(true);
 		pTileList.setVisible(true);
 		pTileList.setFocusable(true);
-		pTileList.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Tiles"),
-				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-
-		this.add(pTileList);
+		pTileList.setBorder(BorderFactory.createTitledBorder("Tiles"));
 	}
 
 	private void setupTileList(List<Tile> tiles, Tile board) {
@@ -1094,6 +979,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		// tiles.get(i).printTile();
 		// }
 
+		/* If there are more than 2 colors on board, then show them. */
 		boolean show_char = false;
 		char c = ' ';
 		for (int i = 0; i < board.data.length && !show_char; i++) {
@@ -1115,9 +1001,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		JPanel pic = new JPanel(null);
 		pic.setSize(tileListAreaWidth, tileListAreaHeight);
 		pic.setLocation(15, 30);
-		pic.setBackground(Color.white);
-		pTileList.add(pic);
+		pic.setBackground(bgColor);
 
+		/* Pack all tiles into a rectangle area. */
 		int[][] pack = Tile.packAllTiles(tiles, (double) tileListAreaHeight
 				/ tileListAreaWidth);
 
@@ -1144,6 +1030,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 						block.setSize(grid + 1, grid + 1);
 						block.setLocation(j * grid, i * grid);
 						if (show_char && grid > 5) {
+							/* Show characters in each tile block. */
 							JLabel l = new JLabel(Character.toString(t));
 							l.setSize(grid - 2, grid - 2);
 							l.setFont(new Font("Arial", Font.PLAIN, grid - 2));
@@ -1159,6 +1046,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				}
 			}
 		}
+		pTileList.add(pic);
 	}
 
 	private void setupMenu() {
@@ -1191,13 +1079,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		fc = new JFileChooser();
 		fc.setCurrentDirectory(new File("."));
-
 	}
 
 	/**
 	 * Initiate the board from input and draw the board.
 	 */
 	private void setupBoard(char[][] b) {
+
+		/* Initialize this list for drawing and cleaning tiles. */
+		blockList = new ArrayList<JPanel>();
 
 		/* Initialize board array. */
 		board = new char[b.length][b[0].length];
@@ -1321,15 +1211,22 @@ public class DisplayDLX extends JPanel implements ActionListener {
 					if (board[i][j] == ' ')
 						continue;
 					JLabel block = new JLabel(Character.toString(board[i][j]));
-					block.setSize(sizeTile / 2, sizeTile / 2);
-					block.setFont(new Font("Arial", Font.PLAIN, sizeTile / 2));
+
+					int fontSize = 0;
+					if (sizeTile < 5) continue;
+					else if (sizeTile < 12) fontSize = sizeTile - 2;
+					else if (sizeTile < 20) fontSize = 10;
+					else fontSize = sizeTile / 2;
+					block.setSize(fontSize, fontSize);
+					block.setFont(new Font("Arial", Font.PLAIN, fontSize));
+					int x = originTile[0] + (j) * sizeTile + OffsetX
+							+ (sizeTile - fontSize) / 2;
+					int y = originTile[1] + (i) * sizeTile + OffsetY
+							+ (sizeTile - fontSize) / 2;
+					block.setLocation(x, y);
+
 					block.setVerticalAlignment(SwingConstants.CENTER);
 					block.setHorizontalAlignment(SwingConstants.CENTER);
-					int x = originTile[0] + (j) * sizeTile + OffsetX + sizeTile
-							/ 4;
-					int y = originTile[1] + (i) * sizeTile + OffsetY + sizeTile
-							/ 4;
-					block.setLocation(x, y);
 					block.setOpaque(false); // set to transparent
 					block.setVisible(true);
 					pDisplay.add(block);
@@ -1339,38 +1236,11 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	}
 
 	public void displayResults(int id) {
-
-		List<List<Integer>> pos = solution.get(id);
-		int number = pos.size();
-
-		if (id >= numOfSolution) {
+		if (id >= solution.size()) {
 			System.err.println("Index of solutions out of range!");
 			return;
 		}
-
-		for (int i = 0; i < number; i++) {
-			List<Integer> tilePos = new ArrayList<Integer>();
-			tilePos = pos.get(i);
-			Color c = colors.get(tilePos.get(0));
-			for (int j = 1; j < tilePos.size(); j++) {
-				JPanel block = new JPanel();
-				block.setBackground(c);
-				block.setSize(sizeTile, sizeTile);
-				int x = originTile[0]
-						+ (posMap[tilePos.get(j)] % (board[0].length))
-						* sizeTile + OffsetX;
-				int y = originTile[0]
-						+ (posMap[tilePos.get(j)] / (board[0].length))
-						* sizeTile + OffsetY;
-				block.setLocation(x, y);
-				block.setOpaque(true);
-				block.setVisible(true);
-				pDisplay.add(block);
-
-			}
-		}
-		pDisplay.repaint();
-
+		displayStep(solution.get(id));
 	}
 
 	public void displayStep(List<List<Integer>> pos) {
@@ -1395,25 +1265,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				block.setOpaque(true);
 				block.setVisible(true);
 				pDisplay.add(block);
-
+				blockList.add(block);
 			}
 		}
 		pDisplay.repaint();
 	}
 
 	private void cleanTiles() {
-
-		for (int i = 0; i < board.length; i++) {
-			for (int j = 0; j < board[0].length; j++) {
-				/* Avoid deleting the grids. */
-				int x = originTile[0] + j * sizeTile + gridWidth + 2 + OffsetX;
-				int y = originTile[0] + i * sizeTile + gridWidth + 2 + OffsetY;
-
-				if (board[i][j] != ' ') {
-					Component t = pDisplay.getComponentAt(x, y);
-					pDisplay.remove(t);
-				}
-			}
+		for (JPanel p: blockList) {
+			pDisplay.remove(p);
 		}
 		pDisplay.repaint();
 	}
@@ -1453,72 +1313,43 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	private List<Color> genColors(int n) {
 		List<Color> colors = new ArrayList<Color>();
 
-		/* Default color list. */
+		/* Preferred colors. */
 		colors.addAll(Arrays.asList(Color.red, Color.green, Color.blue,
-				Color.yellow, Color.cyan, new Color(46, 139, 87), new Color(148,
-						0, 211), new Color(135, 51, 36), Color.magenta,
-				Color.gray, Color.pink, new Color(175, 255, 225), new Color(
-						130, 175, 190)));
+				Color.yellow, Color.cyan, new Color(46, 139, 87),
+				new Color(148, 0, 211), new Color(135, 51, 36), Color.magenta,
+				Color.gray, Color.pink, new Color(175, 255, 225),
+				new Color(130, 175, 190)));
 
-		double goldenRatio = 0.618033988749895;
-		double hue = 0.0; // or use random start value between 0 and 1
-		double saturation = 0.5;
-		double value = 0.95;
+		/* Hand-picked H from 0 to 360, S from 0 to 100, B from 0 to 100 */
+		int[] H = new int[] {0, 20, 30, 40, 50, 60, 90, 160, 190,
+				205, 220, 235, 260, 285, 305, 330};
+		int[] S = new int[] {100, 50, 100, 75, 100};
+		int[] B = new int[] {100, 100, 70, 100, 85};
 
-		int m = n - colors.size();
-		for (int i = 0; i < m; i++) {
-			hue = (hue + goldenRatio) % 1.0;
-
-			/* HSV to RGB */
-			int h = (int) (hue * 6);
-			double f = hue * 6 - h;
-			double p = value * (1 - saturation);
-			double q = value * (1 - f * saturation);
-			double t = value * (1 - (1 - f) * saturation);
-
-			double r, g, b;
-			switch (h) {
-			case 0:
-				r = value;
-				g = t;
-				b = p;
-				break;
-			case 1:
-				r = q;
-				g = value;
-				b = p;
-				break;
-			case 2:
-				r = p;
-				g = value;
-				b = t;
-				break;
-			case 3:
-				r = p;
-				g = q;
-				b = value;
-				break;
-			case 4:
-				r = t;
-				g = p;
-				b = value;
-				break;
-			case 5:
-				r = value;
-				g = p;
-				b = q;
-				break;
-			default:
-				throw new RuntimeException("Error in genColor.");
+		/* First choice: H-100-100, then H-50-100, then H-100-70, etc.*/
+		float h, s, b;
+		int i = 0;
+		while (colors.size() < n) {
+			List<Color> color = new ArrayList<Color>();
+			for (int j = 0; j < H.length; j++) {
+				if (i == 0 && (j == 0 || j == 5 || j == 11 || j == 14)) continue;
+				if (i == 1 && (j == 3 || j == 4)) continue;
+				if (i == 2 && (j == 10 || j == 11 || j == 12 || j == 13)) continue;
+				if (i == 4 && (j == 11 || j == 12)) continue;
+				h = H[j] / 360.f;
+				s = S[i % S.length] / 100.f;
+				b = B[i % B.length] / 100.f;
+				color.add(Color.getHSBColor(h, s, b));
 			}
-
-			colors.add(new Color((int) (r * 256), (int) (g * 256),
-					(int) (b * 256)));
+			//Collections.shuffle(color);
+			colors.addAll(color);
+			i++;
 		}
+
 		return colors;
 	}
 
-	private void setControlPanelComponents(boolean b) {
+	private void setConfigPanelComponents(boolean b) {
 		cbEnableSpin.setEnabled(b);
 		cbEnableSpinFlip.setEnabled(b);
 		cbRmSymm.setEnabled(b);
@@ -1534,7 +1365,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	private void setResultPanelComponents(boolean b) {
 		sNumSolution.setEnabled(b);
 		tIndex.setEnabled(b);
-
 		bShowResult.setEnabled(b);
 		bPre.setEnabled(b);
 		bNext.setEnabled(b);
@@ -1577,9 +1407,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			}
 			// not select any files
 			else {
-				JOptionPane.showConfirmDialog(null, "No file is selected.",
-						"Warning", JOptionPane.CLOSED_OPTION,
-						JOptionPane.WARNING_MESSAGE);
+				//JOptionPane.showConfirmDialog(null, "No file is selected.",
+				//		"Warning", JOptionPane.CLOSED_OPTION,
+				//		JOptionPane.WARNING_MESSAGE);
 				return;
 			}
 
@@ -1595,7 +1425,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			/* Reset text field */
 			tResultInfo.setText("Press Buttons to Solve");
 			tIndex.setText("0");
-			numOfSolution = 0;
 			sNumSolution.setMinimum(0);
 			sNumSolution.setMaximum(0);
 			sNumSolution.setValue(0);
@@ -1618,7 +1447,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			DLX dlx = new DLX(board, tileList);
 			this.dlx = dlx;
 			/* enable control panel components. */
-			setControlPanelComponents(true);
+			setConfigPanelComponents(true);
 			setResultPanelComponents(true);
 			/* Initialize the board and posMap. */
 			setupBoard(board.data);
@@ -1629,24 +1458,32 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		}
 	}
 
-	public static void createAndShowGUI() {
-
+	/**
+	 * Create and show the GUI.
+	 */
+	private static void createAndShowGUI() {
+		System.out.println();
 		JFrame frame = new JFrame("Tilling Puzzle Solver");
-		frame.setContentPane(new DisplayDLX());
-		frame.setJMenuBar(mBar);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(new BorderLayout());
-		frame.setSize(frameSize[0], frameSize[1]);
-		frame.setLocation(framePos[0], framePos[1]);
+		 //set resizable at the beginning to avoid windows border issue.
 		frame.setResizable(false);
+
+		DisplayDLX displayDLX = new DisplayDLX();
+		frame.setContentPane(displayDLX);
+		frame.setJMenuBar(mBar);
+		frame.pack();
+
 		frame.setVisible(true);
 	}
 
+	/**
+	 * Main entry.
+	 * @param args
+	 */
 	public static void main(String[] args) {
 
 		try {
-			UIManager
-					.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+			UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
