@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -249,7 +250,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			setResultPanelComponents(true);
 			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
-			updateResultPanel();
+			updateResultPanel(false);
 			bSolveAll.requestFocus();
 		}
 
@@ -319,7 +320,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			setConfigPanelComponents(true);
 			setResultPanelComponents(true);
 
-			updateResultPanel();
+			updateResultPanel(true);
 			bSolveStep.requestFocus();
 		}
 
@@ -393,7 +394,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			setConfigPanelComponents(true);
 			setResultPanelComponents(true);
 
-			updateResultPanel();
+			updateResultPanel(true);
 			cleanTiles();
 			if (solution.size() > 0)
 				displayStep(solution.get(solution.size() - 1));
@@ -413,7 +414,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 	}
 
-	private void updateResultPanel() {
+	private void updateResultPanel(boolean lastSolution) {
 		if (solution.size() == 0) {
 			if (dlx.Config.hasUnreachablePosition())
 				tResultInfo.setText("Has Unreachable Positions");
@@ -429,10 +430,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				tResultInfo.setText("Only 1 Solution");
 			else
 				tResultInfo.setText(solution.size() + " Solutions");
-			sNumSolution.setValue(1);
 			sNumSolution.setMaximum(solution.size());
 			sNumSolution.setMinimum(1);
-			tIndex.setText("1");
+			if (lastSolution) {
+				sNumSolution.setValue(solution.size());
+				tIndex.setText("" + solution.size());
+			} else {
+				sNumSolution.setValue(1);
+				tIndex.setText("1");
+			}
 		}
 	}
 
@@ -1332,8 +1338,9 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		while (colors.size() < n) {
 			List<Color> color = new ArrayList<Color>();
 			for (int j = 0; j < H.length; j++) {
-				if (i == 0 && (j == 0 || j == 5 || j == 11 || j == 14)) continue;
-				if (i == 1 && (j == 3 || j == 4)) continue;
+				// skip some indistinct colors
+				if (i == 0 && (j == 0 || j == 3 || j == 5 || j == 11 || j == 14)) continue;
+				if (i == 1 && (j == 1 || j == 2 || j == 3 || j == 4)) continue;
 				if (i == 2 && (j == 10 || j == 11 || j == 12 || j == 13)) continue;
 				if (i == 4 && (j == 11 || j == 12)) continue;
 				h = H[j] / 360.f;
@@ -1341,7 +1348,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 				b = B[i % B.length] / 100.f;
 				color.add(Color.getHSBColor(h, s, b));
 			}
-			//Collections.shuffle(color);
+			Collections.shuffle(color);
 			colors.addAll(color);
 			i++;
 		}
@@ -1378,7 +1385,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 
 		if (e.getSource() == miAbout) {
 			JOptionPane.showMessageDialog(null, "Tiling Puzzle Solver v1.0\n"
-					+ "Date: Dec 1, 2014\n"
+					+ "Date: Dec 6, 2014\n"
 					+ "Designed by Dawei Fan and Deyuan Guo", "About",
 					JOptionPane.INFORMATION_MESSAGE);
 		}
