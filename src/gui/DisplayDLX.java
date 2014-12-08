@@ -1455,7 +1455,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			this.dlx = dlx;
 			/* enable control panel components. */
 			setConfigPanelComponents(true);
-			setResultPanelComponents(true);
+			//setResultPanelComponents(true);
 			/* Initialize the board and posMap. */
 			setupBoard(board.data);
 			setPosMap();
@@ -1478,6 +1478,7 @@ public class DisplayDLX extends JPanel implements ActionListener {
 		frame.setContentPane(displayDLX);
 		frame.setJMenuBar(mBar);
 		frame.pack();
+ 		frame.setLocationRelativeTo(null); //center on screen
 
 		frame.setVisible(true);
 	}

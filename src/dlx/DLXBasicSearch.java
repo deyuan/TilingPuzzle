@@ -101,7 +101,9 @@ public class DLXBasicSearch {
 	 * @return true if in order
 	 */
 	private boolean duplicatedTilesUsedInOrder(DLXTrail trail) {
-		for (int i = 0; i < trail.size(); i++) {
+		// Optimization: We only need to check the last element in the trail.
+		int i = trail.size() - 1;
+		//for (int i = 0; i < trail.size(); i++) {
 			DLXCell x = trail.get(i);
 			if (Config.duplica()[x.tid] != x.tid) {
 				int j = x.tid;
@@ -111,7 +113,7 @@ public class DLXBasicSearch {
 						return false;
 				}
 			}
-		}
+		//}
 		return true;
 	}
 
