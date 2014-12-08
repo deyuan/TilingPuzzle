@@ -1469,7 +1469,6 @@ public class DisplayDLX extends JPanel implements ActionListener {
 	 * Create and show the GUI.
 	 */
 	private static void createAndShowGUI() {
-		System.out.println();
 		JFrame frame = new JFrame("Tilling Puzzle Solver");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		 //set resizable at the beginning to avoid windows border issue.
