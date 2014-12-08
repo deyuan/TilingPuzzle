@@ -1,5 +1,4 @@
 # Tiling Puzzle Solver
-============
 
 ## Description
 
@@ -11,7 +10,6 @@ This is a 2D polyomino tiling puzzle solver implemented in Java with GUI based o
 Each input puzzle is a text file, which uses space-separated character blocks to represent tiles and the puzzle board. Different characters represent different colors. The largest block will be chosen as the puzzle board.
 
 Example 1: pentominoes3x20.txt
-
 ```
                             #
   ###        #    #     #   #
@@ -30,7 +28,6 @@ Example 1: pentominoes3x20.txt
 ```
 
 Example 2: checkerboard.txt
-
 ```
          O     OXOXO         OX
      X   XO        X  XO     XO          XOXOXOXO
@@ -45,8 +42,10 @@ Example 2: checkerboard.txt
                           O
 ```
 
-## User Interface
+
+## Graphical User Interface
 
 This solver allows user to configure the tile rotation, tile reflection, symmetric solution elimination, and can visually demonstrate solutions and single search steps.
 
 ![ScreenShot](https://raw.githubusercontent.com/Deyuan/TilingPuzzle/master/screenshots/screenshot_hexomino.png)
+
