@@ -1,17 +1,18 @@
-Tiling Puzzle Solver
+# Tiling Puzzle Solver
 ============
 
-* Description
+## Description
 
 This is a 2D polyomino tiling puzzle solver implemented in Java with GUI based on dancing links (DLX) algorithm. Beyond the recursive DLX algorithm, a loop version DLX algorithm is implemented, with some optimizations such as eliminating symmetric solutions and dealing with duplicated tiles.
 
 
-* Input Puzzle Format
+## Input Puzzle Format
 
 Each input puzzle is a text file, which uses space-separated character blocks to represent tiles and the puzzle board. Different characters represent different colors. The largest block will be chosen as the puzzle board.
 
 Example 1: pentominoes3x20.txt
 
+```
                             #
   ###        #    #     #   #
    #   # #   #    ##   ###  ##
@@ -26,9 +27,11 @@ Example 1: pentominoes3x20.txt
   ####################
   ####################
   ####################
+```
 
 Example 2: checkerboard.txt
 
+```
          O     OXOXO         OX
      X   XO        X  XO     XO          XOXOXOXO
      O    XO           X     O     X     OXOXOXOX
@@ -40,8 +43,9 @@ Example 2: checkerboard.txt
            XO         O    X    XO       OXOXOXOX
                           XO     X
                           O
+```
 
-* User Interface
+## User Interface
 
 This solver allows user to configure the tile rotation, tile reflection, symmetric solution elimination, and can visually demonstrate solutions and single search steps.
 
