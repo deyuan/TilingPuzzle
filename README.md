@@ -1,9 +1,19 @@
 # Tiling Puzzle Solver
 
+Developed by Dawei Fan and Deyuan Guo.
+
 ## Description
 
 This is a 2D polyomino tiling puzzle solver implemented in Java with GUI based on dancing links (DLX) algorithm. Beyond the recursive DLX algorithm, a loop version DLX algorithm is implemented, with some optimizations such as eliminating symmetric solutions and dealing with duplicated tiles.
 
+## Download Link
+[Tiling Puzzle Solver v1.0](https://github.com/Deyuan/TilingPuzzle/blob/master/executable/TillingPuzzleSolverV1.0.jar) (Released on Dec 10, 2014)
+
+## Graphical User Interface
+
+This solver allows user to configure the tile rotation, tile reflection, symmetric solution elimination, and can visually demonstrate solutions and single search steps.
+
+![ScreenShot](https://raw.githubusercontent.com/Deyuan/TilingPuzzle/master/screenshots/screenshot_hexomino.png)
 
 ## Input Puzzle Format
 
@@ -41,11 +51,4 @@ Example 2: checkerboard.txt
                           XO     X
                           O
 ```
-
-
-## Graphical User Interface
-
-This solver allows user to configure the tile rotation, tile reflection, symmetric solution elimination, and can visually demonstrate solutions and single search steps.
-
-![ScreenShot](https://raw.githubusercontent.com/Deyuan/TilingPuzzle/master/screenshots/screenshot_hexomino.png)
 
