@@ -1453,9 +1453,15 @@ public class DisplayDLX extends JPanel implements ActionListener {
 			/* Initiate a new DLX Solver and set it. */
 			DLX dlx = new DLX(board, tileList);
 			this.dlx = dlx;
+
 			/* enable control panel components. */
 			setConfigPanelComponents(true);
 			//setResultPanelComponents(true);
+			/* Set extra tile flag */
+			int area = 0;
+			for (Tile t: tileList) area += t.area;
+			if (area > board.area) cbExtra.setSelected(true);
+
 			/* Initialize the board and posMap. */
 			setupBoard(board.data);
 			setPosMap();
