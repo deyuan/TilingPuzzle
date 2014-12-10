@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Tiling Puzzle Solver by Deyuan</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Tiling Puzzle Solver</h1>
+        <p>A Java GUI polyomino tiling puzzle solver based on DLX algorithm.</p>
+
+        <p class="view"><a href="https://github.com/Deyuan/TilingPuzzle">View the Project on GitHub <small>Deyuan/TilingPuzzle</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/Deyuan/TilingPuzzle/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/Deyuan/TilingPuzzle/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/Deyuan/TilingPuzzle">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="tiling-puzzle-solver" class="anchor" href="#tiling-puzzle-solver" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tiling Puzzle Solver</h1>
+
+<p>Developed by Dawei Fan and Deyuan Guo.</p>
+
+<h2>
+<a id="description" class="anchor" href="#description" aria-hidden="true"><span class="octicon octicon-link"></span></a>Description</h2>
+
+<p>This is a 2D polyomino tiling puzzle solver implemented in Java with GUI based on dancing links (DLX) algorithm. Beyond the recursive DLX algorithm, a loop version DLX algorithm is implemented, with some optimizations such as eliminating symmetric solutions and dealing with duplicated tiles.</p>
+
+<h2>
+<a id="download-link" class="anchor" href="#download-link" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download Link</h2>
+
+<p><a href="https://github.com/Deyuan/TilingPuzzle/blob/master/executable/TillingPuzzleSolverV1.0.jar">Tiling Puzzle Solver v1.0</a> (Released on Dec 10, 2014)</p>
+
+<h2>
+<a id="graphical-user-interface" class="anchor" href="#graphical-user-interface" aria-hidden="true"><span class="octicon octicon-link"></span></a>Graphical User Interface</h2>
+
+<p>This solver allows user to configure the tile rotation, tile reflection, symmetric solution elimination, and can visually demonstrate solutions and single search steps.</p>
+
+<p><img src="https://raw.githubusercontent.com/Deyuan/TilingPuzzle/master/screenshots/screenshot_hexomino.png" alt="ScreenShot"></p>
+
+<h2>
+<a id="input-puzzle-format" class="anchor" href="#input-puzzle-format" aria-hidden="true"><span class="octicon octicon-link"></span></a>Input Puzzle Format</h2>
+
+<p>Each input puzzle is a text file, which uses space-separated character blocks to represent tiles and the puzzle board. Different characters represent different colors. The largest block will be chosen as the puzzle board.</p>
+
+<p>Example 1: pentominoes3x20.txt</p>
+
+<pre><code>                            #
+  ###        #    #     #   #
+   #   # #   #    ##   ###  ##
+   #   ###   ###   ##   #   #
+
+       #  #        #
+   ##  #  #   ##   #  ##
+  ##   #  #   ##  ##   #
+   #   #  ##  #   #    ##
+       #
+
+  ####################
+  ####################
+  ####################
+</code></pre>
+
+<p>Example 2: checkerboard.txt</p>
+
+<pre><code>         O     OXOXO         OX
+     X   XO        X  XO     XO          XOXOXOXO
+     O    XO           X     O     X     OXOXOXOX
+     X                       X     O     XOXOXOXO
+           X   O     XO         OXOX     OXOXOXOX
+    XOXO   O   X     OX                  XOXOXOXO
+    O      X   OXO    O    X             OXOXOXOX
+    X      O          X    O    OX       XOXOXOXO
+           XO         O    X    XO       OXOXOXOX
+                          XO     X
+                          O
+</code></pre>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/Deyuan">Deyuan</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
