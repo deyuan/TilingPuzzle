@@ -1,13 +1,12 @@
 # Tiling Puzzle Solver
 
 Developed by Dawei Fan and Deyuan Guo.
+Executable jar file download link: [Tiling Puzzle Solver v1.0](https://github.com/Deyuan/TilingPuzzle/raw/master/executable/TillingPuzzleSolverV1.0.jar) (Released on Dec 10, 2014)
+Web page: http://deyuan.github.io/TilingPuzzle/
 
 ## Description
 
 This is a 2D polyomino tiling puzzle solver implemented in Java with GUI based on dancing links (DLX) algorithm. Beyond the recursive DLX algorithm, a loop version DLX algorithm is implemented, with some optimizations such as eliminating symmetric solutions and dealing with duplicated tiles.
-
-## Download Link
-[Tiling Puzzle Solver v1.0](https://github.com/Deyuan/TilingPuzzle/raw/master/executable/TillingPuzzleSolverV1.0.jar) (Released on Dec 10, 2014)
 
 ## Graphical User Interface
 
