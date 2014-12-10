@@ -1,7 +1,9 @@
 # Tiling Puzzle Solver
 
 Developed by Dawei Fan and Deyuan Guo.
+
 Executable jar file download link: [Tiling Puzzle Solver v1.0](https://github.com/Deyuan/TilingPuzzle/raw/master/executable/TillingPuzzleSolverV1.0.jar) (Released on Dec 10, 2014)
+
 Web page: http://deyuan.github.io/TilingPuzzle/
 
 ## Description
